@@ -1,0 +1,22 @@
+import { useKeycloak } from "@react-keycloak/web";
+import { Navigate } from "react-router-dom";
+
+const PrivateRoute = ({ children }) => {
+    const { keycloak } = useKeycloak();
+
+    const isLoggedIn = keycloak.authenticated;
+    const isObserver = keycloak.hasRealmRole("observer");
+    const isAdmin = keycloak.hasRealmRole("admin");
+    const isCreator = keycloak.hasRealmRole("creator");
+    
+    if(isLoggedIn == false){
+        return <Navigate to={"/welcome"}/>;
+    }
+    if (window.location.pathname == "/dashboard") {
+        return (isAdmin || isObserver) ? children : null;
+    } else if (window.location.pathname == "/adddevice") {
+        return (isAdmin || isCreator) ? children : null;
+    }
+};
+
+export default PrivateRoute;
