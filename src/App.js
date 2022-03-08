@@ -7,7 +7,7 @@ import { ReactKeycloakProvider } from "@react-keycloak/web";
 import keycloak from "./Keycloak";
 import { BrowserRouter, Route, Routes, Switch, Link, Navigate } from "react-router-dom";
 import PrivateRoute from "./helpers/PrivateRoute";
-import AddDevice from "./components/AddDevice";
+import Devices from "./components/Devices";
 import Welcome from "./components/Welcome";
 
 function App() {
@@ -21,9 +21,9 @@ function App() {
             <Welcome/>
             </>
             } />
-            <Route path="/adddevice" element={<>
+            <Route path="/devices" element={<>
               <PrivateRoute>
-                <AddDevice />
+                <Devices />
               </PrivateRoute>
             </>
             } />

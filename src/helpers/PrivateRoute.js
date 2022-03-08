@@ -14,7 +14,7 @@ const PrivateRoute = ({ children }) => {
     }
     if (window.location.pathname == "/dashboard") {
         return (isAdmin || isObserver) ? children : null;
-    } else if (window.location.pathname == "/adddevice") {
+    } else if (window.location.pathname == "/devices") {
         return (isAdmin || isCreator) ? children : null;
     }
 };

@@ -14,7 +14,7 @@ const Sidebar = () => {
                         <div>
                             <a href="/dashboard" className="list-group-item list-group-item-action bg-transparent second-text active"><i
                                 className="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-                            <a href="/adddevice" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
+                            <a href="/devices" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                                 className="fas fa-fire-alt me-2"></i>Devices</a>
                             <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                                 className="fas fa-building me-2"></i>Buildings</a>
@@ -26,7 +26,7 @@ const Sidebar = () => {
                     }
                     {!!keycloak.hasRealmRole("creator") && (
                         <div>
-                            <a href="/adddevice" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
+                            <a href="/devices" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                                 className="fas fa-fire-alt me-2"></i>Devices</a>
                             <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                                 className="fas fa-building me-2"></i>Buildings</a>
