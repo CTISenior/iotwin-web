@@ -22,6 +22,7 @@ import { visuallyHidden } from '@mui/utils';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import AddDevice from './AddDevice'
+import Navbar from './Navbar';
 
 function createData(name, protocol, type, building, description, createdTime, status) {
     return {
@@ -31,7 +32,7 @@ function createData(name, protocol, type, building, description, createdTime, st
         building,
         description,
         createdTime,
-        status, 
+        status,
     };
 }
 
@@ -114,31 +115,16 @@ function Header(props) {
             <nav className="navbar navbar-expand-lg navbar-light bg-white py-4 px-4 border-bottom">
                 <div className="d-flex align-items-center">
                     <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-                    <h2 className="fs-2 m-0">Dashboard</h2>
+                    <h2 className="fs-2 m-0">Devices</h2>
                 </div>
-
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-
-                <div className="collapse navbar-collapse " id="navbarSupportedContent">
-                    <ul className="navbar-nav ms-auto mb-2 mb-lg-0 ">
-                        <div className='d-lg-none'>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text active"><i
-                                className="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-fire-alt me-2"></i>Devices</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-building me-2"></i>Buildings</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-cogs me-2"></i>Settings</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"><i
-                                className="fas fa-power-off me-2"></i>Logout</a></div>
-                    </ul>
-                </div>
+                <Navbar />
             </nav>
+
         </div>
 
 
@@ -343,7 +329,7 @@ export default function EnhancedTable() {
 
     return (
         <Box sx={{ width: '100%' }}>
-                <Header/>
+            <Header />
 
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar

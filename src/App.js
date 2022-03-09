@@ -8,17 +8,17 @@ import keycloak from "./Keycloak";
 import { BrowserRouter, Route, Routes, Switch, Link, Navigate } from "react-router-dom";
 import PrivateRoute from "./helpers/PrivateRoute";
 import Devices from "./components/Devices";
-import Welcome from "./components/Welcome";
+import Navigation from './helpers/Navigation';
 
 function App() {
   return (
     <div className="d-flex" id="wrapper">
-      <ReactKeycloakProvider authClient={keycloak}>
+      <ReactKeycloakProvider authClient={keycloak} initOptions={{ onLoad: 'login-required' }}>
         <BrowserRouter>
           <Sidebar />
-          <Routes> 
-            <Route exact path="/" element={<>
-            <Welcome/>
+          <Routes>
+            <Route path="/" element={<>
+              <Navigation />
             </>
             } />
             <Route path="/devices" element={<>
@@ -31,10 +31,6 @@ function App() {
               <PrivateRoute>
                 <Dashboard />
               </PrivateRoute>
-            </>
-            } />
-               <Route path="/welcome" element={<>
-              <Welcome/>
             </>
             } />
           </Routes>
