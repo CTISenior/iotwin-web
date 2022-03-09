@@ -44,18 +44,6 @@ const Sidebar = () => {
                         </div>
                     )
                     }
-
-                    {!keycloak.authenticated && (
-                        <button
-                            type="button"
-                            className="list-group-item list-group-item-action bg-transparent text-success fw-bold"
-                            onClick={() => keycloak.login()}
-
-                        >
-                            <i
-                                className="fas fa-power-off me-2"></i>Login
-                        </button>
-                    )}
                     {!!keycloak.authenticated && (
 
                         <button

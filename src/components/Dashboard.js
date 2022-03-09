@@ -1,6 +1,7 @@
 import React from 'react'
 import LineChart from "./LineChart";
 import io from 'socket.io-client';
+import Navbar from './Navbar'
 const socket = io("http://176.235.202.77:8090/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -38,22 +39,7 @@ const Dashboard = () => {
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-
-                <div className="collapse navbar-collapse " id="navbarSupportedContent">
-                    <ul className="navbar-nav ms-auto mb-2 mb-lg-0 ">
-                        <div className='d-lg-none'>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text active"><i
-                                className="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-fire-alt me-2"></i>Devices</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-building me-2"></i>Buildings</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                                className="fas fa-cogs me-2"></i>Settings</a>
-                            <a href="#" className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"><i
-                                className="fas fa-power-off me-2"></i>Logout</a></div>
-                    </ul>
-                </div>
+                <Navbar />
             </nav>
 
             <div className="container-fluid px-4">
@@ -99,8 +85,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
             <div className="row my-5">
@@ -111,7 +95,6 @@ const Dashboard = () => {
                         <div className='col-8 col-xs-8 heat'>Heat</div>
                         <div className='col-1 col-xs-1 humidity'>Humidity</div>
                     </div>
-
                 </div>
             </div>
         </div>
