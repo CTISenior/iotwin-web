@@ -12,6 +12,7 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.26.1",
     "chart.js": "^3.7.0",
     "express": "^4.17.2",
     "kafkajs": "^1.15.0",

@@ -17,12 +17,16 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit'
 import AddIcon from '@mui/icons-material/Add';
 import { visuallyHidden } from '@mui/utils';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import AddDevice from './AddDevice'
 import Navbar from './Navbar';
+import CloseIcon from '@mui/icons-material/Close';
+import TextFieldItem from '../components/textField';
+import DeleteDialog from '../components/DeleteDialog';
 
 function createData(name, protocol, type, building, description, createdTime, status) {
     return {
@@ -106,6 +110,10 @@ const headCells = [
         id: 'status',
         label: 'Status',
     },
+    {
+        id:'operations',
+        label:'Operations'
+    }
 ];
 
 function Header(props) {
@@ -188,8 +196,13 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-    const { numSelected } = props;
+    const { numSelected,selectedName} = props;
     const [open, setOpen] = React.useState(false);
+    const [openAddDialog, setOpenAddDialog] = React.useState(false);
+    const [deleteDialog, setDeleteDialog] = React.useState(false);
+    const [openSearchBar,setOpenSearchBar]= React.useState(false);
+    const [searched,setSearched]=React.useState("");
+    const [allRow,setAllRows]=React.useState();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -201,67 +214,109 @@ const EnhancedTableToolbar = (props) => {
         console.log("Erdem Sert");
     }
 
+    const handleRefresh = () =>{
+        console.log("Refresh table");
+    }
+
+    const handleSearch=()=>{
+        setOpenSearchBar(true);
+    }
+
+    const handleDeleteOpen =()=>{
+        setDeleteDialog(true);
+    }
+    const handleDeleteClose =()=>{
+        setDeleteDialog(false);
+    }
+    const handleDelete = ()=>{
+        console.log("erdem sert");
+    }
+    const searchRequest=(searchValue)=>{
+
+        const filteredRows=rows.filter((row)=>{
+            return Object.keys(row).some((key) =>
+            row[key].toLowerCase().includes(searchValue)
+          );
+        });
+        setAllRows(filteredRows);
+    }
+  
+      const handleCloseSearchBar = () =>{
+        setOpenSearchBar(false);
+        setSearched("");
+        searchRequest(searched);
+      }
+
     return (
-        <div>
-            <Toolbar
-                sx={{
-                    pl: { sm: 2 },
-                    pr: { xs: 1, sm: 1 },
-                    ...(numSelected > 0 && {
-                        bgcolor: (theme) =>
-                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                    }),
-                }}
-            >
-                {numSelected > 0 ? (
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        color="inherit"
-                        variant="subtitle1"
-                        component="div"
-                    >
-                        {numSelected} devices selected
-                    </Typography>
-                ) : (
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        variant="h6"
-                        id="tableTitle"
-                        component="div"
-                    >
-                        Devices
-                    </Typography>
-                )}
+        <div style={{padding:10}}>
+            {openSearchBar===true && numSelected < 1 ? (
+            <Box  sx={{
+               
+               width:'100%',
+               display:'flex',
+               justifyContent:'right'
+             }}>
+                <SearchIcon sx={{ color: 'action.active', mr: 1, my: 3 }}/>
+                <TextFieldItem id="outlined-search" label="Search Devices" fullWidth variant="standard" onChange={(searchVal) => searchRequest(searchVal)} style={{width:'100%'}}/>
+                <CloseIcon sx={{ color: 'action.active', mr: 1, my: 3 }} onClick={handleCloseSearchBar}/>
+                  
+           </Box>
+           
+           ):(
+               <Toolbar 
+               sx={{
+                   pl: { sm: 2 },
+                   pr: { xs: 1, sm: 1 },
+                   ...(numSelected > 0 && {
+                       bgcolor: (theme) =>
+                           alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                   }),
+               }}
+           >
+               {numSelected > 0 && (
+                   <Typography
+                       sx={{ flex: '1 1 100%' }}
+                       color="inherit"
+                       variant="subtitle1"
+                       component="div"
+                   >
+                       {numSelected} devices selected
+                   </Typography>
+               )}
 
-                {numSelected > 0 ? (
-                    <Tooltip title="Delete">
-                        <IconButton>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
+              
+               {numSelected > 0 ? (
+                   <Tooltip title="Delete">
+                       <IconButton onClick={handleDeleteOpen}>
+                           <DeleteIcon />
+                       </IconButton>
+                   </Tooltip>
 
-                ) : (
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Tooltip title="Add Device">
-                            <IconButton onClick={handleClickOpen}>
-                                <AddIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Refresh">
-                            <IconButton>
-                                <RefreshIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Search Devices">
-                            <IconButton>
-                                <SearchIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </div>
+               ) : (
+                   <div style={{ display: 'flex', flexDirection: 'row',marginLeft:'auto'}}>
+                       <Tooltip title="Add Device">
+                           <IconButton onClick={handleClickOpen}>
+                               <AddIcon />
+                           </IconButton>
+                       </Tooltip>
+                       <Tooltip title="Refresh">
+                           <IconButton onClick={handleRefresh}>
+                               <RefreshIcon />
+                           </IconButton>
+                       </Tooltip>
+                       <Tooltip title="Search Devices">
+                           <IconButton onClick={handleSearch}>
+                               <SearchIcon />
+                           </IconButton>
+                       </Tooltip>
+                   </div>
 
-                )}
-            </Toolbar>
+               )}
+           </Toolbar>
+           )}
             <AddDevice open={open} fullWidth={true} maxWidth="md" handleclose={handleClose} handleadd={handleAdd} />
+            <DeleteDialog open={deleteDialog} fullWidth={true} maxWidth="md" handleClose={handleDeleteClose} 
+            handleDelete={handleDelete} numSelected={numSelected}/>
         </div>
     );
 
@@ -269,6 +324,7 @@ const EnhancedTableToolbar = (props) => {
 
 EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
+    selectedName: PropTypes.array.isRequired
 };
 
 export default function EnhancedTable() {
@@ -333,7 +389,8 @@ export default function EnhancedTable() {
 
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
-                    numSelected={selected.length} />
+                    numSelected={selected.length} 
+                    selectedName={selected}/>
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -386,12 +443,24 @@ export default function EnhancedTable() {
                                             <TableCell>{row.description}</TableCell>
                                             <TableCell>{row.createdTime}</TableCell>
                                             <TableCell>{row.status}</TableCell>
+                                            <TableCell>
+                                            <Tooltip title="Edit">
+                                                <IconButton>
+                                                    <EditIcon/>
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete">
+                                                <IconButton>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })}
                             {emptyRows > 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} />
+                                    <TableCell colSpan={9} />
                                 </TableRow>
                             )}
                         </TableBody>
