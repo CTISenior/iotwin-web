@@ -29,7 +29,8 @@ export default function TextFieldItem(props){
             label={label}
             type={type}
             fullWidth
-            variant={variant}/>
+            variant={variant}
+            onChange={onChange}/>
         );
     }
     return (
