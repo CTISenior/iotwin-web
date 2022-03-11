@@ -1,481 +1,152 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit'
+import React,{useState} from 'react';
+import MaterialTable from 'material-table';
 import AddIcon from '@mui/icons-material/Add';
-import { visuallyHidden } from '@mui/utils';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import SearchIcon from '@mui/icons-material/Search';
-import AddDevice from './AddDevice'
+import { createTheme } from '@material-ui/core/styles'
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import Navbar from './Navbar';
-import CloseIcon from '@mui/icons-material/Close';
-import TextFieldItem from '../components/textField';
-import DeleteDialog from '../components/DeleteDialog';
-
-function createData(name, protocol, type, building, description, createdTime, status) {
-    return {
-        name,
-        protocol,
-        type,
-        building,
-        description,
-        createdTime,
-        status,
-    };
-}
-
-const rows = [
-    createData('Device 1', 'MQTT', 'Temperature', 'Building A', '-', '2022-02-27 16:00:29', 'Running'),
-    createData('Device 2', 'MQTT', 'Humidity', 'Building B', '-', '2022-02-27 16:00:29', 'Running'),
-    createData('Device 3', 'HTTP', 'Temperature & Humidity', 'Building C', '-', '2022-02-27 16:00:29', 'Stopped'),
-    createData('Device 4', 'MQTT', 'Humidity', 'Building D', '-', '2022-02-27 16:00:29', 'Stopped'),
-    createData('Device 5', 'HTTP', 'Temperature', 'Building E', '-', '2022-02-27 16:00:29', 'Stopped'),
-    createData('Device 6', 'HTTP', 'Temperature', 'Building F', '-', '2022-02-27 16:00:29', 'Running'),
-    createData('Device 7', 'MQTT', 'Humidity 7', 'Building G', '-', '2022-02-27 16:00:29', 'Running'),
-    createData('Device 8', 'MQTT', 'Model 8', 'Building H', '-', '2022-02-27 16:00:29', 'Running'),
-
-];
-
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
-
-
-const headCells = [
-    {
-        id: 'name',
-        label: 'Name',
-    },
-    {
-        id: 'protocol',
-        label: 'Protocol',
-    },
-    {
-        id: 'type',
-        label: 'Type',
-    },
-    {
-        id: 'building',
-        label: 'Building',
-    },
-    {
-        id: 'description',
-        label: 'Description',
-    },
-    {
-        id: 'createdTime',
-        label: 'Created Time',
-    },
-    {
-        id: 'status',
-        label: 'Status',
-    },
-    {
-        id:'operations',
-        label:'Operations'
-    }
-];
+import axios from 'axios';
 
 function Header(props) {
-
-    return (
-        <div id="page-content-wrapper padding-bottom-2">
-            <nav className="navbar navbar-expand-lg navbar-light bg-white py-4 px-4 border-bottom">
-                <div className="d-flex align-items-center">
-                    <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-                    <h2 className="fs-2 m-0">Devices</h2>
-                </div>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <Navbar />
-            </nav>
-
-        </div>
-
-
-    );
+  return (
+      <div id="page-content-wrapper padding-bottom-2">
+          <nav className="navbar navbar-expand-lg navbar-light bg-white py-4 px-4 border-bottom">
+              <div className="d-flex align-items-center">
+                  <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+                  <h2 className="fs-2 m-0">Devices</h2>
+              </div>
+              <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                  aria-expanded="false" aria-label="Toggle navigation">
+                  <span className="navbar-toggler-icon"></span>
+              </button>
+              <Navbar />
+          </nav>
+      </div>
+  );
 }
-
-function EnhancedTableHead(props) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-        props;
-    const createSortHandler = (property) => (event) => {
-        onRequestSort(event, property);
-    };
-
+const currentDate=new Date().toLocaleString();
+const deviceList=[
+  {name:'Device 1',serialNo:'1235679',protocol:'MQTT',type:'T',building:'A',description:'-',createdTime:currentDate,status:0},
+        {name:'Device 2',serialNo:'23',protocol:'MQTT',type:'H',building:'B',description:'-',createdTime:currentDate,status:0},
+        {name:'Device 3',serialNo:'3',protocol:'HTTP',type:'TH',building:'C',description:'-',createdTime:currentDate,status:1},
+        {name:'Device 4',serialNo:'4',protocol:'MQTT',type:'H',building:'D',description:'-',createdTime:currentDate,status:1},
+        {name:'Device 5',serialNo:'5',protocol:'HTTP',type:'T',building:'E',description:'-',createdTime:currentDate,status:1},
+        {name:'Device 6',serialNo:'6',protocol:'HTTP',type:'T',building:'F',description:'-',createdTime:currentDate,status:0},
+        {name:'Device 7',serialNo:'7',protocol:'MQTT',type:'H',building:'G',description:'-',createdTime:currentDate,status:0},
+        {name:'Device 8',serialNo:'8',protocol:'MQTT',type:'T',building:'H',description:'-',createdTime:currentDate,status:1}
+];
+export default function Devices(){
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#305680',
+      },
+      secondary: {
+        main: '#305680',
+      },
+    },
+  });
+    const [tableData,setTableData]=useState(deviceList);
+    const columns=[
+        {title:"Name",field:"name",defaultSort:'asc',validate: rowData =>{
+          if(rowData.name===undefined || rowData.name===""){
+            return "Name is required.";
+          }else if(rowData.name.length<3){
+            return "Name should contain at least 3 character.";
+          }
+          return true;
+        }},
+        {title:"Serial No",field:"serialNo",validate: rowData =>{
+        if(rowData.serialNo===undefined || rowData.serialNo===""){
+          return "Serial Number is required.";
+        }else if(rowData.serialNo.length<3){
+          return "Serial Number contain at least 3 character.";
+        }
+        return true;
+      }},
+        {title:"Protocol",field:"protocol",lookup:{MQTT:"MQTT",HTTP:'HTTP'},validate: rowData =>{
+          if(rowData.protocol===undefined || rowData.protocol===""){
+            return "Please select your protocol.";
+          }
+          return true;
+        }},
+        {title:"Type",field:"type",lookup:{T:"Temperature",H:'Humidity',TH:'Temperature & Humidity'},validate: rowData =>{
+          if(rowData.type===undefined || rowData.type===""){
+            return "Please select your device type.";
+          }
+          return true;
+        }},
+        {title:"Building",field:"building",lookup:{A:"Building A",B:"Building B",C:"Building C",D:"Building D",E:"Building E",F:"Building F",G:"Building G",H:"Building H"},validate: rowData =>{
+          if(rowData.building===undefined || rowData.building===""){
+            return "Please select your building.";
+          }
+          return true;
+        }},
+        {title:"Description",field:"description",validate:rowData=>({isValid:true,helperText:"Optional"})},
+        {title:"Created Time",field:"createdTime",type:'date',editable:false},
+        {title:"Status",field:"status",lookup:{0:"Running",1:"Stopped"},validate:rowData=>({isValid:true,helperText:"Optional"})},
+    ];
+    const [selectedRow, setSelectedRow] = useState(null);
     return (
-
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all devices',
-                        }}
-                    />
-                </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
-                    </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-
-    );
-}
-
-EnhancedTableHead.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
-};
-
-const EnhancedTableToolbar = (props) => {
-    const { numSelected,selectedName} = props;
-    const [open, setOpen] = React.useState(false);
-    const [openAddDialog, setOpenAddDialog] = React.useState(false);
-    const [deleteDialog, setDeleteDialog] = React.useState(false);
-    const [openSearchBar,setOpenSearchBar]= React.useState(false);
-    const [searched,setSearched]=React.useState("");
-    const [allRow,setAllRows]=React.useState();
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const handleAdd = () => {
-        console.log("Erdem Sert");
-    }
-
-    const handleRefresh = () =>{
-        console.log("Refresh table");
-    }
-
-    const handleSearch=()=>{
-        setOpenSearchBar(true);
-    }
-
-    const handleDeleteOpen =()=>{
-        setDeleteDialog(true);
-    }
-    const handleDeleteClose =()=>{
-        setDeleteDialog(false);
-    }
-    const handleDelete = ()=>{
-        console.log("erdem sert");
-    }
-    const searchRequest=(searchValue)=>{
-
-        const filteredRows=rows.filter((row)=>{
-            return Object.keys(row).some((key) =>
-            row[key].toLowerCase().includes(searchValue)
-          );
-        });
-        setAllRows(filteredRows);
-    }
+        <div style={{display:'flex',flexDirection:'column',width:'100%',height:'auto'}}>
+        <Header/>
+        <MuiThemeProvider theme={theme}>
+          <MaterialTable columns={columns} data={tableData}
+        editable={{
+            onRowAdd: (newRow) => new Promise((resolve, reject) => {
+                newRow.createdTime=currentDate;
+                axios.post('http://localhost:9090/v1/api/device/add', {newRow})
+                .then(function (response) {
+                console.log(response);
+                })
+                .catch(function (error) {
+                console.log(error);
+                });
+                setTableData([...tableData, newRow])
+                setTimeout(() => resolve(), 500)
+            }),
+            onRowUpdate: (newRow, oldRow) => new Promise((resolve, reject) => {
+              const index=oldRow.tableData.id
+              const updatedData = [...tableData]
+              updatedData[index] = newRow
+              axios.post('http://localhost:9090/v1/api/device/edit', {newRow})
+              .then(function (response) {
+              console.log(response);
+              })
+              .catch(function (error) {
+              console.log(error);
+              });
+              setTableData(updatedData)
+              setTimeout(() => resolve(), 500)
+            }),
+            onRowDelete: (selectedRow) => new Promise((resolve, reject) => {
+              const updatedData = [...tableData]
+              axios.post('http://localhost:9090/v1/api/device/delete', {selectedRow})
+              .then(function (response) {
+              console.log(response);
+              })
+              .catch(function (error) {
+              console.log(error);
+              });
+              updatedData.splice(selectedRow.tableData.id, 1)
+              setTableData(updatedData)
+              setTimeout(() => resolve(), 1000)
   
-      const handleCloseSearchBar = () =>{
-        setOpenSearchBar(false);
-        setSearched("");
-        searchRequest(searched);
-      }
-
-    return (
-        <div style={{padding:10}}>
-            {openSearchBar===true && numSelected < 1 ? (
-            <Box  sx={{
-               
-               width:'100%',
-               display:'flex',
-               justifyContent:'right'
-             }}>
-                <SearchIcon sx={{ color: 'action.active', mr: 1, my: 3 }}/>
-                <TextFieldItem id="outlined-search" label="Search Devices" fullWidth variant="standard" onChange={(searchVal) => searchRequest(searchVal)} style={{width:'100%'}}/>
-                <CloseIcon sx={{ color: 'action.active', mr: 1, my: 3 }} onClick={handleCloseSearchBar}/>
-                  
-           </Box>
-           
-           ):(
-               <Toolbar 
-               sx={{
-                   pl: { sm: 2 },
-                   pr: { xs: 1, sm: 1 },
-                   ...(numSelected > 0 && {
-                       bgcolor: (theme) =>
-                           alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                   }),
-               }}
-           >
-               {numSelected > 0 && (
-                   <Typography
-                       sx={{ flex: '1 1 100%' }}
-                       color="inherit"
-                       variant="subtitle1"
-                       component="div"
-                   >
-                       {numSelected} devices selected
-                   </Typography>
-               )}
-
-              
-               {numSelected > 0 ? (
-                   <Tooltip title="Delete">
-                       <IconButton onClick={handleDeleteOpen}>
-                           <DeleteIcon />
-                       </IconButton>
-                   </Tooltip>
-
-               ) : (
-                   <div style={{ display: 'flex', flexDirection: 'row',marginLeft:'auto'}}>
-                       <Tooltip title="Add Device">
-                           <IconButton onClick={handleClickOpen}>
-                               <AddIcon />
-                           </IconButton>
-                       </Tooltip>
-                       <Tooltip title="Refresh">
-                           <IconButton onClick={handleRefresh}>
-                               <RefreshIcon />
-                           </IconButton>
-                       </Tooltip>
-                       <Tooltip title="Search Devices">
-                           <IconButton onClick={handleSearch}>
-                               <SearchIcon />
-                           </IconButton>
-                       </Tooltip>
-                   </div>
-
-               )}
-           </Toolbar>
-           )}
-            <AddDevice open={open} fullWidth={true} maxWidth="md" handleclose={handleClose} handleadd={handleAdd} />
-            <DeleteDialog open={deleteDialog} fullWidth={true} maxWidth="md" handleClose={handleDeleteClose} 
-            handleDelete={handleDelete} numSelected={numSelected}/>
+            })
+          }}
+        onRowClick={((evt, selectedRow) => setSelectedRow(selectedRow.tableData.id))}
+        options={{sorting:true,search:true,searchFieldAlignment:'left',
+        searchAutoFocus:true,searchFieldVariant:'standard',
+        addRowPosition:'first',paging:true,pageSizeOptions:[5,10,20,50,100],paginationType:'stepped',exportButton:true,exportAllData:true,
+        exportFileName:'Devices Information',actionsColumnIndex:-1,selection:true,selectionProps:{
+        },
+        rowStyle: rowData => ({
+          backgroundColor: (selectedRow === rowData.tableData.id) ? '#EEE' : '#FFF'
+        }),columnsButton:true,emptyRowsWhenPaging: false
+        }}
+        title=""
+        icons={{Add:()=><AddIcon/>}}/>  
+        </MuiThemeProvider>
         </div>
-    );
-
-};
-
-EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-    selectedName: PropTypes.array.isRequired
-};
-
-export default function EnhancedTable() {
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('name');
-    const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-    const handleRequestSort = (event, property) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
-    };
-
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
-            setSelected(newSelecteds);
-            return;
-        }
-        setSelected([]);
-    };
-
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
-        }
-
-        setSelected(newSelected);
-    };
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const isSelected = (name) => selected.indexOf(name) !== -1;
-
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-    return (
-        <Box sx={{ width: '100%' }}>
-            <Header />
-
-            <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar
-                    numSelected={selected.length} 
-                    selectedName={selected}/>
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                    >
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
-                        />
-                        <TableBody>
-                            {stableSort(rows, getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    const isItemSelected = isSelected(row.name);
-                                    const labelId = `enhanced-table-checkbox-${index}`;
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={(event) => handleClick(event, row.name)}
-                                            role="checkbox"
-                                            aria-checked={isItemSelected}
-                                            tabIndex={-1}
-                                            key={row.name}
-                                            selected={isItemSelected}
-                                        >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row.name}
-                                            </TableCell>
-                                            <TableCell>{row.protocol}</TableCell>
-                                            <TableCell>{row.type}</TableCell>
-                                            <TableCell>{row.building}</TableCell>
-                                            <TableCell>{row.description}</TableCell>
-                                            <TableCell>{row.createdTime}</TableCell>
-                                            <TableCell>{row.status}</TableCell>
-                                            <TableCell>
-                                            <Tooltip title="Edit">
-                                                <IconButton>
-                                                    <EditIcon/>
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                <IconButton>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            {emptyRows > 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={9} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-        </Box>
-    );
+    )
 }
