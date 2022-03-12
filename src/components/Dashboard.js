@@ -1,8 +1,9 @@
-import React from 'react'
+import React from 'react';
 import LineChart from "./LineChart";
 import io from 'socket.io-client';
-import Navbar from './Navbar'
-const socket = io("http://176.235.202.77:8090/", { transports: ['websocket', 'polling', 'flashsocket'] })
+import Navbar from './Navbar';
+import DeviceCard from './DeviceCard';
+const socket = io("http://176.235.202.77:8090/", { transports: ['websocket', 'polling', 'flashsocket'] });
 
 const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
 const heat = [];
@@ -42,9 +43,11 @@ const Dashboard = () => {
                 <Navbar />
             </nav>
 
+            <DeviceCard name={"Device 1"} type={"Heat"}/>
+
             <div className="container-fluid px-4">
                 <div className="row g-3 my-2">
-                    <div id='info-card' className="col-xl-3 col-lg-6">
+                    <div className="col-xl-6 col-lg-6">
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Device ID</h3>
@@ -54,18 +57,17 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-6">
+                    <div className="col-xl-6 col-lg-6">
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Building</h3>
                                 <p className="fs-5">CTIS</p>
                             </div>
-                            <i
-                                className="fas fa-building fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                            <i className="fas fa-building fs-1 primary-text border rounded-full secondary-bg p-3"></i>
                         </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-6">
+                    <div className="col-xl-6 col-lg-6">
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Average</h3>
@@ -75,7 +77,7 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="col-xl-3 col-lg-6">
+                    <div className="col-xl-6 col-lg-6">
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Max Heat</h3>
