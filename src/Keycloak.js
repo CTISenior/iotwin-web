@@ -1,8 +1,9 @@
 import Keycloak from "keycloak-js";
+import conf from "./conf.json"
 const keycloak = new Keycloak({
- url: "http://localhost:8080/auth",
- realm: "tbiot-keycloak",
- clientId: "Tbiot-auth",
+    url: conf.keycloak.IP + ":" + conf.keycloak.PORT + "/auth",
+    realm: conf.keycloak.realm,
+    clientId: conf.keycloak.clientId,
 });
 
 export default keycloak;
