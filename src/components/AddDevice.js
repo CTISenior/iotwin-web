@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios'
 
 export default function DialogBox(props) {
-    const { open, maxWidth, handleadd, handleclose, handleNextStep, ...fullWidth } = props;
+    const { open, maxWidth, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
     const [building, setBuilding] = React.useState('building-a');
     const [name, setNameValue] = React.useState();
@@ -203,8 +203,6 @@ export default function DialogBox(props) {
                     value={descriptionValue}
                     onChange={handleDescriptionChange}
                     />
-
-                {/* <Button onClick={handleNextStep} style={{ position: 'relative', bottom: 0, borderColor: '#0000001f', width: 'auto', padding: '0 6px', marginTop: 30, backgroundColor: '#1111', borderRadius: '4px', textTransform: 'capitalize', textAlign: 'center' }}>Next: Credetials</Button> */}
             </DialogContent>
             <DialogActions style={{ marginTop: 30, borderTop: '1px solid #D3D3D3' }}>
                 <Button onClick={handleclose} style={{ textTransform: 'capitalize' }}>Cancel</Button>

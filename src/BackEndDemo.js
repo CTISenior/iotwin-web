@@ -13,7 +13,14 @@ app.post("/v1/api/device/add", (req, res) => {
   res.json(req.body);
   console.log(req.body);
 });
-
+app.post("/v1/api/device/edit",(req,res)=>{
+  res.json(req.body);
+  console.log(req.body);
+});
+app.post("/v1/api/device/delete",(req,res)=>{
+  res.json(req.body);
+  console.log(req.body);
+});
 http.listen(port, () => {
   console.log(`IoTwin System running at http://localhost:${port}/`);
 });
