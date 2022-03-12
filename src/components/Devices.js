@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import MaterialTable from 'material-table';
 import AddIcon from '@mui/icons-material/Add';
 import { createTheme } from '@material-ui/core/styles'
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import Navbar from './Navbar';
 import axios from 'axios';
 
