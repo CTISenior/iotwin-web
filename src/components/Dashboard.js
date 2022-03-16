@@ -3,7 +3,11 @@ import LineChart from "./LineChart";
 import io from 'socket.io-client';
 import Navbar from './Navbar';
 import DeviceCard from './DeviceCard';
+import Badge from '@mui/material/Badge';
+import AddAlertIcon from '@mui/icons-material/AddAlert';
+import Alert from './Alert';
 const socket = io("http://176.235.202.77:8090/", { transports: ['websocket', 'polling', 'flashsocket'] });
+
 
 const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
 const heat = [];
@@ -25,7 +29,15 @@ socket.on("getDeviceInfo", function (msg) {
     }
 });
 
+
+
+
 const Dashboard = () => {
+    const [open, setOpen] = React.useState(true);
+      const handleClose = () => {
+        setOpen(false);
+      };
+      const currentDate=new Date().toLocaleString();
     return (
 
         <div id="page-content-wrapper">
@@ -34,7 +46,14 @@ const Dashboard = () => {
                     <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
                     <h2 className="fs-2 m-0">Dashboard</h2>
                 </div>
-
+                <Badge 
+                badgeContent={4} color="error"
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}>
+                  <AddAlertIcon color="action" />
+                </Badge>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +61,7 @@ const Dashboard = () => {
                 </button>
                 <Navbar />
             </nav>
-
+            <Alert value={45} open={open} handleClose={handleClose} vertical="top" horizontal="center" createdTime={currentDate}/>
             <DeviceCard name={"Device 1"} type={"Heat"}/>
 
             <div className="container-fluid px-4">
