@@ -14,6 +14,16 @@ app.get("/", (req, res) => {
   res.send("IoTwin");
 });
 
+app.get("/device/start", (req, res) => {
+  const topic = req.query.topic;
+  console.log(topic);
+
+});
+
+app.get("/device/stop", (req, res) => {
+  const topic = req.query.topic;
+});
+
 io.on("connection", (socket) => {
   const temp = async () => {
     await consumer.connect();
