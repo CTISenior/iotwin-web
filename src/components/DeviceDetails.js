@@ -1,6 +1,8 @@
 import React from 'react';
 import LineChart from "./LineChart";
 import io from 'socket.io-client';
+import CloseIcon from '@mui/icons-material/Close';
+import Tooltip from '@mui/material/Tooltip';
 const socket = io("http://176.235.202.77:8090/", { transports: ['websocket', 'polling', 'flashsocket'] });
 
 const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -23,9 +25,12 @@ socket.on("getDeviceInfo", function (msg) {
     }
 });
 
-const DeviceDetails = () => {
+const DeviceDetails = (props) => {
     return (
         <div>
+            <Tooltip title="Close"> 
+            <CloseIcon sx={{ width:'auto',color: 'action.active',right:10,position:'absolute',top:5,}} onClick={props.onClose}/>
+            </Tooltip>
             <div className="container-fluid">
                 <div className="row g-3 my-2">
                     <div className="col-xl-6 col-lg-6">
