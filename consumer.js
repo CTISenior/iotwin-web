@@ -3,6 +3,7 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const port = 8090;
 const { Kafka } = require("kafkajs");
+const axios = require("axios");
 
 const kafka = new Kafka({
   clientId: "my-app",
@@ -18,10 +19,6 @@ app.get("/device/start", (req, res) => {
   const topic = req.query.topic;
   console.log(topic);
 
-});
-
-app.get("/device/stop", (req, res) => {
-  const topic = req.query.topic;
 });
 
 io.on("connection", (socket) => {
