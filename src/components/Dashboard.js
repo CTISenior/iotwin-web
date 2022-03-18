@@ -36,7 +36,7 @@ function AllDevices(props) {
 
     return <>
         {devices.map(element => {
-            return (<div>
+            return (<div className="flex-row justify-content-around d-inline-flex" style={{margin:5}}>
                 <DeviceCard name={element.name} type={"Heat"} id={element.id} building_id={element.building_id} />
             </div>);
         })}
@@ -67,37 +67,35 @@ const Dashboard = () => {
                     <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
                     <h2 className="fs-2 m-0">Dashboard</h2>
                 </div>
-
-                <NotificationList anchorEl={anchorEl} open={openNotification} handleClose={handleClickNotificationClose} value={40} createdTime={currentDate} />
-
+                <NotificationList anchorEl={anchorEl} open={openNotification} handleClose={handleClickNotificationClose} value={40} createdTime={currentDate}/>
+                <div className='col-lg-1 offset-lg-1 flex-row'>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
-                </button>
-                <Navbar />
-                <div className='col-md-1 offset-md-1'>
-                    <Badge
-                        badgeContent={4} color="error"
-                        onC
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}>
-                        <Tooltip title="Notifications">
-                            <IconButton onClick={handleClickNotificationOpen}>
-                                <AddAlertIcon color="action" />
-                            </IconButton>
-                        </Tooltip>
-                    </Badge>
+                </button>              
+                <Badge
+                    badgeContent={4} color="error"
+                    onCanchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}>
+                    <Tooltip title="Notifications">
+                    <IconButton onClick={handleClickNotificationOpen}>
+                        <AddAlertIcon color="action"/>
+                    </IconButton>
+                    </Tooltip>
+                </Badge>
                 </div>
+                <Navbar />
             </nav>
+            
             <AllDevices />
+           
             <Alert value={45} open={openAlert} handleClose={handleCloseAlert} vertical="top" horizontal="right" createdTime={currentDate} />
 
         </div>
-
     )
 }
 
-export default Dashboard
+export default Dashboard;
