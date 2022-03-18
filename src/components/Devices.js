@@ -5,6 +5,7 @@ import { createTheme } from '@material-ui/core/styles'
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles';
 import Navbar from './Navbar';
 import axios from 'axios';
+import Alert from './Alert';
 
 axios.get('http://176.235.202.77:4000/api/v1/devices')
   .then((response) => {
@@ -12,6 +13,7 @@ axios.get('http://176.235.202.77:4000/api/v1/devices')
     console.log(response);
     response.data.forEach(element => {
       const temp = {
+        id: element.id,
         name: element.name,
         sn: element.sn,
         protocol: element.protocol,
@@ -58,7 +60,7 @@ function Header(props) {
 }
 const currentDate = new Date().toLocaleString();
 const deviceList = [
-  { name: 'Device 1', sn: '1235679', protocol: 'mqtt', type: 'T', building_id: '1', description: '-', created_at: currentDate, status: "true" },
+  { id: "99", name: 'Device 1', sn: '1235679', protocol: 'mqtt', type: 'T', building_id: '1', description: '-', created_at: currentDate, status: "true" },
 ];
 export default function Devices() {
   const theme = createTheme({
@@ -130,37 +132,50 @@ export default function Devices() {
           editable={{
             onRowAdd: (newRow) => new Promise((resolve, reject) => {
               newRow.created_at = currentDate;
-              axios.post('http://localhost:9090/v1/api/device/add', { newRow })
-                .then(function (response) {
+              axios.post('http://176.235.202.77:4000/api/v1/devices', {
+                "sn": newRow.sn,
+                "name": newRow.name,
+                "protocol": newRow.protocol,
+                "type": newRow.type,
+                "keys": ["temp"]
+              }
+              )
+                .then((response) => {
                   console.log(response);
-                })
-                .catch(function (error) {
+                }, (error) => {
                   console.log(error);
                 });
               setTableData([...tableData, newRow])
               setTimeout(() => resolve(), 500)
             }),
             onRowUpdate: (newRow, oldRow) => new Promise((resolve, reject) => {
-              const index = oldRow.tableData.id
-              const updatedData = [...tableData]
-              updatedData[index] = newRow
-              axios.post('http://localhost:9090/v1/api/device/edit', { newRow })
-                .then(function (response) {
+
+              axios.post('http://176.235.202.77:4000/api/v1/devices/' + oldRow.id, {
+                "name": newRow.name,
+                "protocol": newRow.protocol,
+                "type": newRow.type,
+                "keys": ["temp"]
+              }
+              )
+                .then((response) => {
+                  const index = oldRow.tableData.id
+                  const updatedData = [...tableData]
+                  updatedData[index] = newRow
+                  setTableData(updatedData)
                   console.log(response);
-                })
-                .catch(function (error) {
+                }, (error) => {
                   console.log(error);
                 });
-              setTableData(updatedData)
+
               setTimeout(() => resolve(), 500)
             }),
             onRowDelete: (selectedRow) => new Promise((resolve, reject) => {
               const updatedData = [...tableData]
-              axios.post('http://localhost:9090/v1/api/device/delete', { selectedRow })
-                .then(function (response) {
+              axios.delete('http://176.235.202.77:4000/api/v1/devices/' + selectedRow.id + "/" + selectedRow.sn
+              )
+                .then((response) => {
                   console.log(response);
-                })
-                .catch(function (error) {
+                }, (error) => {
                   console.log(error);
                 });
               updatedData.splice(selectedRow.tableData.id, 1)
