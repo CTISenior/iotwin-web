@@ -36,7 +36,7 @@ function AllDevices(props) {
 
     return <>
         {devices.map(element => {
-            return (<div>
+            return (<div className="flex-row justify-content-around d-inline-flex" style={{margin:5}}>
                 <DeviceCard name={element.name} type={"Heat"} id={element.id} building_id={element.building_id} />
             </div>);
         })}
@@ -89,7 +89,9 @@ const Dashboard = () => {
                 </div>
                 <Navbar />
             </nav>
+            
             <AllDevices />
+           
             <Alert value={45} open={openAlert} handleClose={handleCloseAlert} vertical="top" horizontal="right" createdTime={currentDate} />
 
         </div>

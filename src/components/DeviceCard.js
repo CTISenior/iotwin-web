@@ -87,7 +87,7 @@ export default function DeviceCardComponent(props) {
     }
 
     return (
-                    <div className="p-2 bg-white shadow-sm d-flex justify-content-around flex-column align-items-center" style={{width:'50%',margin:5}}>
+                    <div className="p-2 bg-white shadow-sm d-flex justify-content-around flex-column align-items-center" style={{width:'auto',margin:5}}>
                         <div className='p-1 align-items-center text-center'>
                             <i className="fas fa-fire-alt fs-1 primary-text border rounded-full secondary-bg p-3"></i>
                             <h3 className="fs-2" >{name}</h3>
