@@ -3,7 +3,6 @@ import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import Container from '@mui/material/Container';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
@@ -88,10 +87,7 @@ export default function DeviceCardComponent(props) {
     }
 
     return (
-        <Container style={{ width: '100%' }}>
-            <div className="row g-3 my-2">
-                <div className="col-xl-4 col-lg-4">
-                    <div className="p-2 bg-white shadow-sm d-flex justify-content-around flex-column align-items-center rounded">
+                    <div className="p-2 bg-white shadow-sm d-flex justify-content-around flex-column align-items-center" style={{width:'auto',margin:5}}>
                         <div className='p-1 align-items-center text-center'>
                             <i className="fas fa-fire-alt fs-1 primary-text border rounded-full secondary-bg p-3"></i>
                             <h3 className="fs-2" >{name}</h3>
@@ -124,8 +120,5 @@ export default function DeviceCardComponent(props) {
                             </Modal>
                         </div>
                     </div>
-                </div>
-            </div>
-        </Container>
     );
 }

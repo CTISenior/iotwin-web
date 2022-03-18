@@ -104,7 +104,7 @@ export default function Devices() {
       }
     },
     {
-      title: "Type", field: "type", lookup: { T: "Temperature", H: 'Humidity', TH: 'Temperature & Humidity' }, validate: rowData => {
+      title: "Type", field: "type", lookup: { therm: "Temperature", hum: 'Humidity', TH: 'Temperature & Humidity' }, validate: rowData => {
         if (rowData.type === undefined || rowData.type === "") {
           return "Please select your device type.";
         }
