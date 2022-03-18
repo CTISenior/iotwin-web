@@ -32,7 +32,6 @@ axios.get('http://176.235.202.77:4000/api/v1/devices')
       console.log(error.response.status);
       console.log(error.response.headers);
     } else if (error.request) {
-
       console.log(error.request);
     } else {
       console.log('Error', error.message);

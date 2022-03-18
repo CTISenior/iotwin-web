@@ -98,20 +98,20 @@ export default function DeviceCardComponent(props) {
                             <p className="fs-5">{type}</p>
                         </div>
                         <div className='p-0 align-items-center'>
-                        <Tooltip title="Start Device"> 
-                            <IconButton aria-label="play" onClick={handleStart}>
-                                <PlayArrowIcon sx={{ height: 38, width: 38 }} />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Stop Device"> 
-                            <IconButton aria-label="stop" onClick={handleStop}>
-                                <StopIcon sx={{ height: 38, width: 38 }} />
-                            </IconButton>
+                            <Tooltip title="Start Device">
+                                <IconButton aria-label="play" onClick={handleStart}>
+                                    <PlayArrowIcon sx={{ height: 38, width: 38 }} />
+                                </IconButton>
                             </Tooltip>
-                            <Tooltip title="Display Device Details"> 
-                            <IconButton aria-label="display" onClick={handleOpen}>
-                                <ShowChartIcon sx={{ height: 38, width: 38 }} />
-                            </IconButton>
+                            <Tooltip title="Stop Device">
+                                <IconButton aria-label="stop" onClick={handleStop}>
+                                    <StopIcon sx={{ height: 38, width: 38 }} />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Display Device Details">
+                                <IconButton aria-label="display" onClick={handleOpen}>
+                                    <ShowChartIcon sx={{ height: 38, width: 38 }} />
+                                </IconButton>
                             </Tooltip>
 
                             <Modal
@@ -119,7 +119,7 @@ export default function DeviceCardComponent(props) {
                                 aria-describedby="simple-modal-description"
                                 open={open}>
                                 <div style={modalStyle} className={classes.paper}>
-                                    <DeviceDetails onClose={handleClose}/>
+                                    <DeviceDetails onClose={handleClose} />
                                 </div>
                             </Modal>
                         </div>
