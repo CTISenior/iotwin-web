@@ -8,7 +8,7 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import DeviceDetails from './DeviceDetails';
-
+import Tooltip from '@mui/material/Tooltip';
 
 function rand() {
     return Math.round(Math.random() * 20) - 10;
@@ -98,24 +98,28 @@ export default function DeviceCardComponent(props) {
                             <p className="fs-5">{type}</p>
                         </div>
                         <div className='p-0 align-items-center'>
+                        <Tooltip title="Start Device"> 
                             <IconButton aria-label="play" onClick={handleStart}>
                                 <PlayArrowIcon sx={{ height: 38, width: 38 }} />
                             </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Stop Device"> 
                             <IconButton aria-label="stop" onClick={handleStop}>
                                 <StopIcon sx={{ height: 38, width: 38 }} />
                             </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Display Device Details"> 
                             <IconButton aria-label="display" onClick={handleOpen}>
                                 <ShowChartIcon sx={{ height: 38, width: 38 }} />
                             </IconButton>
+                            </Tooltip>
 
                             <Modal
                                 aria-labelledby="simple-modal-title"
                                 aria-describedby="simple-modal-description"
-                                open={open}
-                                onClose={handleClose}
-                            >
+                                open={open}>
                                 <div style={modalStyle} className={classes.paper}>
-                                    <DeviceDetails />
+                                    <DeviceDetails onClose={handleClose}/>
                                 </div>
                             </Modal>
                         </div>
