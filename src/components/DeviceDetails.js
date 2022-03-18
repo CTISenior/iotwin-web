@@ -10,26 +10,29 @@ const heat = [];
 const hum = [];
 const flag = 0;
 
-socket.on("getDeviceInfo", function (msg) {
-    let info = JSON.parse(msg);
-    const date = new Date();
+// socket.on("getDeviceInfo", function (msg) {
+//     let info = JSON.parse(msg);
+//     const date = new Date();
 
-    if (parseInt(info.values.temperature) == 0) {
-        hum.push(parseInt(info.values.humidity));
-        document.getElementById('avg').textContent = average(hum).toFixed(2);
-        document.getElementById('max').textContent = Math.max(...hum);
-    } else if (parseInt(info.values.humidity) == 0) {
-        heat.push(parseInt(info.values.temperature));
-        document.getElementById('avg').textContent = average(heat).toFixed(2);
-        document.getElementById('max').textContent = Math.max(...heat);
-    }
-});
+//     if (parseInt(info.values.temperature) == 0) {
+//         hum.push(parseInt(info.values.humidity));
+//         document.getElementById('avg').textContent = average(hum).toFixed(2);
+//         document.getElementById('max').textContent = Math.max(...hum);
+//     } else if (parseInt(info.values.humidity) == 0) {
+//         heat.push(parseInt(info.values.temperature));
+//         document.getElementById('avg').textContent = average(heat).toFixed(2);
+//         document.getElementById('max').textContent = Math.max(...heat);
+//     }
+// });
+// const building_name = "";
 
 const DeviceDetails = (props) => {
+    const { id, building_id, } = props;
+
     return (
         <div>
-            <Tooltip title="Close"> 
-            <CloseIcon sx={{ width:'auto',color: 'action.active',right:10,position:'absolute',top:5,}} onClick={props.onClose}/>
+            <Tooltip title="Close">
+                <CloseIcon sx={{ width: 'auto', color: 'action.active', right: 10, position: 'absolute', top: 5, }} onClick={props.onClose} />
             </Tooltip>
             <div className="container-fluid">
                 <div className="row g-3 my-2">
@@ -37,7 +40,7 @@ const DeviceDetails = (props) => {
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Device ID</h3>
-                                <p className="fs-5">1</p>
+                                <p className="fs-5">{id}</p>
                             </div>
                             <i className="fas fa-fire-alt fs-1 primary-text border rounded-full secondary-bg p-3"></i>
                         </div>
@@ -47,7 +50,7 @@ const DeviceDetails = (props) => {
                         <div className="p-4 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
                                 <h3 className="fs-2">Building</h3>
-                                <p className="fs-5">CTIS</p>
+                                <p className="fs-5">Main Building</p>
                             </div>
                             <i className="fas fa-building fs-1 primary-text border rounded-full secondary-bg p-3"></i>
                         </div>
@@ -78,7 +81,7 @@ const DeviceDetails = (props) => {
             <div className="row my-5">
                 <h3 className="fs-4 mb-3 text-center">Device Graph</h3>
                 <div id='chart' className="col-lg-9 mx-auto">
-                    <LineChart />
+                    <LineChart id={id} />
                     <div className='text-center d-flex'>
                         <div className='col-8 col-xs-8 heat'>Heat</div>
                         <div className='col-1 col-xs-1 humidity'>Humidity</div>
