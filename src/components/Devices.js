@@ -17,7 +17,8 @@ axios.get('http://176.235.202.77:4000/api/v1/devices')
         name: element.name,
         sn: element.sn,
         protocol: element.protocol,
-        type: element.type,
+        model: element.model,
+        type: element.type.join("-"),
         building_id: element.building_id,
         description: element.description ? element.description : '-',
         created_at: element.created_at,
@@ -103,7 +104,15 @@ export default function Devices() {
       }
     },
     {
-      title: "Type", field: "type", lookup: { therm: "Temperature", hum: 'Humidity', TH: 'Temperature & Humidity' }, validate: rowData => {
+      title: "Model", field: "model", lookup: { "raspberryPi": "Rasberry Pi", "arduino": 'Arduino' }, validate: rowData => {
+        if (rowData.model === undefined || rowData.model === "") {
+          return "Please select your device model.";
+        }
+        return true;
+      }
+    },
+    {
+      title: "Type", field: "type", lookup: { "temperature": "Temperature", "humidity": 'Humidity', "temperature-humidity": 'Temperature & Humidity' }, validate: rowData => {
         if (rowData.type === undefined || rowData.type === "") {
           return "Please select your device type.";
         }
@@ -111,7 +120,7 @@ export default function Devices() {
       }
     },
     {
-      title: "Building", field: "building_id", lookup: { "1": "Building A", "2": "Building B", "3": "Building C", "4": "Building D", "5": "Building E", "6": "Building F", "7": "Building G", "8": "Building H" }, validate: rowData => {
+      title: "Building", field: "building_id", lookup: { "1": "Main Building", }, validate: rowData => {
         if (rowData.building_id === undefined || rowData.building_id === "") {
           return "Please select your building.";
         }
@@ -135,8 +144,9 @@ export default function Devices() {
                 "sn": newRow.sn,
                 "name": newRow.name,
                 "protocol": newRow.protocol,
-                "type": newRow.type,
-                "keys": ["temp"]
+                "model": newRow.model,
+                "type": newRow.type.split('-'),
+                "description": "123"
               }
               )
                 .then((response) => {
@@ -149,11 +159,12 @@ export default function Devices() {
             }),
             onRowUpdate: (newRow, oldRow) => new Promise((resolve, reject) => {
 
-              axios.post('http://176.235.202.77:4000/api/v1/devices/' + oldRow.id, {
+              axios.put('http://176.235.202.77:4000/api/v1/devices/' + oldRow.id, {
                 "name": newRow.name,
                 "protocol": newRow.protocol,
-                "type": newRow.type,
-                "keys": ["temp"]
+                "model": newRow.model,
+                "type": newRow.type.split('-'),
+                "description": newRow.description,
               }
               )
                 .then((response) => {

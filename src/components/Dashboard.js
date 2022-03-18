@@ -15,7 +15,7 @@ axios.get('http://176.235.202.77:4000/api/v1/devices')
         // Success 🎉
         console.log(response);
         response.data.forEach(element => {
-            const temp = { name: element.name, type: "Temperature" };
+            const temp = { name: element.name, type: "Temperature", id: element.sn, building_id: element.building_id };
             devices.push(temp);
         });
         console.log(devices);
@@ -37,7 +37,7 @@ function AllDevices(props) {
     return <>
         {devices.map(element => {
             return (<div>
-                <DeviceCard name={element.name} type={"Heat"} />
+                <DeviceCard name={element.name} type={"Heat"} id={element.id} building_id={element.building_id} />
             </div>);
         })}
     </>

@@ -55,7 +55,7 @@ export default function DeviceCardComponent(props) {
     };
 
 
-    const { name, type, } = props;
+    const { name, type, id, building_id } = props;
 
     const handleStart = (event) => {
         // setSerialValue(event.target.value);
@@ -115,7 +115,7 @@ export default function DeviceCardComponent(props) {
                                 aria-describedby="simple-modal-description"
                                 open={open}>
                                 <div style={modalStyle} className={classes.paper}>
-                                    <DeviceDetails onClose={handleClose} />
+                                    <DeviceDetails id={id} building_id={building_id} onClose={handleClose} />
                                 </div>
                             </Modal>
                         </div>
