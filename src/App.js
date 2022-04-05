@@ -9,34 +9,42 @@ import { BrowserRouter, Route, Routes, Switch, Link, Navigate } from "react-rout
 import PrivateRoute from "./helpers/PrivateRoute";
 import Devices from "./components/Devices";
 import Navigation from './helpers/Navigation';
+import Layout from "./components/Layout";
+
 
 function App() {
+  // return (
+  //   <div className="d-flex" id="wrapper">
+  //     <ReactKeycloakProvider authClient={keycloak} initOptions={{ onLoad: 'login-required' }}>
+  //       <BrowserRouter>
+  //         <Sidebar />
+  //         <Routes>
+  //           <Route path="/" element={<>
+  //             <Navigation />
+  //           </>
+  //           } />
+  //           <Route path="/devices" element={<>
+  //             <PrivateRoute>
+  //               <Devices />
+  //             </PrivateRoute>
+  //           </>
+  //           } />
+  //           <Route path="/dashboard" element={<>
+  //             <PrivateRoute>
+  //               <Dashboard />
+  //             </PrivateRoute>
+  //           </>
+  //           } />
+  //         </Routes>
+  //       </BrowserRouter>
+  //     </ReactKeycloakProvider>
+  //   </div>
+  // );
   return (
-    <div className="d-flex" id="wrapper">
-      <ReactKeycloakProvider authClient={keycloak} initOptions={{ onLoad: 'login-required' }}>
-        <BrowserRouter>
-          <Sidebar />
-          <Routes>
-            <Route path="/" element={<>
-              <Navigation />
-            </>
-            } />
-            <Route path="/devices" element={<>
-              <PrivateRoute>
-                <Devices />
-              </PrivateRoute>
-            </>
-            } />
-            <Route path="/dashboard" element={<>
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            </>
-            } />
-          </Routes>
-        </BrowserRouter>
-      </ReactKeycloakProvider>
-    </div>
+    <ReactKeycloakProvider authClient={keycloak} initOptions={{ onLoad: 'login-required' }}>
+      <Layout />
+    </ReactKeycloakProvider>
+
   );
 }
 
