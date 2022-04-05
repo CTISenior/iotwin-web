@@ -15,8 +15,6 @@ const temp = [];
 const hum = [];
 const tempLabel = [];
 
-
-
 const LineChart = (props) => {
   const { id, } = props;
   socket.emit("telemetry_topic", id);
