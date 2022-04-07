@@ -10,12 +10,10 @@ import SensorsSharpIcon from '@mui/icons-material/SensorsSharp';
 import DeviceDetails from './DeviceDetails';
 import LineChart from './LineChart';
 import Chart from './Chart';
-const DevicesDemo2 = () => {
-
-
+const DeviceModal = () => {
 
     return (
-        <Container>
+        <Container sx={{ mt: '5%' }}>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={8}>
                     <Paper elevation={3}>
@@ -43,8 +41,8 @@ const DevicesDemo2 = () => {
                     </Paper>
                 </Grid>
             </Grid>
-        </Container>
+        </Container >
     )
 }
 
-export default DevicesDemo2
+export default DeviceModal

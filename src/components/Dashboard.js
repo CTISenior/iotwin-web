@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import Navbar from './Navbar';
-import DeviceCard from './DeviceCard';
-import Badge from '@mui/material/Badge';
-import AddAlertIcon from '@mui/icons-material/AddAlert';
-import Alert from './Alert';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import NotificationList from './NotificationList';
+import { Container, Grid, IconButton, Paper, Typography } from '@mui/material'
+import { Box } from '@mui/system';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import axios from 'axios';
+import Tooltip from '@mui/material/Tooltip';
+import React from 'react'
+import SensorsSharpIcon from '@mui/icons-material/SensorsSharp';
+import Modal from '@mui/material/Modal';
+import DeviceModal from './DeviceModal';
 
 const devices = [];
+
 axios.get('http://176.235.202.77:4000/api/v1/devices')
     .then((response) => {
         // Success 🎉
@@ -32,70 +34,112 @@ axios.get('http://176.235.202.77:4000/api/v1/devices')
         }
         console.log(error.config);
     });
-function AllDevices(props) {
 
-    return <>
-        {devices.map(element => {
-            return (<div className="flex-row justify-content-around d-inline-flex" style={{margin:5}}>
-                <DeviceCard name={element.name} type={"Heat"} id={element.id} building_id={element.building_id} />
-            </div>);
-        })}
-    </>
-
+const ModalStyle = {
+    position: 'absolute',
+    top: '5%',
+    left: '5%',
+    right: '5%',
+    overflow: 'scroll',
+    height: '90%',
+    display: 'block',
+    backgroundColor: '#ebeced',
+    display: 'flex',
 }
 
-const Dashboard = () => {
-    const [openAlert, setOpenAlert] = useState(true);
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const openNotification = Boolean(anchorEl);
+const DevicesDemo = () => {
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleModalClose = () => {
+        setOpenModal(false);
+    }
+    const handleModalOpen = () => {
+        setOpenModal(true);
+    }
 
-    const handleCloseAlert = () => {
-        setOpenAlert(false);
+    const handleClose = () => {
+        setOpen(false);
     };
-    const handleClickNotificationOpen = (event) => {
-        setAnchorEl(event.currentTarget);
+    const [open, setOpen] = React.useState(false);
+
+
+    const handleStart = (event) => {
+        console.log("Hello");
+        axios.get("http://localhost:8090/device/start", {
+            params: {
+                topic: "topic start"
+            }
+        })
+        console.log("Hello")
     }
-    const handleClickNotificationClose = () => {
-        setAnchorEl(null);
+    const handleStop = (event) => {
+        axios.get("http://localhost:8090/device/stop", {
+            params: {
+                topic: "topic stop"
+            }
+        })
+        console.log("Hello")
     }
-    const currentDate = new Date().toLocaleString();
+    const handleDisplay = (event) => {
+        axios.get("http://localhost:8090/device/stop", {
+            params: {
+                topic: "topic stop"
+            }
+        })
+        console.log("Hello")
+    }
+
     return (
-
-        <div id="page-content-wrapper">
-            <nav className="navbar navbar-expand-lg navbar-light bg-white py-4 px-4 border-bottom">
-                <div className="d-flex align-items-center">
-                    <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-                    <h2 className="fs-2 m-0">Dashboard</h2>
-                </div>
-                <NotificationList anchorEl={anchorEl} open={openNotification} handleClose={handleClickNotificationClose} value={40} createdTime={currentDate}/>
-                <div className='col-lg-1 offset-lg-1 flex-row'>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>              
-                <Badge
-                    badgeContent={4} color="error"
-                    onCanchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}>
-                    <Tooltip title="Notifications">
-                    <IconButton onClick={handleClickNotificationOpen}>
-                        <AddAlertIcon color="action"/>
-                    </IconButton>
-                    </Tooltip>
-                </Badge>
-                </div>
-                <Navbar />
-            </nav>
-            
-            <AllDevices />
-           
-            <Alert value={45} open={openAlert} handleClose={handleCloseAlert} vertical="top" horizontal="right" createdTime={currentDate} />
-
-        </div>
+        <Container>
+            <Grid container spacing={3}>
+                {devices.map(element => {
+                    return (<Grid item xs={12} sm={6} md={3}>
+                        <Paper elevation={3}>
+                            <Box
+                                display={'flex'}
+                                flexDirection={'column'}
+                                alignItems={'center'}
+                            >
+                                <SensorsSharpIcon sx={{ fontSize: 100, color: 'first.main' }} />
+                                <Typography>
+                                    {element.name}
+                                </Typography>
+                                <Box
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                >
+                                    <Tooltip title="Start Device">
+                                        <IconButton variant='side' aria-label="play" onClick={handleStart}>
+                                            <PlayArrowIcon fontSize='large' />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Stop Device">
+                                        <IconButton variant='side' aria-label="stop" onClick={handleStop}>
+                                            <StopIcon fontSize='large' />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Display Device Details">
+                                        <IconButton variant='side' aria-label="display" onClick={handleModalOpen}>
+                                            <ShowChartIcon fontSize='large' />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Grid>);
+                })}
+            </Grid>
+            <Modal
+                open={openModal}
+                onClose={handleModalClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={ModalStyle}>
+                    <DeviceModal />
+                </Box>
+            </Modal>
+        </Container>
     )
 }
 
-export default Dashboard;
+export default DevicesDemo
