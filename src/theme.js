@@ -24,7 +24,7 @@ const customTheme = createTheme({
         MuiDrawer: {
             styleOverrides: {
                 paper: {
-                    background: "white",
+                    background: primaryColor,
                 }
             }
         },
@@ -67,7 +67,7 @@ const customTheme = createTheme({
                 {
                     props: { variant: 'side' },
                     style: {
-                        color: primaryColor,
+                        color: secondaryColor,
                         '&:hover': {
                             backgroundColor: secondaryColor,
                             opacity: [0.1, 0.1, 0.1],
@@ -91,7 +91,7 @@ const customTheme = createTheme({
                 {
                     props: { variant: 'side' },
                     style: {
-                        color: primaryColor,
+                        color: secondaryColor,
                         fontSize: '1.25rem'
                     },
                 },
