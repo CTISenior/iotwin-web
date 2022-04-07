@@ -30,6 +30,7 @@ import { Link } from '@mui/material';
 import Dashboard from './Dashboard';
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
+import Devices from './Devices';
 
 const drawerWidth = 200;
 
@@ -263,6 +264,9 @@ export default function PersistentDrawerLeft() {
                         </>
                         } />
                         <Route path="/devices" element={<>
+                            <PrivateRoute>
+                                <Devices />
+                            </PrivateRoute>
                         </>
                         } />
                         <Route path="/dashboard" element={<>
