@@ -47,7 +47,7 @@ const ModalStyle = {
     display: 'flex',
 }
 
-const DevicesDemo = () => {
+const Dashboard = () => {
     const [openModal, setOpenModal] = React.useState(false);
     const handleModalClose = () => {
         setOpenModal(false);
@@ -142,4 +142,4 @@ const DevicesDemo = () => {
     )
 }
 
-export default DevicesDemo
+export default Dashboard

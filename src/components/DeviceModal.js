@@ -22,9 +22,7 @@ const DeviceModal = () => {
                             flexDirection={'column'}
                             alignItems={'center'}
                         >
-                            <Typography>Hello</Typography>
                             <Chart />
-
                         </Box>
                     </Paper>
                 </Grid>
