@@ -48,34 +48,39 @@ const customTheme = createTheme({
             ],
         },
         MuiListItemText: {
-            styleOverrides: {
-                root: {
-                    color: secondaryColor,
-
-                },
-            }
-        },
-        MuiListItemIcon: {
-            styleOverrides: {
-                root: {
-                    color: secondaryColor,
-                }
-            }
-        },
-        MuiIconButton: {
             variants: [
                 {
                     props: { variant: 'side' },
                     style: {
-                        color: secondaryColor,
+                        color: secondaryColor
+                    },
+                },
+            ],
+        },
+        MuiListItemIcon: {
+            variants: [
+                {
+                    props: { variant: 'side' },
+                    style: {
+                        color: secondaryColor
+                    },
+                },
+            ],
+        },
+        MuiIconButton: {
+            variants: [
+                {
+                    props: { variant: 'modal' },
+                    style: {
+                        color: primaryColor,
                         '&:hover': {
-                            backgroundColor: secondaryColor,
+                            backgroundColor: thirdColor,
                             opacity: [0.1, 0.1, 0.1],
                         },
                     },
                 },
                 {
-                    props: { variant: 'nav' },
+                    props: { variant: 'layout' },
                     style: {
                         color: secondaryColor,
                         '&:hover': {
@@ -102,8 +107,24 @@ const customTheme = createTheme({
                         fontSize: '1.25rem'
                     },
                 },
+                {
+                    props: { variant: 'modal' },
+                    style: {
+                        color: thirdColor,
+                        fontSize: '1.5rem',
+                        fontFamily: '"Rockwell"',
+                    },
+                },
             ],
         },
+        MuiAlert: {
+            styleOverrides: {
+                root: {
+                    marginBottom: '0.50rem',
+                },
+            }
+        },
+
     },
 
 });

@@ -7,58 +7,86 @@ import ErrorIcon from '@mui/icons-material/Error';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import WarningIcon from '@mui/icons-material/Warning';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/system';
 import axios from 'axios';
 
-const NotificationList = (props)=>{
-   const {anchorEl,open,handleClose,value,createdTime}=props;
-   const heatValue=parseInt(value);
-   const notificationListItem = [
-    {
-        message: "The temperature is reached "+ heatValue +" degree",
-        createdTime: createdTime,
-        status:"error",
-    },
-    {
-      message: "The temperature is reached "+ heatValue +" degree",
-      createdTime: createdTime,
-      status:"warning",
-    }
-];
-   const handleDelete=()=>{
-      //axios.post("http://localhost:9090/api/v1/alerts",{notification})
-   }
-    return (
-      <Menu
-        id="fade-menu"
-        MenuListProps={{
-          'aria-labelledby': 'fade-button',
-        }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Fade}
-      >
+let notificationListItem = [];
+setInterval(function tick() {
+  notificationListItem = [];
+  axios.get('http://176.235.202.77:4000/api/v1/alerts/')
+    .then((response) => {
+      response.data.forEach(element => {
+        const temp = {
+          id: element.id,
+          message: element.message,
+          createdTime: element.created_at,
+          status: element.status,
+        };
+        notificationListItem.push(temp);
+      });
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        console.log(error.request);
+      } else {
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    });
+}, 2000);
+
+const notificationCount = React.createContext();
+
+const NotificationList = (props) => {
+  const { anchorEl, open, handleClose, value, createdTime } = props;
+  const heatValue = parseInt(value);
+  function AllAlerts(props) {
+    return <>
       {notificationListItem.map((list) => (
         <MenuItem key={list.message}>
-           {list.status==='error'?(
-             <ListItemIcon>
-                <ErrorIcon fontSize="medium" color="error"/>
-            </ListItemIcon>
-           ):(
+          {list.status === 'error' ? (
             <ListItemIcon>
-              <WarningIcon fontSize="medium" color="warning"/>
+              <ErrorIcon fontSize="medium" color="error" />
             </ListItemIcon>
-           )}
-           <div style={{flexDirection:'column',margin:10}}>
-                <ListItemText>{list.message}</ListItemText>
-                <ListItemText style={{color:'gray'}}>{list.createdTime}</ListItemText>
-           </div>
-           <ListItemIcon onClick={handleDelete}>
-              <DeleteIcon fontSize="medium"/>
+          ) : (
+            <ListItemIcon>
+              <WarningIcon fontSize="medium" color="warning" />
+            </ListItemIcon>
+          )}
+          <Box>
+            <ListItemText>{list.message}</ListItemText>
+            <ListItemText style={{ color: 'gray' }}>{list.createdTime}</ListItemText>
+          </Box>
+          <ListItemIcon sx={{ ml: '10px' }} onClick={() => handleDelete(list.id)}>
+            <DeleteIcon fontSize="medium" />
           </ListItemIcon>
         </MenuItem>
-    ))}
-      </Menu>
-    )
+      ))}
+    </>
+
+  }
+  const handleDelete = (id) => {
+    axios.delete('http://176.235.202.77:4000/api/v1/alerts/' + id)
+      .then((response) => {
+        console.log(response);
+      }, (error) => {
+        console.log(error);
+      });
+    handleClose();
+  }
+  return (
+    <Menu
+
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+    >
+      <AllAlerts />
+    </Menu>
+  )
 }
 export default NotificationList;
