@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { BrowserRouter, Route, Routes, Switch, Navigate, useHistory } from "react-router-dom";
-import { styled, useTheme } from '@mui/material/styles';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -26,11 +26,13 @@ import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
-import { Link } from '@mui/material';
+import { Alert, AlertTitle, Link } from '@mui/material';
 import Dashboard from './Dashboard';
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
 import Devices from './Devices';
+import { useEffect } from 'react';
+import NotificationList from './NotificationList';
 
 const drawerWidth = 200;
 
@@ -77,12 +79,33 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
+const Alerts = [
+    {
+        type: "error",
+        message: "Unread Alert",
+    },
+    {
+        type: "warning",
+        message: "Unread Alert",
+    },
+];
 
+function AllAlerts(props) {
+    return <>
 
+        {Alerts.map(element => {
+            return (
+                <Alert variant="filled" severity={element.type}>
+                    <AlertTitle>{element.type}</AlertTitle>
+                    {element.message}
+                </Alert>
+            );
+        })}
+    </>
+}
 
 export default function PersistentDrawerLeft() {
-    const theme = useTheme();
-    const { keycloak, initialized } = useKeycloak();
+    const { keycloak } = useKeycloak();
     const isObserver = keycloak.hasRealmRole("observer");
     const isAdmin = keycloak.hasRealmRole("admin");
     const isCreator = keycloak.hasRealmRole("creator");
@@ -126,12 +149,21 @@ export default function PersistentDrawerLeft() {
 
 
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorElNotification, setAnchorElNotification] = React.useState(null);
 
     const isMenuOpen = Boolean(anchorEl);
+    const openNotification = Boolean(anchorElNotification);
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
+    const handleClickNotificationOpen = (event) => {
+        setAnchorElNotification(event.currentTarget);
+    }
+
+    const handleClickNotificationClose = () => {
+        setAnchorElNotification(null);
+    }
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -163,13 +195,20 @@ export default function PersistentDrawerLeft() {
         </Menu>
     );
 
+    const [AlertOpen, setAlertOpen] = React.useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setAlertOpen(false);
+        }, 5000);
+    }, [AlertOpen])
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar>
                     <IconButton
-                        variant='nav'
+                        variant='layout'
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
@@ -183,15 +222,25 @@ export default function PersistentDrawerLeft() {
                     </Typography>}
 
                     <Box marginLeft={"auto"}>
-                        <IconButton
-                            size="large"
-                            aria-label="show 17 new notifications"
-                            variant="nav"
-                        >
-                            <Badge badgeContent={17} color="error">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
+
+                        {(isAdmin || isObserver) && (
+                            <IconButton
+                                size="large"
+                                aria-label="show 17 new notifications"
+                                variant="layout"
+                                onClick={handleClickNotificationOpen}
+                            >
+                                <Badge badgeContent={5} color="error"
+                                    onCanchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                >
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                        )}
+                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} />
                         <IconButton
                             size="large"
                             edge="end"
@@ -199,7 +248,7 @@ export default function PersistentDrawerLeft() {
                             aria-controls={menuId}
                             aria-haspopup="true"
                             onClick={handleProfileMenuOpen}
-                            variant='nav'
+                            variant='layout'
                             sx={{
                                 borderRadius: 2,
                                 mx: 1,
@@ -232,7 +281,7 @@ export default function PersistentDrawerLeft() {
                     <Typography marginRight={"auto"} variant="side" noWrap component="div">
                         IoTwin
                     </Typography>
-                    <IconButton variant='side' onClick={handleDrawerClose}>
+                    <IconButton variant='layout' onClick={handleDrawerClose}>
                         <ArrowCircleLeftSharpIcon fontSize='large' />
                     </IconButton>
                 </DrawerHeader>
@@ -240,22 +289,23 @@ export default function PersistentDrawerLeft() {
                 <List >
                     {DrawerContent.map((content, index) => (
                         <ListItem button key={content.text} variant='side' component={Link} href={content.path} >
-                            <ListItemIcon  >
+                            <ListItemIcon variant='side'  >
                                 {content.Icon}
                             </ListItemIcon>
-                            <ListItemText primary={content.text} />
+                            <ListItemText variant="side" primary={content.text} />
                         </ListItem>
                     ))}
                     <ListItem variant='side' onClick={() => keycloak.logout()} button key={"logout"}>
-                        <ListItemIcon   >
+                        <ListItemIcon variant='side'    >
                             <ExitToAppSharpIcon fontSize='large' />
                         </ListItemIcon>
-                        <ListItemText primary={"Logout"} />
+                        <ListItemText variant="side" primary={"Logout"} />
                     </ListItem>
 
                 </List>
             </Drawer>
             <Main sx={{ mt: "60px" }} open={open}>
+                {AlertOpen && <AllAlerts />}
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<>
