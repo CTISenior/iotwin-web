@@ -2,7 +2,6 @@
     "keycloak":{
         "IP":"http://176.235.202.77",
         "PORT":"8080",
-        "realm":"IoTwin",
         "clientId":"IoTwin-auth"
     }
 }

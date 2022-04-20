@@ -10,43 +10,48 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Box } from '@mui/system';
 import axios from 'axios';
 
-let notificationListItem = [];
-setInterval(function tick() {
-  notificationListItem = [];
-  axios.get('http://176.235.202.77:4000/api/v1/alerts/')
-    .then((response) => {
-      response.data.forEach(element => {
-        const temp = {
-          id: element.id,
-          message: element.message,
-          createdTime: element.created_at,
-          status: element.status,
-        };
-        notificationListItem.push(temp);
-      });
-    })
-    .catch((error) => {
-      if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        console.log(error.request);
-      } else {
-        console.log('Error', error.message);
-      }
-      console.log(error.config);
-    });
-}, 2000);
+
 
 const notificationCount = React.createContext();
 
 const NotificationList = (props) => {
-  const { anchorEl, open, handleClose, value, createdTime } = props;
-  const heatValue = parseInt(value);
+  const { anchorEl, open, handleClose, value, createdTime, tenantID } = props;
+  const [notificationList, setNotificationList] = React.useState([]);
+
+  React.useEffect(() => {
+    let notificationListItem = [];
+    setInterval(function tick() {
+      notificationListItem = [];
+      axios.get('http://176.235.202.77:4000/api/v1/tenants/ctis/alerts')
+        .then((response) => {
+          response.data.forEach(element => {
+            const temp = {
+              id: element.id,
+              message: element.message,
+              createdTime: element.created_at,
+              status: element.status,
+            };
+            notificationListItem.push(temp);
+          });
+          setNotificationList(notificationListItem);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        });
+    }, 1000);
+  }, []);
   function AllAlerts(props) {
     return <>
-      {notificationListItem.map((list) => (
+      {notificationList.map((list) => (
         <MenuItem key={list.message}>
           {list.status === 'error' ? (
             <ListItemIcon>

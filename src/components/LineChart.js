@@ -16,27 +16,36 @@ ChartJS.register(
   Legend
 )
 
+
 const temp = [];
 const hum = [];
 const tempLabel = [];
 
-socket.emit("telemetry_topic", "tempDev");
-socket.on("telemetry_topic_message", function (msg) {
-  let info = JSON.parse(msg);
-  console.log(temp);
-  const date = new Date();
-  if (tempLabel.length > 15) {
-    tempLabel.shift();
-    temp.shift();
-  }
-  temp.push(info.temperature);
-  tempLabel.push(date.getHours() + ":" + date.getMinutes());
-});
-
 const LineChart = (props) => {
 
-  const { id, } = props;
+  const { id, types, list } = props;
+  // React.useEffect(() => {
+  //   console.log("New list is : " + JSON.stringify(list));
+  // }, [list])
 
+  React.useEffect(() => {
+    socket.emit("telemetry_topic", [id, "SN-2001"]);
+    socket.on("telemetry_topic_message", function (msg) {
+      let info = JSON.parse(msg);
+      console.log(info.values);
+      const date = new Date();
+      if (tempLabel.length > 15) {
+        tempLabel.shift();
+        if (temp.length > 0)
+          temp.shift();
+        if (hum.length > 0)
+          hum.shift();
+      }
+      temp.push(info.values.temperature);
+      hum.push(info.values.humidity);
+      tempLabel.push(date.getHours() + ":" + date.getMinutes());
+    });
+  }, []);
 
   const [openAlert, setOpenAlert] = useState(true);
   const handleCloseAlert = () => {
@@ -63,7 +72,6 @@ const LineChart = (props) => {
     ],
   })
   useEffect(() => {
-
     setTimeout(function () {
       setChart({
         labels: tempLabel,
@@ -74,12 +82,12 @@ const LineChart = (props) => {
             borderColor: "#FF0000",
             fill: true,
           },
-          // {
-          //   label: "Humidity",
-          //   data: hum,
-          //   borderColor: "#3e95cd",
-          //   fill: true,
-          // },
+          {
+            label: "Humidity",
+            data: hum,
+            borderColor: "#3e95cd",
+            fill: true,
+          },
         ],
       }, [tempLabel, temp]);
 
@@ -113,6 +121,12 @@ const LineChart = (props) => {
   }
   return (
     <div style={{ width: '80%' }}>
+      <Line
+        data={chart}
+        height={400}
+        width={600}
+        options={options}
+      />
       <Line
         data={chart}
         height={400}
