@@ -18,7 +18,7 @@ export default function DialogBox(props) {
     const [protocol, setProtocol] = React.useState('http');
     const [descriptionValue, setDescriptionValue] = React.useState();
 
-    const Buildings = [
+    const Assets = [
         {
             value: 'building-a',
             label: 'Building A',
