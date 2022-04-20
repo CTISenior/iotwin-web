@@ -15,7 +15,7 @@ export default function DialogBox(props) {
     const [deviceType, setDeviceType] = React.useState('temp');
     const [protocol, setProtocol] = React.useState('http');
 
-    const Buildings = [
+    const Assets= [
         {
             value: 'building-a',
             label: 'Building A',

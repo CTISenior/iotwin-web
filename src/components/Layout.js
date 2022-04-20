@@ -31,6 +31,7 @@ import Dashboard from './Dashboard';
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
 import Devices from './Devices';
+import Assets from './Assets';
 import NotificationList from './NotificationList';
 import AlertComponent from './Alert';
 
@@ -91,15 +92,15 @@ export default function PersistentDrawerLeft() {
     if (isAdmin) {
         DrawerContent = [
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
+            { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
-            { text: "Building", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/buildings" },
             { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
     else if (isCreator) {
         DrawerContent = [
+            { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
-            { text: "Building", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/buildings" },
             { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
@@ -282,15 +283,22 @@ export default function PersistentDrawerLeft() {
 
                             </>
                             } />
-                            <Route path="/devices" element={<>
-                                <PrivateRoute>
-                                    <Devices />
-                                </PrivateRoute>
-                            </>
-                            } />
+   
                             <Route path="/dashboard" element={<>
                                 <PrivateRoute>
                                     <Dashboard tenantID={tenantID} />
+                                </PrivateRoute>
+                            </>
+                            } />
+                            <Route path="/assets" element={<>
+                                <PrivateRoute>
+                                    <Assets  tenantID={tenantID}/>
+                                </PrivateRoute>
+                            </>
+                            } />
+                            <Route path="/devices" element={<>
+                                <PrivateRoute>
+                                    <Devices  tenantID={tenantID}/>
                                 </PrivateRoute>
                             </>
                             } />

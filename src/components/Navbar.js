@@ -17,7 +17,7 @@ const Navbar = ({ children }) => {
                         <a href="/devices" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                             className="fas fa-fire-alt me-2"></i>Devices</a>
                         <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                            className="fas fa-building me-2"></i>Buildings</a>
+                            className="fas fa-building me-2"></i>Assets</a>
                         <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                             className="fas fa-cogs me-2"></i>Settings</a>
                         {!!keycloak.authenticated && (
@@ -43,7 +43,7 @@ const Navbar = ({ children }) => {
                         <a href="/devices" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                             className="fas fa-fire-alt me-2"></i>Devices</a>
                         <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
-                            className="fas fa-building me-2"></i>Buildings</a>
+                            className="fas fa-building me-2"></i>Assets</a>
                         <a href="#" className="list-group-item list-group-item-action bg-transparent second-text fw-bold"><i
                             className="fas fa-cogs me-2"></i>Settings</a>
                         {!!keycloak.authenticated && (
