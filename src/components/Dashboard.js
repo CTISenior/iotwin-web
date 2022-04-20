@@ -6,9 +6,6 @@ import io from 'socket.io-client';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
-const temp = [];
-const hum = [];
-const tempLabel = [];
 
 const Dashboard = (props) => {
     const { tenantID } = props;
@@ -16,27 +13,20 @@ const Dashboard = (props) => {
     const [topics, setTopics] = React.useState([]);
     const [graphList, setGraphList] = React.useState([]);
 
-    React.useEffect(() => {
-        if (topics.length > 0) {
-            socket.emit("telemetry_topic", topics);
-            socket.on("telemetry_topic_message", function (msg, topic) {
-                let info = JSON.parse(msg);
-                console.log(info);
-                const date = new Date();
-                if (tempLabel.length > 15) {
-                    tempLabel.shift();
-                    if (temp.length > 0)
-                        temp.shift();
-                    if (hum.length > 0)
-                        hum.shift();
-                }
-                const timeLabel = date.getHours() + ":" + date.getMinutes();
-                setGraphList(graphList.map(item => item.id === topic ? { ...item, temperature: [...item.temperature, info.values.temperature], humidity: [...item.humidity, info.values.humidity] } : item))
-                temp.push(info.values.temperature);
-                hum.push(info.values.humidity);
-            });
-        }
-    }, [topics]);
+    // React.useEffect(() => {
+    //     console.log("New list is : " + JSON.stringify(graphList));
+    // }, [graphList])
+
+    // React.useEffect(() => {
+    //     if (topics.length > 0) {
+    //         socket.emit("telemetry_topic", topics);
+    //         socket.on("telemetry_topic_message", function (msg, topic) {
+    //             let info = JSON.parse(msg);
+    //             console.log("topic is : " + topic);
+    //             setGraphList(graphList.map(item => item.id === topic ? { ...item, temperature: [info.values.temperature], humidity: [info.values.humidity] } : { ...item, temperature: null, humidity: null }))
+    //         });
+    //     }
+    // }, [topics]);
 
     React.useEffect(async () => {
         const tempDevices = [];
@@ -49,10 +39,10 @@ const Dashboard = (props) => {
                     const temp = { name: element.name, id: element.sn, building_id: element.building_id, types: element.types };
                     tempDevices.push(temp);
                     tempTopics.push(element.sn);
-                    tempGraphList.push({ id: element.sn, temperature: [10], humidity: [11], label: [] });
+                    // tempGraphList.push({ id: element.sn, temperature: [], humidity: [] });
 
                 });
-                setGraphList(tempGraphList);
+                // setGraphList(tempGraphList);
                 setTopics(tempTopics);
                 setDevices(tempDevices);
 
@@ -72,23 +62,17 @@ const Dashboard = (props) => {
     }, []);
 
 
-    function AllDevices(props) {
-        function sendGraphList(id) {
-            return graphList.filter(item => item.id === id ? item : "");
-        }
-        return <>
-            {devices.map(element => {
-                return (
-                    <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
-                );
-            })}
-        </>
-
+    function sendGraphList(id) {
+        return graphList.filter(item => item.id === id ? item : "");
     }
     return (
         <Container>
             <Grid container spacing={3}>
-                <AllDevices />
+                {devices.map(element => {
+                    return (
+                        <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                    );
+                })}
             </Grid>
         </Container>
     )

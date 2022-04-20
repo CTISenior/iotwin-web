@@ -9,7 +9,6 @@ import { Tooltip } from '@mui/material';
 
 const DeviceModal = (props) => {
     const { name, id, types, onClose, list } = props;
-    console.log(list);
     function createData(name, hour, day, week, month, year) {
         return { name, hour, day, week, month, year };
     }
