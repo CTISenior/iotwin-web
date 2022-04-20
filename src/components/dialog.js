@@ -4,18 +4,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import TextFieldItem from './textField';
+import TextFieldItem from './TextField';
 import MenuItem from '@mui/material/MenuItem';
 
 export default function DialogBox(props) {
-    const { open, maxWidth, handleadd, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
-    const [descriptionValue, setDescriptionValue] = React.useState();
+    const [descriptionValue, setDescriptionValue] = React.useState('');
+    const [maxValues, setMaxValues] = React.useState('');
+    const [deviceName, setDeviceName] = React.useState('');
     const [building, setBuilding] = React.useState('building-a');
     const [deviceType, setDeviceType] = React.useState('temp');
     const [protocol, setProtocol] = React.useState('http');
-
-    const Assets= [
+    const [deviceSn, setDeviceSn] = React.useState('');
+    const Assets = [
         {
             value: 'building-a',
             label: 'Building A',
@@ -70,10 +72,29 @@ export default function DialogBox(props) {
     const handleDescriptionChange = (event) => {
         setDescriptionValue(event.target.value);
     }
+    const handleMaxValueChange = (event) => {
+        setMaxValues(event.target.value);
+    }
+    const handleDeviceNameChange = (event) => {
+        setDeviceName(event.target.value);
+    }
+    const handleDeviceSnChange = (event) => {
+        setDeviceSn(event.target.value);
+    }
     /*
     const handleErrorChange = () => {
         setError(true);
     }*/
+
+    const handleadd = () => {
+        console.log(building);
+        console.log(deviceName);
+        console.log(deviceSn);
+        console.log(deviceType);
+        console.log(protocol)
+        console.log(descriptionValue);
+        console.log(maxValues);
+    }
 
     return (
         <Dialog open={open}
@@ -95,7 +116,7 @@ export default function DialogBox(props) {
                     helperText="Please select your building"
                     required={true}
                 >
-                    {Buildings.map((option) => (
+                    {Assets.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
                             {option.label}
                         </MenuItem>
@@ -108,6 +129,8 @@ export default function DialogBox(props) {
                     label="Name"
                     type="text"
                     fullWidth
+                    value={deviceName}
+                    onChange={handleDeviceNameChange}
                     variant="standard"
                     required={true}
                     // error={true}
@@ -120,6 +143,8 @@ export default function DialogBox(props) {
                     type="text"
                     fullWidth
                     variant="standard"
+                    value={deviceSn}
+                    onChange={handleDeviceSnChange}
                     required={true}
                     // error={true}
                     helperText="Serial Number is required." />
@@ -170,6 +195,16 @@ export default function DialogBox(props) {
                     value={descriptionValue}
                     onChange={handleDescriptionChange}
                     variant="standard" />
+                <TextFieldItem
+                    id="maxValues"
+                    label="Max Values"
+                    type="text"
+                    autoFocus
+                    fullWidth
+                    variant="standard"
+                    value={maxValues}
+                    onChange={handleMaxValueChange}
+                    margin="normal" />
             </DialogContent>
             <DialogActions style={{ marginTop: 30, borderTop: '1px solid #D3D3D3' }}>
                 <Button onClick={handleclose} style={{ textTransform: 'capitalize' }}>Cancel</Button>
