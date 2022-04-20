@@ -23,13 +23,9 @@ const tempLabel = [];
 
 const LineChart = (props) => {
 
-  const { id, types, list } = props;
-  // React.useEffect(() => {
-  //   console.log("New list is : " + JSON.stringify(list));
-  // }, [list])
-
+  const { id, types } = props;
   React.useEffect(() => {
-    socket.emit("telemetry_topic", [id, "SN-2001"]);
+    socket.emit("telemetry_topic", id);
     socket.on("telemetry_topic_message", function (msg) {
       let info = JSON.parse(msg);
       console.log(info.values);

@@ -38,9 +38,9 @@ export default function DeviceCard(props) {
     const handleStop = (event) => {
         socket.emit("stop", id);
     }
-    React.useEffect(() => {
-        console.log("New list is : " + JSON.stringify(list));
-    }, [list])
+    // React.useEffect(() => {
+    //     console.log("New list is : " + JSON.stringify(list));
+    // }, [list])
 
     return (
         <Grid item xs={12} sm={6} md={3}>
