@@ -26,13 +26,13 @@ import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
-import { Alert, AlertTitle, Link } from '@mui/material';
+import { Link } from '@mui/material';
 import Dashboard from './Dashboard';
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
 import Devices from './Devices';
-import { useEffect } from 'react';
 import NotificationList from './NotificationList';
+import AlertComponent from './Alert';
 
 const drawerWidth = 200;
 
@@ -79,39 +79,15 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     justifyContent: 'flex-end',
 }));
 
-const Alerts = [
-    {
-        type: "error",
-        message: "Unread Alert",
-    },
-    {
-        type: "warning",
-        message: "Unread Alert",
-    },
-];
-
-function AllAlerts(props) {
-    return <>
-
-        {Alerts.map(element => {
-            return (
-                <Alert variant="filled" severity={element.type}>
-                    <AlertTitle>{element.type}</AlertTitle>
-                    {element.message}
-                </Alert>
-            );
-        })}
-    </>
-}
-
 export default function PersistentDrawerLeft() {
     const { keycloak } = useKeycloak();
     const isObserver = keycloak.hasRealmRole("observer");
     const isAdmin = keycloak.hasRealmRole("admin");
     const isCreator = keycloak.hasRealmRole("creator");
-    let DrawerContent = [
+    const tenantID = keycloak.realm;
+    console.log(keycloak.realm);
 
-    ];
+    let DrawerContent = [];
     if (isAdmin) {
         DrawerContent = [
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
@@ -134,10 +110,7 @@ export default function PersistentDrawerLeft() {
         ];
     }
 
-
-
     const [open, setOpen] = React.useState(true);
-
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -146,7 +119,6 @@ export default function PersistentDrawerLeft() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [anchorElNotification, setAnchorElNotification] = React.useState(null);
@@ -195,13 +167,6 @@ export default function PersistentDrawerLeft() {
         </Menu>
     );
 
-    const [AlertOpen, setAlertOpen] = React.useState(true);
-    useEffect(() => {
-        setTimeout(() => {
-            setAlertOpen(false);
-        }, 5000);
-    }, [AlertOpen])
-
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -240,7 +205,7 @@ export default function PersistentDrawerLeft() {
                                 </Badge>
                             </IconButton>
                         )}
-                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} />
+                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} tenantID={tenantID} />
                         <IconButton
                             size="large"
                             edge="end"
@@ -264,6 +229,7 @@ export default function PersistentDrawerLeft() {
                 </Toolbar>
             </AppBar>
             {renderMenu}
+
             <Drawer
                 sx={{
                     width: drawerWidth,
@@ -304,30 +270,36 @@ export default function PersistentDrawerLeft() {
 
                 </List>
             </Drawer>
-            <Main sx={{ mt: "60px" }} open={open}>
-                {AlertOpen && <AllAlerts />}
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<>
-                            <Navigation />
+            {isAdmin && (
 
-                        </>
-                        } />
-                        <Route path="/devices" element={<>
-                            <PrivateRoute>
-                                <Devices />
-                            </PrivateRoute>
-                        </>
-                        } />
-                        <Route path="/dashboard" element={<>
-                            <PrivateRoute>
-                                <Dashboard />
-                            </PrivateRoute>
-                        </>
-                        } />
-                    </Routes>
-                </BrowserRouter>
-            </Main>
+                <Main sx={{ mt: "60px" }} open={open}>
+
+                    <AlertComponent message={"test"} type={"error"} />
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<>
+                                <Navigation />
+
+                            </>
+                            } />
+                            <Route path="/devices" element={<>
+                                <PrivateRoute>
+                                    <Devices />
+                                </PrivateRoute>
+                            </>
+                            } />
+                            <Route path="/dashboard" element={<>
+                                <PrivateRoute>
+                                    <Dashboard tenantID={tenantID} />
+                                </PrivateRoute>
+                            </>
+                            } />
+                        </Routes>
+                    </BrowserRouter>
+
+                </Main>
+            )}
+
         </Box >
     );
 }

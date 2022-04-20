@@ -23,23 +23,24 @@ const ModalStyle = {
 
 export default function DeviceCard(props) {
 
-    const { name, id, building_id } = props;
+    const { name, id, building_id, types, socket, list } = props;
 
     const [openModal, setOpenModal] = React.useState(false);
-
     const handleModalClose = () => {
         setOpenModal(false);
     }
     const handleModalOpen = (params) => {
         setOpenModal(true);
     }
-
     const handleStart = (event) => {
-
+        socket.emit("start", id);
     }
     const handleStop = (event) => {
-
+        socket.emit("stop", id);
     }
+    React.useEffect(() => {
+        console.log("New list is : " + JSON.stringify(list));
+    }, [list])
 
     return (
         <Grid item xs={12} sm={6} md={3}>
@@ -79,7 +80,7 @@ export default function DeviceCard(props) {
                             aria-describedby="modal-modal-description"
                         >
                             <Box sx={ModalStyle}>
-                                <DeviceModal name={name} id={id} building_id={building_id} onClose={handleModalClose} />
+                                <DeviceModal name={name} id={id} building_id={building_id} types={types} onClose={handleModalClose} list={list} />
                             </Box>
                         </Modal>
                     </Box>

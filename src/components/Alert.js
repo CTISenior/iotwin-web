@@ -1,30 +1,42 @@
 import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
+import { Slide } from '@mui/material';
 
-export default function PositionedSnackbar(props){
-  const {open,value,handleClose,vertical,horizontal,createdTime}=props;
-  const heatValue=parseInt(value);
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+function TransitionLeft(props) {
+  return <Slide {...props} direction="left" />;
+}
+
+export default function AlertComponent(props) {
+  const { message, type, variant } = props;
+  const [AlertOpen, setAlertOpen] = React.useState(true);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
   return (
-    <div style={{display:(heatValue<40)?'none':'block'}}>
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-       
-        key={vertical + horizontal}>
-        {(value>=40 && value<=49) ?(
-            
-            <Alert severity="warning" onClose={handleClose} sx={{ width: '100%' }}>The temperature is reached {heatValue} degrees at {createdTime} !</Alert>
-        ):
-        (
-            <Alert severity="error" onClose={handleClose} sx={{ width: '100%' }}>The temperature is reached {heatValue} degrees at {createdTime} !</Alert>
-        )}
-      </Snackbar>
-    </div>
-    );
+    <Snackbar anchorOrigin={{
+      vertical: ' bottom',
+      horizontal: 'right'
+    }}
+      open={AlertOpen}
+      autoHideDuration={5000}
+      onClose={handleClose}
+      variant={variant}
+      TransitionComponent={TransitionLeft}
+    >
+      <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
+        {message}
+      </Alert>
+
+    </Snackbar >
+  );
 }

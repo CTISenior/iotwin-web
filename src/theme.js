@@ -124,6 +124,16 @@ const customTheme = createTheme({
                 },
             }
         },
+        MuiSnackbar: {
+            variants: [
+                {
+                    props: { variant: 'over' },
+                    style: {
+                        marginBottom: '3.5rem'
+                    },
+                }
+            ],
+        }
 
     },
 
