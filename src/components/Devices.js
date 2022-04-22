@@ -4,21 +4,37 @@ import axios from 'axios';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import AddDialog from './dialog';
-
+import EditDeviceDialog from './EditDeviceDialog';
+import DeleteDeviceDialog from './DeleteDevice';
 
 const Devices = (props) => {
     const { tenantID } = props;
     const devices = [];
     const [tableData, setTableData] = useState([]);
+    const [selectedRow, setSelectedRow] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);
-    const handleclose = () => {
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedRowId, setSelectedRowId] = useState(0);
+    const [selectedRowName, setSelectedRowName] = useState("");
+
+    const handleCloseAdd = () => {
         setOpenAddDialog(false);
     };
-    const handleOpen = () => {
+    const handleCloseEdit = () => {
+        setOpenEditDialog(false);
+    }
+    const handleCloseDelete = () => {
+        setOpenDeleteDialog(false);
+    }
+    const handleOpenAdd = () => {
         setOpenAddDialog(true);
     }
+
     useEffect(() => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`)
             .then((response) => {
@@ -58,12 +74,42 @@ const Devices = (props) => {
         { name: 'Types' },
         { name: 'Max Values' },
         { name: 'Description' },
-        { name: 'Asset', options: { display: true } }
+        { name: 'Asset', options: { display: true } },
+        {
+            name: 'Action', options: {
+                customBodyRenderLite: (rowIndex) => {
+                    return (
+                        <>
+                            <IconButton onClick={() => {
+                                const rowValue = tableData[rowIndex];
+                                setSelectedRow(rowValue);
+                                setOpenEditDialog(true);
+                            }}>
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton cnClick={() => {
+                                const rowValue = tableData[rowIndex];
+                                console.log(rowValue);
+                                setSelectedRowId(rowValue[0]);
+                                console.log(selectedRowId);
+                                setSelectedRowName(rowValue[2]);
+                                console.log(selectedRowName);
+                                setOpenDeleteDialog(true);
+                            }}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </>
+
+                    )
+                }
+            }
+        }
     ]
 
 
     const options = {
         filterType: 'checkbox',
+        responsive: "scroll"
         //onRowClick: handleRowClick,// row
     };
 
@@ -81,12 +127,15 @@ const Devices = (props) => {
 
             <Box sx={{ '& > :not(style)': { m: 1 } }}>
                 <Fab color='secondary' aria-label='add'>
-                    <IconButton onClick={handleOpen}>
+                    <IconButton onClick={handleOpenAdd}>
                         <AddIcon />
                     </IconButton>
                 </Fab>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleclose} fullWidth={true} tenantID={tenantID} maxWidth='md' />
+            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} tenantID={tenantID} />
+            <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={true} maxWidth='md'
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} tenantID={tenantID} />
         </>
     )
 }

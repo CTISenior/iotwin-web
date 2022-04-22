@@ -5,18 +5,22 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import { DialogContentText } from '@mui/material';
+import axios from 'axios';
 
-export default function DeleteDialogBox(props){
-    const { open, maxWidth, handleadd,handleClose, handleDelete,numSelected,deviceName, ...fullWidth} = props;
+export default function DeleteDialogBox(props) {
+    const { open, maxWidth, selectedRowName, selectedRowId, handleclose, ...fullWidth } = props;
 
+    const handleDelete = async () => {
+
+    }
     return (
-        <Dialog 
+        <Dialog
             open={open}
             {...fullWidth}
             maxWidth={maxWidth}
             aria-labelledby="responsive-dialog-title">
-            <DialogTitle style={{fontWeight:'bold'}}>
-                {"Are you sure you want to delete "+(numSelected>0?numSelected:deviceName )+ " device?"}
+            <DialogTitle style={{ fontWeight: 'bold' }}>
+                {"Are you sure you want to delete " + selectedRowName + " device?"}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
@@ -24,10 +28,10 @@ export default function DeleteDialogBox(props){
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>No</Button>
+                <Button onClick={handleclose}>No</Button>
                 <Button onClick={handleDelete} autoFocus>Yes</Button>
             </DialogActions>
-            
+
         </Dialog>
     );
 }
