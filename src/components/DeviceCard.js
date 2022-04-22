@@ -8,6 +8,8 @@ import React from 'react'
 import SensorsSharpIcon from '@mui/icons-material/SensorsSharp';
 import Modal from '@mui/material/Modal';
 import DeviceModal from './DeviceModal';
+import { SnackbarProvider, useSnackbar } from 'notistack';
+
 
 const ModalStyle = {
     position: 'absolute',
@@ -26,21 +28,32 @@ export default function DeviceCard(props) {
     const { name, id, building_id, types, socket, list } = props;
 
     const [openModal, setOpenModal] = React.useState(false);
+    const { enqueueSnackbar } = useSnackbar();
+    const [status, setStatus] = React.useState(false);
+
+
+    const handleClick = (message, variant) => {
+        enqueueSnackbar(message, { variant });
+    };
+
     const handleModalClose = () => {
         setOpenModal(false);
     }
     const handleModalOpen = (params) => {
+        handleClick();
         setOpenModal(true);
     }
     const handleStart = (event) => {
         socket.emit("start", id);
+        setStatus(false);
+        handleClick("The device : " + id + " is continue resuming", "success");
     }
     const handleStop = (event) => {
         socket.emit("stop", id);
+        setStatus(true);
+        handleClick("The device : " + id + " is stopped", "warning");
     }
-    // React.useEffect(() => {
-    //     console.log("New list is : " + JSON.stringify(list));
-    // }, [list])
+
 
     return (
         <Grid item xs={12} sm={6} md={3}>
@@ -69,7 +82,7 @@ export default function DeviceCard(props) {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Display Device Details">
-                            <IconButton variant='modal' aria-label="display" onClick={handleModalOpen}>
+                            <IconButton variant='modal' aria-label="display" onClick={handleModalOpen} disabled={status}>
                                 <ShowChartIcon fontSize='large' />
                             </IconButton>
                         </Tooltip>
