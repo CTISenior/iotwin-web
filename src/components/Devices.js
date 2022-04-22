@@ -9,9 +9,8 @@ import AddDialog from './dialog';
 
 
 const Devices = (props) => {
-
+    const { tenantID } = props;
     const devices = [];
-    const tenantID = props.tenantID
     const [tableData, setTableData] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const handleclose = () => {
@@ -87,7 +86,7 @@ const Devices = (props) => {
                     </IconButton>
                 </Fab>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleclose} fullWidth={true} maxWidth='md' />
+            <AddDialog open={openAddDialog} handleclose={handleclose} fullWidth={true} tenantID={tenantID} maxWidth='md' />
         </>
     )
 }

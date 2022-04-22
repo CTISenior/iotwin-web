@@ -2,6 +2,7 @@ import { Container, Grid } from '@mui/material'
 import axios from 'axios';
 import React from 'react'
 import DeviceCard from './DeviceCard';
+import { SnackbarProvider } from 'notistack';
 import io from 'socket.io-client';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
@@ -67,13 +68,18 @@ const Dashboard = (props) => {
     }
     return (
         <Container>
-            <Grid container spacing={3}>
-                {devices.map(element => {
-                    return (
-                        <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
-                    );
-                })}
-            </Grid>
+            <SnackbarProvider maxSnack={3}>
+
+                <Grid container spacing={3}>
+
+                    {devices.map(element => {
+                        return (
+                            <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                        );
+                    })}
+                </Grid>
+            </SnackbarProvider>
+
         </Container>
     )
 }
