@@ -68,7 +68,7 @@ export default function AddDialogBox(props) {
             {...fullWidth}
             maxWidth={maxWidth}
             aria-labelledby="responsive-dialog-title">
-            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Add new device</DialogTitle>
+            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Add New Asset</DialogTitle>
             <DialogContent>
                 <TextFieldItem
                     autoFocus

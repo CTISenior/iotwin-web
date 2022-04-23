@@ -142,7 +142,7 @@ export default function AddDialogBox(props) {
                 </div>
                 <Stack direction="row" spacing={3}>
                     <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                    <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && coordinate)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(name && city && location && coordinate) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                 </Stack>
             </DialogActions>
         </Dialog >

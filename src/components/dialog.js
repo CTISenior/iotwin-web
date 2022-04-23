@@ -269,7 +269,7 @@ export default function DialogBox(props) {
             <DialogActions style={{ marginTop: 30 }}>
                 <Stack direction="row" spacing={3}>
                     <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                    <Button onClick={handleadd} variant="contained" disabled={!(building && deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(building && deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                 </Stack>
             </DialogActions>
         </Dialog >

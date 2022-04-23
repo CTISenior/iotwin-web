@@ -81,6 +81,7 @@ const Devices = (props) => {
                             <Tooltip title="Edit">
                                 <IconButton color='warning' onClick={() => {
                                     const rowValue = tableData[rowIndex];
+                                    console.log(rowValue);
                                     setSelectedRow(rowValue);
                                     setOpenEditDialog(true);
                                 }}>
