@@ -14,7 +14,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 const Devices = (props) => {
     const { tenantID } = props;
-    const devices = [];
     const [tableData, setTableData] = useState([]);
     const [selectedRow, setSelectedRow] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);

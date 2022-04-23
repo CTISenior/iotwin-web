@@ -122,7 +122,17 @@ export default function DialogBox(props) {
                 console.log(error);
             })
 
-            .finally(handleclose)
+            .finally(() => {
+                setDeviceSn(null);
+                setDeviceName(null);
+                setProtocol(null);
+                setMaxTemp(null);
+                setModel(null);
+                setMaxHum(null);
+                setDeviceType(null);
+                setDescriptionValue(null);
+                handleclose();
+            }, 1000)
     }
 
     return (
