@@ -17,7 +17,6 @@ export default function AddDialogBox(props) {
     const [location, setLocation] = useState(null);
     const [coordinate, setCoordinate] = useState(null);
     const [description, setDescription] = useState(null);
-    const [closeModel, setCloseModel] = useState(false);
 
     const handleNameChange = (event) => {
         setName(event.target.value);
