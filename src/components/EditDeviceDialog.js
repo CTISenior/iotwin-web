@@ -6,10 +6,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextFieldItem from './TextField';
 import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, tenantID, selectedRow, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, selectedRow, handleclose, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
@@ -31,11 +34,11 @@ export default function EditDeviceDialog(props) {
         setDescriptionValue(selectedRow[7]);
         setAssetId(selectedRow[8]);
     }, [selectedRow]);
+
     const handleadd = async () => {
         console.log(id) //selected row id
         console.log(selectedRow); //selected row data can be observed 
         await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
-            "sn": deviceSn,
             "name": deviceName,
             "protocol": protocol,
             "model": model,
@@ -43,7 +46,6 @@ export default function EditDeviceDialog(props) {
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": assetId,
-            "tenant_id": tenantID
         })
             .then(function (response) {
                 console.log(response);
@@ -105,7 +107,7 @@ export default function EditDeviceDialog(props) {
             {...fullWidth}
             maxWidth={maxWidth}
             aria-labelledby="responsive-dialog-title">
-            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device name</DialogTitle>
+            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device {deviceSn}</DialogTitle>
             <DialogContent>
                 <TextFieldItem
                     autoFocus
@@ -118,6 +120,7 @@ export default function EditDeviceDialog(props) {
                     value={deviceSn}
                     onChange={handleDeviceSnChange}
                     required={true}
+                    disabled
                     // error={true}
                     helperText="Serial Number is required." />
                 <TextFieldItem
@@ -211,9 +214,11 @@ export default function EditDeviceDialog(props) {
                     onChange={handleMaxHumValueChange}
                     margin="normal" />
             </DialogContent>
-            <DialogActions style={{ marginTop: 30, borderTop: '1px solid #D3D3D3' }}>
-                <Button onClick={handleclose} style={{ textTransform: 'capitalize' }}>Cancel</Button>
-                <Button onClick={handleadd} style={{ backgroundColor: '#305680', color: 'white', textTransform: 'capitalize' }}>Edit</Button>
+            <DialogActions style={{ marginTop: 30 }}>
+                <Stack direction="row" spacing={3}>
+                    <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
+                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Save</Button>
+                </Stack>
             </DialogActions>
         </Dialog>
     );

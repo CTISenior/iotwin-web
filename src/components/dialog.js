@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -6,20 +6,24 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextFieldItem from './TextField';
 import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import axios from 'axios';
+import AlertComponent from './Alert';
 
 export default function DialogBox(props) {
     const { open, maxWidth, tenantID, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
-    const [descriptionValue, setDescriptionValue] = React.useState('');
-    const [maxTemp, setMaxTemp] = React.useState(0);
-    const [maxHum, setMaxHum] = React.useState(0);
-    const [deviceName, setDeviceName] = React.useState('');
-    const [building, setBuilding] = React.useState('building-a');
-    const [deviceType, setDeviceType] = React.useState('temp');
-    const [protocol, setProtocol] = React.useState('http');
-    const [deviceSn, setDeviceSn] = React.useState('');
-    const [model, setModel] = React.useState('');
+    const [descriptionValue, setDescriptionValue] = useState('');
+    const [maxTemp, setMaxTemp] = useState(0);
+    const [maxHum, setMaxHum] = useState(0);
+    const [deviceName, setDeviceName] = useState('');
+    const [building, setBuilding] = useState('building-a');
+    const [deviceType, setDeviceType] = useState('temp');
+    const [protocol, setProtocol] = useState('http');
+    const [deviceSn, setDeviceSn] = useState('');
+    const [model, setModel] = useState('');
     const Assets = [
         {
             value: 'building-a',
@@ -96,10 +100,7 @@ export default function DialogBox(props) {
     }*/
 
     const handleadd = async () => {
-
-
         await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
-
             "sn": deviceSn,
             "name": deviceName,
             "protocol": protocol,
@@ -112,10 +113,15 @@ export default function DialogBox(props) {
         })
             .then(function (response) {
                 console.log(response);
+                console.log(response.data);
+                <AlertComponent message={response.data}
+                    type={response.status === 201 ? 'info' : 'error'
+                    } />
             })
             .catch(function (error) {
                 console.log(error);
             })
+
             .finally(handleclose)
     }
 
@@ -250,10 +256,12 @@ export default function DialogBox(props) {
                     onChange={handleMaxHumValueChange}
                     margin="normal" />
             </DialogContent>
-            <DialogActions style={{ marginTop: 30, borderTop: '1px solid #D3D3D3' }}>
-                <Button onClick={handleclose} style={{ textTransform: 'capitalize' }}>Cancel</Button>
-                <Button onClick={handleadd} style={{ backgroundColor: '#305680', color: 'white', textTransform: 'capitalize' }}>Add</Button>
+            <DialogActions style={{ marginTop: 30 }}>
+                <Stack direction="row" spacing={3}>
+                    <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
+                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                </Stack>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 }
