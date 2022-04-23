@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,39 +10,51 @@ import Stack from '@mui/material/Stack';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import axios from 'axios';
-import AlertComponent from './Alert';
 
-export default function DialogBox(props) {
-    const { open, maxWidth, tenantID, handleclose, ...fullWidth } = props;
-    //const [error,setError]=React.useState(true);
+export default function EditDeviceDialog(props) {
+    const { open, maxWidth, selectedRow, handleclose, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
+    const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState('');
-    const [building, setBuilding] = useState('building-a');
     const [deviceType, setDeviceType] = useState('temp');
     const [protocol, setProtocol] = useState('http');
     const [deviceSn, setDeviceSn] = useState('');
     const [model, setModel] = useState('');
-    const Assets = [
-        {
-            value: 'building-a',
-            label: 'Building A',
-        },
-        {
-            value: 'building-b',
-            label: 'Building B',
-        }, {
-            value: 'building-c',
-            label: 'Building C',
-        }, {
-            value: 'building-d',
-            label: 'Building D',
-        }, {
-            value: 'building-e',
-            label: 'Building E',
-        },
-    ];
+    const [assetId, setAssetId] = useState();
+
+    useEffect(() => {
+        setID(selectedRow[0]);
+        setDeviceSn(selectedRow[1]);
+        setDeviceName(selectedRow[2]);
+        setModel(selectedRow[3]);
+        setProtocol(selectedRow[4]);
+        setDeviceType(selectedRow[5]);
+        setDescriptionValue(selectedRow[7]);
+        setAssetId(selectedRow[8]);
+    }, [selectedRow]);
+
+    const handleadd = async () => {
+        console.log(id) //selected row id
+        console.log(selectedRow); //selected row data can be observed 
+        await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
+            "name": deviceName,
+            "protocol": protocol,
+            "model": model,
+            "types": ["temperature"],
+            "max_values": [maxTemp, maxHum],
+            "description": descriptionValue,
+            "asset_id": assetId,
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(handleclose);
+    }
     const deviceTypes = [
         {
             value: 'temp',
@@ -66,10 +78,6 @@ export default function DialogBox(props) {
         },
     ];
 
-
-    const handleBuildingChange = (event) => {
-        setBuilding(event.target.value);
-    };
     const handleDeviceTypeChange = (event) => {
         setDeviceType(event.target.value);
     };
@@ -94,73 +102,27 @@ export default function DialogBox(props) {
     const handleModelChange = (event) => {
         setModel(event.target.value);
     }
-    /*
-    const handleErrorChange = () => {
-        setError(true);
-    }*/
-
-    const handleadd = async () => {
-        await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
-            "sn": deviceSn,
-            "name": deviceName,
-            "protocol": protocol,
-            "model": model,
-            "types": ["temperature"],
-            "max_values": [maxTemp, maxHum],
-            "description": descriptionValue,
-            "asset_id": null,
-            "tenant_id": tenantID
-        })
-            .then(function (response) {
-                console.log(response);
-                console.log(response.data);
-                <AlertComponent message={response.data}
-                    type={response.status === 201 ? 'info' : 'error'
-                    } />
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
-            .finally(() => {
-                setDeviceSn(null);
-                setDeviceName(null);
-                setProtocol(null);
-                setMaxTemp(null);
-                setModel(null);
-                setMaxHum(null);
-                setDeviceType(null);
-                setDescriptionValue(null);
-                handleclose();
-            }, 1000)
-    }
-
     return (
         <Dialog open={open}
             {...fullWidth}
             maxWidth={maxWidth}
             aria-labelledby="responsive-dialog-title">
-            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Add new device</DialogTitle>
+            <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device {deviceSn}</DialogTitle>
             <DialogContent>
                 <TextFieldItem
-                    id="building"
                     autoFocus
                     margin="dense"
-                    select
+                    id="serial-number"
+                    label="Serial Number"
+                    type="text"
                     fullWidth
                     variant="standard"
-                    label="Select"
-                    value={building}
-                    onChange={handleBuildingChange}
-                    helperText="Please select your building"
+                    value={deviceSn}
+                    onChange={handleDeviceSnChange}
                     required={true}
-                >
-                    {Assets.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextFieldItem>
+                    disabled
+                    // error={true}
+                    helperText="Serial Number is required." />
                 <TextFieldItem
                     autoFocus
                     margin="dense"
@@ -177,46 +139,13 @@ export default function DialogBox(props) {
                 <TextFieldItem
                     autoFocus
                     margin="dense"
-                    id="serial-number"
-                    label="Serial Number"
-                    type="text"
-                    fullWidth
-                    variant="standard"
-                    value={deviceSn}
-                    onChange={handleDeviceSnChange}
-                    required={true}
-                    // error={true}
-                    helperText="Serial Number is required." />
-                <TextFieldItem
-                    autoFocus
-                    margin="dense"
                     id="model"
                     label="Model"
                     type="text"
                     fullWidth
                     variant="standard"
                     value={model}
-                    onChange={handleModelChange}
-                />
-                <TextFieldItem
-                    id="deviceType"
-                    autoFocus
-                    margin="dense"
-                    select
-                    fullWidth
-                    variant="standard"
-                    label="Select"
-                    value={deviceType}
-                    onChange={handleDeviceTypeChange}
-                    helperText="Please select your device type"
-                    required={true}
-                >
-                    {deviceTypes.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextFieldItem>
+                    onChange={handleModelChange} />
                 <TextFieldItem
                     id="protocol"
                     autoFocus
@@ -236,6 +165,25 @@ export default function DialogBox(props) {
                         </MenuItem>
                     ))}
                 </TextFieldItem>
+                <TextFieldItem
+                    id="deviceType"
+                    autoFocus
+                    margin="dense"
+                    select
+                    fullWidth
+                    variant="standard"
+                    label="Select"
+                    value={deviceType}
+                    onChange={handleDeviceTypeChange}
+                    helperText="Please select your device type"
+                    required={true}>
+                    {deviceTypes.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </TextFieldItem>
+
                 <TextFieldItem
                     id="description"
                     label="Description"
@@ -269,9 +217,9 @@ export default function DialogBox(props) {
             <DialogActions style={{ marginTop: 30 }}>
                 <Stack direction="row" spacing={3}>
                     <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                    <Button onClick={handleadd} variant="contained" startIcon={<SaveAltIcon />} style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Save</Button>
                 </Stack>
             </DialogActions>
-        </Dialog >
+        </Dialog>
     );
 }

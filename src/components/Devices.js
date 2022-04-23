@@ -4,21 +4,38 @@ import axios from 'axios';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import AddDialog from './dialog';
-
+import EditDeviceDialog from './EditDeviceDialog';
+import DeleteDeviceDialog from './DeleteDevice';
+import Tooltip from '@mui/material/Tooltip';
 
 const Devices = (props) => {
     const { tenantID } = props;
-    const devices = [];
     const [tableData, setTableData] = useState([]);
+    const [selectedRow, setSelectedRow] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);
-    const handleclose = () => {
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedRowId, setSelectedRowId] = useState(0);
+    const [selectedRowName, setSelectedRowName] = useState('');
+    const [selectedRowSn, setSelectedRowSn] = useState('');
+
+    const handleCloseAdd = () => {
         setOpenAddDialog(false);
     };
-    const handleOpen = () => {
+    const handleCloseEdit = () => {
+        setOpenEditDialog(false);
+    }
+    const handleCloseDelete = () => {
+        setOpenDeleteDialog(false);
+    }
+    const handleOpenAdd = () => {
         setOpenAddDialog(true);
     }
+
     useEffect(() => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`)
             .then((response) => {
@@ -30,9 +47,6 @@ const Devices = (props) => {
                     temp.push(data);
                 });
                 setTableData(temp);
-                //devices = response.data
-                console.log(devices);
-                console.log(tableData);
             })
             .catch((error) => {
                 if (error.response) {
@@ -46,7 +60,7 @@ const Devices = (props) => {
                 }
                 console.log(error.config);
             });
-    }, [])
+    }, [tableData])
 
 
     const columns = [
@@ -58,12 +72,45 @@ const Devices = (props) => {
         { name: 'Types' },
         { name: 'Max Values' },
         { name: 'Description' },
-        { name: 'Asset', options: { display: true } }
+        { name: 'Asset', options: { display: true } },
+        {
+            name: 'Action', options: {
+                customBodyRenderLite: (rowIndex) => {
+                    return (
+                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                            <Tooltip title="Edit">
+                                <IconButton color='warning' onClick={() => {
+                                    const rowValue = tableData[rowIndex];
+                                    setSelectedRow(rowValue);
+                                    setOpenEditDialog(true);
+                                }}>
+                                    <EditIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                                <IconButton color='error' onClick={() => {
+                                    //const rowValue = tableData[rowIndex];
+                                    console.log(tableData[rowIndex][1]);
+                                    setSelectedRowId(tableData[rowIndex][0]);
+                                    setSelectedRowSn(tableData[rowIndex][1]);
+                                    setSelectedRowName(tableData[rowIndex][2]);
+                                    setOpenDeleteDialog(true);
+                                }}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+
+                    )
+                }
+            }
+        }
     ]
 
 
     const options = {
-        filterType: 'checkbox',
+        filterType: 'select',
+        //responsive: "scroll"
         //onRowClick: handleRowClick,// row
     };
 
@@ -79,14 +126,19 @@ const Devices = (props) => {
                 options={options}
             />
 
-            <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                <Fab color='secondary' aria-label='add'>
-                    <IconButton onClick={handleOpen}>
-                        <AddIcon />
-                    </IconButton>
-                </Fab>
+            <Box sx={{ '& > :not(style)': { m: 1 } }} style={{ float: 'right', marginRight: 22 }}>
+                <Tooltip title="Add">
+                    <Fab color='success' aria-label='add'>
+                        <IconButton color='inherit' onClick={handleOpenAdd}>
+                            <AddIcon />
+                        </IconButton>
+                    </Fab>
+                </Tooltip>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleclose} fullWidth={true} tenantID={tenantID} maxWidth='md' />
+            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} />
+            <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} />
         </>
     )
 }
