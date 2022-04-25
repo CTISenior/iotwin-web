@@ -7,10 +7,11 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
-import AddDialog from './dialog';
+import AddDialog from './AddDeviceDialog';
 import EditDeviceDialog from './EditDeviceDialog';
 import DeleteDeviceDialog from './DeleteDevice';
 import Tooltip from '@mui/material/Tooltip';
+import AlertComponent from './Alert';
 
 const Devices = (props) => {
     const { tenantID } = props;
@@ -22,6 +23,8 @@ const Devices = (props) => {
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
     const [selectedRowSn, setSelectedRowSn] = useState('');
+    const [isChange, setIsChange] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     const handleCloseAdd = () => {
         setOpenAddDialog(false);
@@ -35,8 +38,7 @@ const Devices = (props) => {
     const handleOpenAdd = () => {
         setOpenAddDialog(true);
     }
-
-    useEffect(() => {
+    const getDevices = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`)
             .then((response) => {
                 // Success 🎉
@@ -47,6 +49,7 @@ const Devices = (props) => {
                     temp.push(data);
                 });
                 setTableData(temp);
+                setIsChange(false);
             })
             .catch((error) => {
                 if (error.response) {
@@ -60,8 +63,16 @@ const Devices = (props) => {
                 }
                 console.log(error.config);
             });
-    }, [tableData])
+        console.log("Table data is : " + tableData);
+    }
 
+    useEffect(() => {
+        getDevices();
+    }, [])
+    useEffect(() => {
+        if (isChange)
+            getDevices();
+    }, [isChange])
 
     const columns = [
         { name: 'ID', options: { display: false, viewColumns: false, filter: false } },
@@ -77,7 +88,8 @@ const Devices = (props) => {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
                     return (
-                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <Box display={'flex'}
+                            flexDirection={'row'}>
                             <Tooltip title="Edit">
                                 <IconButton color='warning' onClick={() => {
                                     const rowValue = tableData[rowIndex];
@@ -100,7 +112,7 @@ const Devices = (props) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
-                        </div>
+                        </Box>
 
                     )
                 }
@@ -126,8 +138,10 @@ const Devices = (props) => {
                 columns={columns}
                 options={options}
             />
+            {alertMessage && <AlertComponent message={alertMessage ? alertMessage : ''}
+                type={'info'} />}
 
-            <Box sx={{ '& > :not(style)': { m: 1 } }} style={{ float: 'right', marginRight: 22 }}>
+            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 22 } }} >
                 <Tooltip title="Add">
                     <Fab color='success' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
@@ -136,10 +150,10 @@ const Devices = (props) => {
                     </Fab>
                 </Tooltip>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} />
+            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} setAlertMessage={setAlertMessage} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
-                selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} />
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
         </>
     )
 }

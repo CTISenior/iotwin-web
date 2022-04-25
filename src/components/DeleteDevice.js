@@ -12,13 +12,14 @@ import axios from 'axios';
 
 // <AlertComponent message={"test"} type={"error"} />
 export default function DeleteDialogBox(props) {
-    const { open, maxWidth, selectedRowName, selectedRowSn, selectedRowId, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, selectedRowName, selectedRowSn, selectedRowId, handleclose, ...fullWidth } = props;
 
     const handleDelete = async () => {
         console.log(selectedRowSn);
         await axios.delete('http://176.235.202.77:4000/api/v1/devices/' + selectedRowSn + '-' + selectedRowId)
             .then(function (response) {
                 console.log(response);
+                setIsChange(true);
             })
             .catch(function (error) {
                 console.log(error);

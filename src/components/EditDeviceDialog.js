@@ -12,7 +12,7 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, selectedRow, setIsChange, setAlertMessage, handleclose, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
@@ -48,6 +48,8 @@ export default function EditDeviceDialog(props) {
             "asset_id": assetId,
         })
             .then(function (response) {
+                setIsChange(true);
+                setAlertMessage(response.data);
                 console.log(response);
             })
             .catch(function (error) {

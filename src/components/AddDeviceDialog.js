@@ -13,7 +13,7 @@ import axios from 'axios';
 import AlertComponent from './Alert';
 
 export default function DialogBox(props) {
-    const { open, maxWidth, tenantID, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
     const [descriptionValue, setDescriptionValue] = useState('');
     const [maxTemp, setMaxTemp] = useState(0);
@@ -114,6 +114,7 @@ export default function DialogBox(props) {
             .then(function (response) {
                 console.log(response);
                 console.log(response.data);
+                setIsChange(true);
                 <AlertComponent message={response.data}
                     type={response.status === 201 ? 'info' : 'error'
                     } />

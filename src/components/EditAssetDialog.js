@@ -19,7 +19,7 @@ export default function AddDialogBox(props) {
     const [location, setLocation] = useState('');
     const [coordinate, setCoordinate] = useState('');
     const [description, setDescription] = useState('');
-    const [responseAlert, setResponseAlert] = useState([]);
+    const [responseAlert, setResponseAlert] = useState('');
 
     useEffect(() => {
         setID(selectedRow[0]);
@@ -136,10 +136,9 @@ export default function AddDialogBox(props) {
                     variant="standard" />
             </DialogContent>
             <DialogActions style={{ marginTop: 30, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <div>
-                    <AlertComponent message={responseAlert ? responseAlert : ''}
-                        type={'info'} />
-                </div>
+                {responseAlert && <AlertComponent message={responseAlert ? responseAlert : ''}
+                    type={'info'} />}
+
                 <Stack direction="row" spacing={3}>
                     <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
                     <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && coordinate)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(name && city && location && coordinate) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
