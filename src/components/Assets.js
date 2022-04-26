@@ -11,6 +11,7 @@ import EditAssetDialog from './EditAssetDialog';
 import DeleteAssetDialog from './DeleteAssetDialog';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
+import AlertComponent from './Alert';
 
 
 const Assets = (props) => {
@@ -23,6 +24,7 @@ const Assets = (props) => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
+    const [isChange, setIsChange] = useState(false);
 
     const handleCloseAdd = () => {
         setOpenAddDialog(false);
@@ -38,7 +40,7 @@ const Assets = (props) => {
     }
 
 
-    useEffect(() => {
+    const getAssets = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
                 // Success 🎉
@@ -49,6 +51,7 @@ const Assets = (props) => {
                     temp.push(data);
                 });
                 setTableData(temp);
+                setIsChange(false);
                 //Assets = response.data
             })
             .catch((error) => {
@@ -63,7 +66,23 @@ const Assets = (props) => {
                 }
                 console.log(error.config);
             });
-    }, [tableData])
+    }
+
+    useEffect(() => {
+        getAssets();
+    }, []);
+
+    useEffect(() => {
+        if (isChange)
+            getAssets();
+    }, [isChange]);
+
+    /*
+    useEffect(() => {
+        if (alertMessage !== null) {
+            console.log(alertMessage);
+        }
+    }, [alertMessage]);*/
 
     const options = {
         filterType: 'checkbox',
@@ -81,7 +100,8 @@ const Assets = (props) => {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
                     return (
-                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <Box display={'flex'}
+                            flexDirection={'row'}>
                             <Tooltip title="Edit">
                                 <IconButton color='warning' onClick={() => {
                                     const rowValue = tableData[rowIndex];
@@ -100,7 +120,7 @@ const Assets = (props) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
-                        </div>
+                        </Box>
 
                     )
                 }
@@ -115,10 +135,9 @@ const Assets = (props) => {
                 title={"Asset List"}
                 data={tableData}
                 columns={columns}
-
                 options={options}
             />
-            <Box sx={{ '& > :not(style)': { m: 1 } }} style={{ float: 'right', marginRight: 22 }}>
+            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 10 } }}>
                 <Tooltip title="Add">
                     <Fab color='success' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
@@ -128,10 +147,10 @@ const Assets = (props) => {
                 </Tooltip>
             </Box>
 
-            <AddAssetDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} />
-            <EditAssetDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} />
+            <AddAssetDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditAssetDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} />
             <DeleteAssetDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
-                selectedRowId={selectedRowId} selectedRowName={selectedRowName} />
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
 
         </>
     )

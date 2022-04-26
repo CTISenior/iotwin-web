@@ -11,7 +11,6 @@ import AddDialog from './AddDeviceDialog';
 import EditDeviceDialog from './EditDeviceDialog';
 import DeleteDeviceDialog from './DeleteDevice';
 import Tooltip from '@mui/material/Tooltip';
-import AlertComponent from './Alert';
 
 const Devices = (props) => {
     const { tenantID } = props;
@@ -24,7 +23,6 @@ const Devices = (props) => {
     const [selectedRowName, setSelectedRowName] = useState('');
     const [selectedRowSn, setSelectedRowSn] = useState('');
     const [isChange, setIsChange] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
 
     const handleCloseAdd = () => {
         setOpenAddDialog(false);
@@ -138,10 +136,8 @@ const Devices = (props) => {
                 columns={columns}
                 options={options}
             />
-            {alertMessage && <AlertComponent message={alertMessage ? alertMessage : ''}
-                type={'info'} />}
 
-            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 22 } }} >
+            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 3 } }} >
                 <Tooltip title="Add">
                     <Fab color='success' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
@@ -151,7 +147,7 @@ const Devices = (props) => {
                 </Tooltip>
             </Box>
             <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} setAlertMessage={setAlertMessage} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
         </>
