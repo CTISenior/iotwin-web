@@ -1,86 +1,125 @@
-import { Container, Grid } from '@mui/material'
+import { Container, FormControl, Grid, InputLabel, Paper, Typography, Select, MenuItem } from '@mui/material'
+import { Box } from '@mui/system';
+import React, { useEffect } from 'react'
 import axios from 'axios';
-import React from 'react'
-import DeviceCard from './DeviceCard';
-import { SnackbarProvider } from 'notistack';
-import io from 'socket.io-client';
-const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
-
+import ApartmentSharpIcon from '@mui/icons-material/ApartmentSharp';
+import SensorsSharpIcon from '@mui/icons-material/SensorsSharp';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 
 const Dashboard = (props) => {
     const { tenantID } = props;
-    const [devices, setDevices] = React.useState([]);
-    const [topics, setTopics] = React.useState([]);
-    const [graphList, setGraphList] = React.useState([]);
+    const [totalAssets, setTotalAssets] = React.useState(0);
+    const [totalDevice, setTotalDevice] = React.useState(0);
+    const [age, setAge] = React.useState(1);
 
-    // React.useEffect(() => {
-    //     console.log("New list is : " + JSON.stringify(graphList));
-    // }, [graphList])
-
-    // React.useEffect(() => {
-    //     if (topics.length > 0) {
-    //         socket.emit("telemetry_topic", topics);
-    //         socket.on("telemetry_topic_message", function (msg, topic) {
-    //             let info = JSON.parse(msg);
-    //             console.log("topic is : " + topic);
-    //             setGraphList(graphList.map(item => item.id === topic ? { ...item, temperature: [info.values.temperature], humidity: [info.values.humidity] } : { ...item, temperature: null, humidity: null }))
-    //         });
-    //     }
-    // }, [topics]);
-
-    React.useEffect(async () => {
-        const tempDevices = [];
-        const tempTopics = [];
-        const tempGraphList = [];
-
-        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`).then((response) => {
-            if (response != null) {
-                response.data.forEach(element => {
-                    const temp = { name: element.name, id: element.sn, building_id: element.building_id, types: element.types };
-                    tempDevices.push(temp);
-                    tempTopics.push(element.sn);
-                    // tempGraphList.push({ id: element.sn, temperature: [], humidity: [] });
-
-                });
-                // setGraphList(tempGraphList);
-                setTopics(tempTopics);
-                setDevices(tempDevices);
-
-            }
-        }).catch((error) => {
-            if (error.response) {
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            } else if (error.request) {
-                console.log(error.request);
-            } else {
-                console.log('Error', error.message);
-            }
-            console.log(error.config);
-        });
-    }, []);
-
-
-    function sendGraphList(id) {
-        return graphList.filter(item => item.id === id ? item : "");
+    const getDashboard = () => {
+        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/dashboard`)
+            .then((response) => {
+                // Success 🎉
+                console.log(response.data);
+                setTotalAssets(response.data.assetCount);
+                setTotalDevice(response.data.deviceCount);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            });
     }
+
+    useEffect(() => {
+        getDashboard();
+    }, [])
+    const handleChange = (event) => {
+        setAge(event.target.value);
+    };
+
     return (
-        <Container>
-            <SnackbarProvider maxSnack={3}>
 
-                <Grid container spacing={3}>
-
-                    {devices.map(element => {
-                        return (
-                            <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
-                        );
-                    })}
+        <Container sx={{ mt: '5%' }}>
+            <Grid container spacing={2} xs={12} width={1}>
+                <Grid item xs={12} md={6} lg={3}>
+                    <Paper sx={{ bgcolor: 'primary.main' }} elevation={3}>
+                        <Box p={1}
+                            display={'flex'}
+                            flexDirection={'column'}
+                            alignItems={'center'}
+                        >
+                            <ApartmentSharpIcon sx={{ fontSize: "6rem", color: 'secondary.main' }} />
+                            <Box
+                                flexDirection={'row'}
+                            >
+                                <Typography variant='modal'>Total Asset:</Typography>
+                                <Typography mx={1} variant='side'>{totalAssets}</Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
                 </Grid>
-            </SnackbarProvider>
+                <Grid item xs={12} md={6} lg={3}>
+                    <Paper sx={{ bgcolor: 'primary.main' }} elevation={3}>
+                        <Box p={1}
+                            display={'flex'}
+                            flexDirection={'column'}
+                            alignItems={'center'}
+                        >
+                            <SensorsSharpIcon sx={{ fontSize: "6rem", color: 'secondary.main' }} />
+                            <Box
+                                flexDirection={'row'}
+                            >
+                                <Typography variant='modal'>Total Device:</Typography>
+                                <Typography mx={1} variant='side'>{totalDevice}</Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6} lg={3}>
+                    <Paper sx={{ bgcolor: 'primary.main' }} elevation={3}>
 
-        </Container>
+                        <Box p={1}
+                            display={'flex'}
+                            flexDirection={'column'}
+                            alignItems={'center'}
+                        >
+
+                            <NotificationsIcon sx={{ fontSize: "6rem", color: 'secondary.main' }} />
+                            <Box
+                                flexDirection={'row'}
+                            >
+                                <Typography variant='modal'>Total Alert Last Week: </Typography>
+
+                            </Box>
+
+                        </Box>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6} lg={3}>
+                    <Paper sx={{ bgcolor: 'primary.main' }} elevation={3}>
+                        <Box p={1}
+                            display={'flex'}
+                            flexDirection={'column'}
+                            alignItems={'center'}
+                        >
+                            <ApartmentSharpIcon sx={{ fontSize: "6rem", color: 'secondary.main' }} />
+                            <Box
+                                flexDirection={'row'}
+                            >
+                                <Typography variant='modal'>Device ID:</Typography>
+                                <Typography mx={1} variant='side'>0</Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Grid>
+
+            </Grid >
+        </Container >
     )
 }
 
