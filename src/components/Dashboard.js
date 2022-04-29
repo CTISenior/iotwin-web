@@ -15,24 +15,20 @@ import ApartmentSharpIcon from "@mui/icons-material/ApartmentSharp";
 import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { makeStyles } from "@mui/styles";
+import Button from "@mui/material/Button";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    minWidth: 100,
-    marginTop: 30,
-  },
-}));
 const Dashboard = (props) => {
   const { tenantID } = props;
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalDevice, setTotalDevice] = useState(0);
   const [age, setAge] = useState(0);
+  const [telemetry, setTelemetry] = useState(0);
   const [latestAlerts, setLatestAlerts] = useState([]);
   const [latestTelemetry, setLatestTelemetry] = useState([]);
   const [alertCount, setAlertCount] = useState([]);
+  const [telemetryCount, setTelemetryCount] = useState([]);
   const [isChange, setIsChange] = useState(false);
-  const classes = useStyles();
 
   const getDashboard = () => {
     axios
@@ -46,6 +42,7 @@ const Dashboard = (props) => {
         let alerts = [];
         let telemetry = [];
         let alertCount = [];
+        let telemetryCount = [];
 
         response.data.latestAlerts.forEach((elm) => {
           const data = [
@@ -84,7 +81,7 @@ const Dashboard = (props) => {
         });
         setLatestTelemetry(telemetry);
 
-        const data = [
+        const alert = [
           { value: response.data.alertCount.daily_count, text: "Daily Alerts" },
           {
             value: response.data.alertCount.weekly_count,
@@ -99,9 +96,31 @@ const Dashboard = (props) => {
             text: "Yearly Alerts",
           },
         ];
-        data.map((item) => alertCount.push(item));
+        alert.map((item) => alertCount.push(item));
         console.log(alertCount);
         setAlertCount(alertCount);
+
+        const telemetryData = [
+          {
+            value: response.data.telemetryCount.daily_count,
+            text: "Daily Telemetry",
+          },
+          {
+            value: response.data.telemetryCount.weekly_count,
+            text: "Weekly Telemetry",
+          },
+          {
+            value: response.data.telemetryCount.monthly_count,
+            text: "Monthly Telemetry",
+          },
+          {
+            value: response.data.telemetryCount.yearly_count,
+            text: "Yearly Telemetry",
+          },
+        ];
+        telemetryData.map((item) => telemetryCount.push(item));
+        console.log(telemetryCount);
+        setTelemetryCount(telemetryCount);
       })
       .catch((error) => {
         if (error.response) {
@@ -121,12 +140,19 @@ const Dashboard = (props) => {
     setAge(event.target.value);
   };
 
+  const handleTelemetryChange = (event) => {
+    setIsChange(true);
+    setTelemetry(event.target.value);
+  };
+
   useEffect(() => {
     getDashboard();
   }, []);
 
   useEffect(() => {
-    if (isChange) getDashboard();
+    if (isChange) {
+      getDashboard();
+    }
   }, [isChange]);
 
   const alertsColumn = [
@@ -140,8 +166,16 @@ const Dashboard = (props) => {
   const telemetryColumn = [
     { name: "Created At" },
     { name: "Device Sn" },
-    { name: "Temperature Value" },
-    { name: "Humidity Value" },
+    {
+      name: "Temperature Value", options: {
+        setCellProps: value => ({ style: { textAlign: 'center' } }),
+      }
+    },
+    {
+      name: "Humidity Value", options: {
+        setCellProps: value => ({ style: { textAlign: 'center' } }),
+      }
+    },
   ];
   const options = {
     filter: false,
@@ -154,13 +188,24 @@ const Dashboard = (props) => {
     selectableRows: "none",
     selectableRowsHeader: false,
     viewColumns: false,
+    textLabels: {
+      body: {
+        noMatch: "Sorry, no matching records found"
+      },
+      pagination: {
+        next: "Next Page",
+        previous: "Previous Page",
+        rowsPerPage: "Rows per page:",
+        displayRows: "of",
+      },
+    },
   };
 
   return (
-    <Container sx={{ mt: "5%" }}>
+    <Container>
       <Grid container spacing={2} xs={12} width={1}>
         <Grid item xs={12} md={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main" }} elevation={3}>
+          <Paper sx={{ bgcolor: "white" }} elevation={3}>
             <Box
               p={1}
               display={"flex"}
@@ -184,7 +229,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main" }} elevation={3}>
+          <Paper sx={{ bgcolor: "white" }} elevation={3}>
             <Box
               p={1}
               display={"flex"}
@@ -208,7 +253,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main" }} elevation={3}>
+          <Paper sx={{ bgcolor: "white" }} elevation={3}>
             <Box
               p={1}
               display={"flex"}
@@ -216,9 +261,9 @@ const Dashboard = (props) => {
               justifyContent={"space-around"}
             >
               <NotificationsIcon
-                sx={{ fontSize: "6rem", color: "primary.main" }}
+                sx={{ fontSize: "5rem", color: "primary.main" }}
               />
-              <FormControl variant="standard" className={classes.formControl}>
+              <FormControl variant="standard" sx={{ marginTop: "25px" }}>
                 <InputLabel>Total Alerts</InputLabel>
                 <Select
                   labelId="select-demo"
@@ -229,7 +274,7 @@ const Dashboard = (props) => {
                   label="Select Total Alert"
                 >
                   {alertCount.map((option) => (
-                    <MenuItem key={option.id} svalue={option.value}>
+                    <MenuItem key={option.id} value={option.value}>
                       {option.text}
                     </MenuItem>
                   ))}
@@ -253,33 +298,65 @@ const Dashboard = (props) => {
             </Box>
           </Paper>
         </Grid>
+
         <Grid item xs={12} md={6} lg={3}>
-          <Paper sx={{ bgcolor: "secondary.main" }} elevation={3}>
+          <Paper sx={{ bgcolor: "white" }} elevation={3}>
             <Box
               p={1}
               display={"flex"}
-              flexDirection={"column"}
-              alignItems={"center"}
+              flexDirection={"row"}
+              justifyContent={"space-around"}
             >
               <ApartmentSharpIcon
-                sx={{ fontSize: "6rem", color: "primary.main" }}
+                sx={{ fontSize: "5rem", color: "primary.main" }}
               />
-              <Box flexDirection={"row"}>
-                <Typography variant="modal">Device ID:</Typography>
-                <Typography
-                  mx={1}
-                  variant="side"
-                  sx={{ color: "primary.main" }}
+              <FormControl variant="standard" sx={{ marginTop: "25px" }}>
+                <InputLabel>Total Telemetry</InputLabel>
+                <Select
+                  labelId="select-Telemetry"
+                  id="select-totalTelemetry"
+                  value={telemetry}
+                  onChange={handleTelemetryChange}
+                  autoWidth
+                  label="Select Total Telemetry"
                 >
-                  0
-                </Typography>
-              </Box>
+                  {telemetryCount.map((option) => (
+                    <MenuItem key={option.id} value={option.value}>
+                      {option.text}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box
+              p={1}
+              display={"flex"}
+              flexDirection={"row"}
+              justifyContent={"center"}
+            >
+              <Typography
+                variant="modal"
+                sx={{ fontSize: "21px", marginTop: "5px" }}
+              >
+                Total Telemetry:{" "}
+              </Typography>
+              <Typography
+                mx={1}
+                variant="side"
+                sx={{
+                  fontSize: "1em",
+                  color: "primary.main",
+                  marginTop: "12px",
+                }}
+              >
+                {telemetry}
+              </Typography>
             </Box>
           </Paper>
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} xs={12} width={1} sx={{ marginTop: 2 }}>
+      <Grid container spacing={2} xs={12} width={1} sx={{ marginTop: 1 }}>
         <Grid item xs={12} md={6} lg={6}>
           <MUIDataTable
             title={"Latest Alerts"}
@@ -296,6 +373,23 @@ const Dashboard = (props) => {
             options={options}
           />
         </Grid>
+      </Grid>
+
+      <Grid
+        item
+        xs={12}
+        md={6}
+        lg={6}
+        sx={{ justifyContent: "center", display: "flex", marginTop: 5 }}
+      >
+        <Button
+          href="/dashboard/devices"
+          variant="contained"
+          startIcon={<VisibilityIcon />}
+          style={{ color: "#FFF" }}
+        >
+          View All Devices
+        </Button>
       </Grid>
     </Container>
   );

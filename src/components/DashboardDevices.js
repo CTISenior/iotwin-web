@@ -4,6 +4,8 @@ import React from 'react'
 import DeviceCard from './DeviceCard';
 import { SnackbarProvider } from 'notistack';
 import io from 'socket.io-client';
+import Button from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
@@ -69,6 +71,12 @@ const DashboardDevices = (props) => {
     return (
         <Container>
             <SnackbarProvider maxSnack={3}>
+                <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 5 }}>
+                    <Button href="/dashboard" variant="contained"
+                        startIcon={<ArrowBackIcon />} style={{ color: '#FFF' }}>
+                        Back to dashboard
+                    </Button>
+                </Grid>
 
                 <Grid container spacing={3}>
 
