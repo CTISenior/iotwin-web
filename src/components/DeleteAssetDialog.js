@@ -70,7 +70,7 @@ export default function DeleteDialogBox(props) {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        After the confirmation the device and all related data will become unrecoverable.
+                        After the confirmation the asset and all related data will become unrecoverable.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
