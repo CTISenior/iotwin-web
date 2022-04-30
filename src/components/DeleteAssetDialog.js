@@ -66,7 +66,7 @@ export default function DeleteDialogBox(props) {
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
                 <DialogTitle style={{ fontWeight: 'bold' }}>
-                    {"Are you sure you want to delete " + selectedRowName + " device?"}
+                    {"Are you sure you want to delete " + selectedRowName + " asset?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
