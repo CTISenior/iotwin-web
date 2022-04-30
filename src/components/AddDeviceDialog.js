@@ -115,7 +115,7 @@ export default function DialogBox(props) {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": ["temperature"],
+            "types": [deviceType],
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": null,

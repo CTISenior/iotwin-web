@@ -22,13 +22,12 @@ const Dashboard = (props) => {
   const { tenantID } = props;
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalDevice, setTotalDevice] = useState(0);
-  const [age, setAge] = useState(0);
+  const [alert, setAlert] = useState(0);
   const [telemetry, setTelemetry] = useState(0);
   const [latestAlerts, setLatestAlerts] = useState([]);
   const [latestTelemetry, setLatestTelemetry] = useState([]);
   const [alertCount, setAlertCount] = useState([]);
   const [telemetryCount, setTelemetryCount] = useState([]);
-  const [isChange, setIsChange] = useState(false);
 
   const getDashboard = () => {
     axios
@@ -36,14 +35,12 @@ const Dashboard = (props) => {
       .then((response) => {
         // Success 🎉
         console.log(response.data);
-        setIsChange(false);
         setTotalAssets(response.data.assetCount);
         setTotalDevice(response.data.deviceCount);
         let alerts = [];
         let telemetry = [];
         let alertCount = [];
         let telemetryCount = [];
-
         response.data.latestAlerts.forEach((elm) => {
           const data = [
             new Intl.DateTimeFormat("en-US", {
@@ -80,7 +77,6 @@ const Dashboard = (props) => {
           telemetry.push(data);
         });
         setLatestTelemetry(telemetry);
-
         const alert = [
           { value: response.data.alertCount.daily_count, text: "Daily Alerts" },
           {
@@ -99,7 +95,6 @@ const Dashboard = (props) => {
         alert.map((item) => alertCount.push(item));
         console.log(alertCount);
         setAlertCount(alertCount);
-
         const telemetryData = [
           {
             value: response.data.telemetryCount.daily_count,
@@ -135,25 +130,17 @@ const Dashboard = (props) => {
         console.log(error.config);
       });
   };
-  const handleChange = (event) => {
-    setIsChange(true);
-    setAge(event.target.value);
+  const handleAlertChange = (event) => {
+    setAlert(event.target.value);
   };
 
   const handleTelemetryChange = (event) => {
-    setIsChange(true);
     setTelemetry(event.target.value);
   };
 
   useEffect(() => {
     getDashboard();
   }, []);
-
-  useEffect(() => {
-    if (isChange) {
-      getDashboard();
-    }
-  }, [isChange]);
 
   const alertsColumn = [
     { name: "Created At" },
@@ -263,13 +250,13 @@ const Dashboard = (props) => {
               <NotificationsIcon
                 sx={{ fontSize: "5rem", color: "primary.main" }}
               />
-              <FormControl variant="standard" sx={{ marginTop: "25px" }}>
+              <FormControl variant="standard" sx={{ marginTop: "25px", width: '100%' }}>
                 <InputLabel>Total Alerts</InputLabel>
                 <Select
                   labelId="select-demo"
                   id="select-totalAlert"
-                  value={age}
-                  onChange={handleChange}
+                  value={alert === 0 ? '' : alert}
+                  onChange={handleAlertChange}
                   autoWidth
                   label="Select Total Alert"
                 >
@@ -291,9 +278,8 @@ const Dashboard = (props) => {
               <Typography
                 mx={1}
                 variant="side"
-                sx={{ color: "primary.main", marginTop: "5px" }}
-              >
-                {age}
+                sx={{ color: "primary.main", marginTop: "5px" }}>
+                {alert}
               </Typography>
             </Box>
           </Paper>
@@ -310,12 +296,12 @@ const Dashboard = (props) => {
               <ApartmentSharpIcon
                 sx={{ fontSize: "5rem", color: "primary.main" }}
               />
-              <FormControl variant="standard" sx={{ marginTop: "25px" }}>
+              <FormControl variant="standard" sx={{ marginTop: "25px", width: '100%' }}>
                 <InputLabel>Total Telemetry</InputLabel>
                 <Select
                   labelId="select-Telemetry"
                   id="select-totalTelemetry"
-                  value={telemetry}
+                  value={telemetry === 0 ? '' : telemetry}
                   onChange={handleTelemetryChange}
                   autoWidth
                   label="Select Total Telemetry"
@@ -334,12 +320,7 @@ const Dashboard = (props) => {
               flexDirection={"row"}
               justifyContent={"center"}
             >
-              <Typography
-                variant="modal"
-                sx={{ fontSize: "21px", marginTop: "5px" }}
-              >
-                Total Telemetry:{" "}
-              </Typography>
+              <Typography variant="modal" sx={{ fontSize: "21px", marginTop: "5px" }}>Total Telemetry: </Typography>
               <Typography
                 mx={1}
                 variant="side"

@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, setIsChange, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, selectedRow, selectedRowMaxTemp, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
@@ -32,6 +32,7 @@ export default function EditDeviceDialog(props) {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
+
     useEffect(() => {
         setID(selectedRow[0]);
         setDeviceSn(selectedRow[1]);
@@ -39,6 +40,8 @@ export default function EditDeviceDialog(props) {
         setModel(selectedRow[3]);
         setProtocol(selectedRow[4]);
         setDeviceType(selectedRow[5]);
+        setMaxTemp(selectedRowMaxTemp);
+        setMaxHum(selectedRowMaxHum);
         setDescriptionValue(selectedRow[7]);
         setAssetId(selectedRow[8]);
     }, [selectedRow]);
@@ -50,7 +53,7 @@ export default function EditDeviceDialog(props) {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": ["temperature"],
+            "types": [deviceType],
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": assetId,
