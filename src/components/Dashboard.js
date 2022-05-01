@@ -139,8 +139,12 @@ const Dashboard = (props) => {
   };
 
   useEffect(() => {
-    getDashboard();
+    setInterval(function tick() {
+      getDashboard();
+    }, 10000)
   }, []);
+
+
 
   const alertsColumn = [
     { name: "Created At" },
@@ -148,7 +152,21 @@ const Dashboard = (props) => {
     { name: "Device Sn" },
     { name: "Status", options: { display: false } },
     { name: "Telemetry Key" },
-    { name: "Type" },
+    {
+      name: "Type", options: {
+        setCellProps: value => ({
+          style: {
+            borderRadius: 25,
+            // borderWidth: 1,
+            margin: 20,
+            //borderColor: latestAlerts.type === 'abc' ? 'orange' : 'red',
+            height: '50px',
+            width: '50px',
+            textAlign: 'center'
+          }
+        }),
+      }
+    },
   ];
   const telemetryColumn = [
     { name: "Created At" },

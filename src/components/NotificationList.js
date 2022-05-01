@@ -12,10 +12,8 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 
-const notificationCount = React.createContext();
-
 const NotificationList = (props) => {
-  const { anchorEl, open, handleClose, tenantID } = props;
+  const { anchorEl, open, handleClose, setAlertCount, tenantID } = props;
   const [notificationList, setNotificationList] = React.useState([]);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
@@ -36,6 +34,7 @@ const NotificationList = (props) => {
               createdTime: element.created_at,
               status: element.status,
             };
+            setAlertCount(response.data.length);
             notificationListItem.push(temp);
           });
           setNotificationList(notificationListItem);
@@ -52,7 +51,7 @@ const NotificationList = (props) => {
           }
           console.log(error.config);
         });
-    }, 1000);
+    }, 2500);
   }, []);
   function AllAlerts(props) {
     return <>

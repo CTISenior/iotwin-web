@@ -25,6 +25,7 @@ const Devices = (props) => {
     const [isChange, setIsChange] = useState(false);
     const [selectedRowMaxTemp, setSelectedRowMaxTemp] = useState(0);
     const [selectedRowMaxHum, setSelectedRowMaxHum] = useState(0);
+    const [selectedDeviceType, setSelectedDeviceType] = useState([]);
 
     const handleCloseAdd = () => {
         setOpenAddDialog(false);
@@ -96,8 +97,30 @@ const Devices = (props) => {
                                     setSelectedRow(rowValue);
                                     const maxValues = rowValue[6];
                                     let splitMaxValues = maxValues.split("-");
-                                    setSelectedRowMaxTemp(splitMaxValues[0]);
-                                    setSelectedRowMaxHum(splitMaxValues[1]);
+                                    if (splitMaxValues[0] !== undefined)
+                                        setSelectedRowMaxTemp(splitMaxValues[0].trim());
+                                    else
+                                        setSelectedRowMaxTemp(0);
+                                    if (splitMaxValues[1] !== undefined)
+                                        setSelectedRowMaxHum(splitMaxValues[1].trim());
+                                    else
+                                        setSelectedRowMaxHum(0);
+                                    let deviceType = rowValue[5];
+                                    let splitDeviceType = [];
+                                    let trimmedDeviceType = [];
+                                    if (deviceType.includes('&')) {
+                                        splitDeviceType = deviceType.split('&');
+                                        trimmedDeviceType = splitDeviceType.map(element => {
+                                            return element.trim();
+                                        });
+                                    }
+                                    else {
+                                        splitDeviceType = deviceType.split(' ');
+                                        trimmedDeviceType = splitDeviceType.map(element => {
+                                            return element.trim();
+                                        });
+                                    }
+                                    setSelectedDeviceType(trimmedDeviceType);
                                     setOpenEditDialog(true);
                                 }}>
                                     <EditIcon />
@@ -152,7 +175,7 @@ const Devices = (props) => {
                 </Tooltip>
             </Box>
             <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
         </>

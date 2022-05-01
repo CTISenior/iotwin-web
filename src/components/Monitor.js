@@ -10,6 +10,8 @@ import { useParams } from 'react-router-dom';
 import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import io from 'socket.io-client';
+import Button from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
@@ -105,7 +107,13 @@ const Monitor = (props) => {
     }, [updateHum])
 
     return (
-        <React.Fragment>
+        <Container>
+            <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
+                <Button href="/dashboard/devices" variant="contained"
+                    startIcon={<ArrowBackIcon style={{ borderRight: '1px solid white', borderRightWidth: '1px' }} />} style={{ color: '#FFF' }}>
+                    Back to Devices
+                </Button>
+            </Grid>
 
             <TabContext value={selectedTab}>
 
@@ -178,12 +186,12 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"row"}>
+                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"} paddingLeft={'9px'}>
                                             <Typography variant="modal">Types:</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
-                                                sx={{ color: "primary.main" }}
+                                                sx={{ color: "primary.main", fontSize: 15, marginTop: '5px', textTransform: 'capitalize' }}
                                             >
                                                 {types.replace(',', '&')}
                                             </Typography>
@@ -255,7 +263,7 @@ const Monitor = (props) => {
                 </TabPanel>
 
             </TabContext>
-        </React.Fragment>
+        </Container>
     )
 }
 

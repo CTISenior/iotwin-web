@@ -11,8 +11,6 @@ import EditAssetDialog from './EditAssetDialog';
 import DeleteAssetDialog from './DeleteAssetDialog';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
-import AlertComponent from './Alert';
-
 
 const Assets = (props) => {
 

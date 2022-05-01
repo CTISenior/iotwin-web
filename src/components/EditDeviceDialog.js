@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, selectedRowMaxTemp, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, selectedRow, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
@@ -39,7 +39,7 @@ export default function EditDeviceDialog(props) {
         setDeviceName(selectedRow[2]);
         setModel(selectedRow[3]);
         setProtocol(selectedRow[4]);
-        setDeviceType(selectedRow[5]);
+        setDeviceType(selectedDeviceType);
         setMaxTemp(selectedRowMaxTemp);
         setMaxHum(selectedRowMaxHum);
         setDescriptionValue(selectedRow[7]);
@@ -67,7 +67,7 @@ export default function EditDeviceDialog(props) {
             .catch(function (error) {
                 console.log(error);
                 setSnackbarOpen(true);
-                setSnackbarMessage('The asset could not edited successfully')
+                setSnackbarMessage('The device could not edited successfully')
             })
             .finally(() => {
                 setTimeout(function () {

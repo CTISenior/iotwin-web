@@ -74,7 +74,7 @@ const DashboardDevices = (props) => {
             <SnackbarProvider maxSnack={3}>
                 <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 5 }}>
                     <Button href="/dashboard" variant="contained"
-                        startIcon={<ArrowBackIcon />} style={{ color: '#FFF' }}>
+                        startIcon={<ArrowBackIcon style={{ borderRight: '1px solid white', borderRightWidth: '1px' }} />} style={{ color: '#FFF' }}>
                         Back to dashboard
                     </Button>
                 </Grid>
@@ -89,7 +89,7 @@ const DashboardDevices = (props) => {
                 </Grid>
             </SnackbarProvider>
 
-        </Container>
+        </Container >
     )
 }
 
