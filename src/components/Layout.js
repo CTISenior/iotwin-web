@@ -34,6 +34,7 @@ import PrivateRoute from '../helpers/PrivateRoute';
 import Devices from './Devices';
 import Assets from './Assets';
 import NotificationList from './NotificationList';
+import Monitor from './Monitor';
 
 const drawerWidth = 200;
 
@@ -291,6 +292,12 @@ export default function PersistentDrawerLeft() {
                             <Route path="/dashboard/devices" element={<>
                                 <PrivateRoute>
                                     <DashboardDevices tenantID={tenantID} />
+                                </PrivateRoute>
+                            </>
+                            } />
+                            <Route path="/dashboard/monitor/:tenantID/:name/:building_id/:types" element={<>
+                                <PrivateRoute>
+                                    <Monitor />
                                 </PrivateRoute>
                             </>
                             } />

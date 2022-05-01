@@ -21,7 +21,7 @@ export default function EditDeviceDialog(props) {
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState('');
-    const [deviceType, setDeviceType] = useState('temp');
+    const [deviceType, setDeviceType] = useState([]);
     const [protocol, setProtocol] = useState('http');
     const [deviceSn, setDeviceSn] = useState('');
     const [model, setModel] = useState('');
@@ -53,7 +53,7 @@ export default function EditDeviceDialog(props) {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": [deviceType],
+            "types": deviceType,
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": assetId,
@@ -78,14 +78,14 @@ export default function EditDeviceDialog(props) {
     }
     const deviceTypes = [
         {
-            value: 'temp',
+            value: 'temperature',
             label: 'Temperature',
         },
         {
-            value: 'hum',
+            value: 'humidity',
             label: 'Humidity',
         }, {
-            value: 'temp-hum',
+            value: 'temperature,humidity',
             label: 'Temperature & Humidity',
         },
     ];
@@ -100,7 +100,10 @@ export default function EditDeviceDialog(props) {
     ];
 
     const handleDeviceTypeChange = (event) => {
-        setDeviceType(event.target.value);
+        if (event.target.value.includes(','))
+            setDeviceType(event.target.value.split(','));
+        else
+            setDeviceType(event.target.value.split(' '));
     };
     const handleProtocolChange = (event) => {
         setProtocol(event.target.value);

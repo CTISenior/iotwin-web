@@ -45,7 +45,7 @@ const Devices = (props) => {
                 let temp = [];
                 response.data.forEach(elm => {
                     //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join('-'), elm.max_values.join('-'), elm.description, elm.asset_id];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id];
                     temp.push(data);
                 });
                 setTableData(temp);

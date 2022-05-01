@@ -25,7 +25,7 @@ const ModalStyle = {
 
 export default function DeviceCard(props) {
 
-    const { name, id, building_id, types, socket, list } = props;
+    const { name, id, building_id, types } = props;
 
     const [openModal, setOpenModal] = React.useState(false);
     const { enqueueSnackbar } = useSnackbar();
@@ -43,17 +43,6 @@ export default function DeviceCard(props) {
         handleClick();
         setOpenModal(true);
     }
-    const handleStart = (event) => {
-        socket.emit("start", id);
-        setStatus(false);
-        handleClick("The device : " + id + " is continue resuming", "success");
-    }
-    const handleStop = (event) => {
-        socket.emit("stop", id);
-        setStatus(true);
-        handleClick("The device : " + id + " is stopped", "warning");
-    }
-
 
     return (
         <Grid item xs={12} sm={6} md={3}>
@@ -71,34 +60,16 @@ export default function DeviceCard(props) {
                         display={'flex'}
                         alignItems={'center'}
                     >
-                        <Tooltip title="Start Device">
-                            <IconButton variant='modal' aria-label="play" onClick={handleStart}>
-                                <PlayArrowIcon fontSize='large' />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Stop Device">
-                            <IconButton variant='modal' aria-label="stop" onClick={handleStop}>
-                                <StopIcon fontSize='large' />
-                            </IconButton>
-                        </Tooltip>
+
                         <Tooltip title="Display Device Details">
-                            <IconButton variant='modal' aria-label="display" onClick={handleModalOpen} disabled={status}>
+                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/${name}/${building_id}/${types}/`} onClick={handleModalOpen} disabled={status}>
                                 <ShowChartIcon fontSize='large' />
                             </IconButton>
                         </Tooltip>
-                        <Modal
-                            open={openModal}
-                            onClose={handleModalClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={ModalStyle}>
-                                <DeviceModal name={name} id={id} building_id={building_id} types={types} onClose={handleModalClose} list={list} />
-                            </Box>
-                        </Modal>
+
                     </Box>
                 </Box>
             </Paper>
-        </Grid>
+        </Grid >
     );
 }

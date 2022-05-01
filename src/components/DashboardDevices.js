@@ -42,6 +42,7 @@ const DashboardDevices = (props) => {
                     const temp = { name: element.name, id: element.sn, building_id: element.building_id, types: element.types };
                     tempDevices.push(temp);
                     tempTopics.push(element.sn);
+                    console.log(element.types);
                     // tempGraphList.push({ id: element.sn, temperature: [], humidity: [] });
 
                 });
@@ -82,7 +83,7 @@ const DashboardDevices = (props) => {
 
                     {devices.map(element => {
                         return (
-                            <DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                            < DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
                         );
                     })}
                 </Grid>
