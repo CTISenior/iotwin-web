@@ -25,7 +25,7 @@ const ModalStyle = {
 
 export default function DeviceCard(props) {
 
-    const { name, id, building_id, types } = props;
+    const { name, id, building_id, types, sn } = props;
 
     const [openModal, setOpenModal] = React.useState(false);
     const { enqueueSnackbar } = useSnackbar();
@@ -62,7 +62,7 @@ export default function DeviceCard(props) {
                     >
 
                         <Tooltip title="Display Device Details">
-                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/${name}/${building_id}/${types}/`} onClick={handleModalOpen} disabled={status}>
+                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${sn}/${id}/${name}/${building_id}/${types}/`} onClick={handleModalOpen} disabled={status}>
                                 <ShowChartIcon fontSize='large' />
                             </IconButton>
                         </Tooltip>

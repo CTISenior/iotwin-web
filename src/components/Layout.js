@@ -297,7 +297,7 @@ export default function PersistentDrawerLeft() {
                                 </PrivateRoute>
                             </>
                             } />
-                            <Route path="/dashboard/monitor/:tenantID/:name/:building_id/:types" element={<>
+                            <Route path="/dashboard/monitor/:sn/:id/:name/:building_id/:types" element={<>
                                 <PrivateRoute>
                                     <Monitor />
                                 </PrivateRoute>

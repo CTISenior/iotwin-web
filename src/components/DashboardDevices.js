@@ -16,21 +16,6 @@ const DashboardDevices = (props) => {
     const [topics, setTopics] = React.useState([]);
     const [graphList, setGraphList] = React.useState([]);
 
-    // React.useEffect(() => {
-    //     console.log("New list is : " + JSON.stringify(graphList));
-    // }, [graphList])
-
-    // React.useEffect(() => {
-    //     if (topics.length > 0) {
-    //         socket.emit("telemetry_topic", topics);
-    //         socket.on("telemetry_topic_message", function (msg, topic) {
-    //             let info = JSON.parse(msg);
-    //             console.log("topic is : " + topic);
-    //             setGraphList(graphList.map(item => item.id === topic ? { ...item, temperature: [info.values.temperature], humidity: [info.values.humidity] } : { ...item, temperature: null, humidity: null }))
-    //         });
-    //     }
-    // }, [topics]);
-
     React.useEffect(async () => {
         const tempDevices = [];
         const tempTopics = [];
@@ -39,7 +24,7 @@ const DashboardDevices = (props) => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`).then((response) => {
             if (response != null) {
                 response.data.forEach(element => {
-                    const temp = { name: element.name, id: element.sn, building_id: element.building_id, types: element.types };
+                    const temp = { name: element.name, id: element.id, sn: element.sn, building_id: element.building_id, types: element.types };
                     tempDevices.push(temp);
                     tempTopics.push(element.sn);
                     console.log(element.types);
@@ -83,7 +68,7 @@ const DashboardDevices = (props) => {
 
                     {devices.map(element => {
                         return (
-                            < DeviceCard name={element.name} id={element.id} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                            < DeviceCard name={element.name} id={element.id} sn={element.sn} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
                         );
                     })}
                 </Grid>
