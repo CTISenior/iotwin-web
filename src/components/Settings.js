@@ -216,7 +216,7 @@ const Settings = (props) => {
                             flexDirection={"row"}
                             alignItems={"center"}
                         >
-                            <Typography variant="modal">Tenant Name:</Typography>
+                            <Typography variant="modal">Tenant ID:</Typography>
                             <Typography variant="modal" sx={{ marginLeft: 1, width: '54%' }}>
                                 <TextFieldItem
                                     autoFocus

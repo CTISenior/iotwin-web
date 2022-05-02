@@ -90,6 +90,7 @@ export default function PersistentDrawerLeft() {
     const tenantID = keycloak.realm;
     const [alertCount, setAlertCount] = React.useState(null);
     console.log(keycloak.realm);
+    console.log(isObserver);
 
     let DrawerContent = [];
     if (isAdmin) {

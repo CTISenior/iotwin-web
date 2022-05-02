@@ -1,6 +1,6 @@
 import { Container, Grid, Paper, Tab, Typography } from '@mui/material'
 import { Box } from '@mui/system';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import LineChart from './LineChart';
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
@@ -137,7 +137,7 @@ const Monitor = (props) => {
     }
     React.useEffect(() => {
         getAlerts();
-        getTelemetries();
+        //  getTelemetries();
         socket.emit("telemetry_topic", sn);
         socket.on("telemetry_topic_message", function (msg) {
 
@@ -200,12 +200,12 @@ const Monitor = (props) => {
         { name: "Device Sn" },
         {
             name: "Temperature Value", options: {
-                setCellProps: value => ({ style: { textAlign: 'center' } }),
+                setCellProps: value => ({ style: { textAlign: 'left' } }),
             }
         },
         {
             name: "Humidity Value", options: {
-                setCellProps: value => ({ style: { textAlign: 'center' } }),
+                setCellProps: value => ({ style: { textAlign: 'left' } }),
             }
         },
     ];
@@ -266,8 +266,8 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"row"}>
-                                            <Typography variant="modal">ID:</Typography>
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
+                                            <Typography variant="modal">ID</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
@@ -290,8 +290,8 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"row"}>
-                                            <Typography variant="modal">Name:</Typography>
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
+                                            <Typography variant="modal">Name</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
@@ -314,12 +314,12 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
-                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"} paddingLeft={'9px'}>
-                                            <Typography variant="modal">Types:</Typography>
+                                        <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
+                                            <Typography variant="modal">Types</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
-                                                sx={{ color: "primary.main", fontSize: 15, marginTop: '5px', textTransform: 'capitalize' }}
+                                                sx={{ color: "primary.main", textTransform: 'capitalize' }}
                                             >
                                                 {types.replace(',', '&')}
                                             </Typography>
@@ -338,14 +338,14 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"row"}>
-                                            <Typography variant="modal">Building:</Typography>
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
+                                            <Typography variant="modal">Building</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
                                                 sx={{ color: "primary.main" }}
                                             >
-                                                {building_id}
+                                                {building_id === 'undefined' ? 'Not Assigned' : ''}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -399,7 +399,7 @@ const Monitor = (props) => {
                     <Grid container spacing={2} xs={12} width={1} sx={{ marginTop: 1 }}>
                         <Grid item xs={12}>
                             <MUIDataTable
-                                title={"Latest Alerts"}
+                                title={"Latest Telemetry"}
                                 data={latestTelemetry}
                                 columns={telemetryColumn}
                                 options={options}
