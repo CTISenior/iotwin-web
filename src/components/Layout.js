@@ -88,10 +88,9 @@ export default function PersistentDrawerLeft() {
     const isAdmin = keycloak.hasRealmRole("admin");
     const isCreator = keycloak.hasRealmRole("creator");
     const tenantID = keycloak.realm;
+    const clientID = keycloak.clientId;
     const [alertCount, setAlertCount] = React.useState(null);
     console.log(keycloak.realm);
-    console.log(isObserver);
-
     let DrawerContent = [];
     if (isAdmin) {
         DrawerContent = [
@@ -275,58 +274,56 @@ export default function PersistentDrawerLeft() {
 
                 </List>
             </Drawer>
-            {isAdmin && (
+            <Main sx={{ mt: "60px" }} open={open}>
 
-                <Main sx={{ mt: "60px" }} open={open}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<>
+                            <Navigation />
 
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<>
-                                <Navigation />
+                        </>
+                        } />
+                        <Route path="/dashboard" element={<>
+                            <PrivateRoute>
+                                <Dashboard tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/dashboard/devices" element={<>
+                            <PrivateRoute>
+                                <DashboardDevices tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/dashboard/monitor/:sn/:id/:name/:assetName/:types" element={<>
+                            <PrivateRoute>
+                                <Monitor />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/assets" element={<>
+                            <PrivateRoute>
+                                <Assets tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/devices" element={<>
+                            <PrivateRoute>
+                                <Devices tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/settings" element={<>
+                            <PrivateRoute>
+                                <Settings tenantID={tenantID} clientID={clientID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                    </Routes>
+                </BrowserRouter>
 
-                            </>
-                            } />
-                            <Route path="/dashboard" element={<>
-                                <PrivateRoute>
-                                    <Dashboard tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/dashboard/devices" element={<>
-                                <PrivateRoute>
-                                    <DashboardDevices tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/dashboard/monitor/:sn/:id/:name/:building_id/:types" element={<>
-                                <PrivateRoute>
-                                    <Monitor />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/assets" element={<>
-                                <PrivateRoute>
-                                    <Assets tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/devices" element={<>
-                                <PrivateRoute>
-                                    <Devices tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/settings" element={<>
-                                <PrivateRoute>
-                                    <Settings tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                        </Routes>
-                    </BrowserRouter>
+            </Main>
 
-                </Main>
-            )}
 
         </Box >
     );

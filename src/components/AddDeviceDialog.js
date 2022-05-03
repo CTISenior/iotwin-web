@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -11,48 +11,32 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import CancelIcon from '@mui/icons-material/Cancel';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import SaveIcon from '@mui/icons-material/Save';
+import SnackbarContent from '@mui/material/SnackbarContent';
 import axios from 'axios';
 
 
 export default function DialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
-    const [descriptionValue, setDescriptionValue] = useState('');
+    const [descriptionValue, setDescriptionValue] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
-    const [deviceName, setDeviceName] = useState('');
-    const [building, setBuilding] = useState('building-a');
+    const [deviceName, setDeviceName] = useState();
+    const [asset, setAsset] = useState();
     const [deviceType, setDeviceType] = useState([]);
-    const [protocol, setProtocol] = useState('http');
-    const [deviceSn, setDeviceSn] = useState('');
+    const [protocol, setProtocol] = useState();
+    const [deviceSn, setDeviceSn] = useState();
     const [model, setModel] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarColor, setSnackbarColor] = useState();
+    const [assetName, setAssetName] = useState([]);
 
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
-    const Assets = [
-        {
-            value: 'building-a',
-            label: 'Building A',
-        },
-        {
-            value: 'building-b',
-            label: 'Building B',
-        }, {
-            value: 'building-c',
-            label: 'Building C',
-        }, {
-            value: 'building-d',
-            label: 'Building D',
-        }, {
-            value: 'building-e',
-            label: 'Building E',
-        },
-    ];
     const deviceTypes = [
         {
             value: 'temperature',
@@ -77,8 +61,8 @@ export default function DialogBox(props) {
     ];
 
 
-    const handleBuildingChange = (event) => {
-        setBuilding(event.target.value);
+    const handleAssetChange = (event) => {
+        setAsset(event.target.value);
     };
     const handleDeviceTypeChange = (event) => {
         if (event.target.value.includes(','))
@@ -111,6 +95,38 @@ export default function DialogBox(props) {
     const handleErrorChange = () => {
         setError(true);
     }*/
+    const getAssetsName = () => {
+        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
+            .then((response) => {
+                // Success 🎉
+                let temp = [];
+                response.data.forEach(elm => {
+                    const data = {
+                        id: elm.id,
+                        name: elm.name,
+                    };
+                    temp.push(data);
+                });
+                setAssetName(temp);
+                console.log(temp)
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            });
+    }
+
+    useEffect(() => {
+        getAssetsName();
+    }, []);
 
     const handleadd = async () => {
         await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
@@ -121,17 +137,17 @@ export default function DialogBox(props) {
             "types": deviceType,
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
-            "asset_id": null,
+            "asset_id": asset,
             "tenant_id": tenantID
         })
             .then(function (response) {
-                console.log(response);
+                setSnackbarColor('#4caf50');
                 setIsChange(true);
                 setSnackbarOpen(true);
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
-                console.log(error);
+                setSnackbarColor('#ff5722');
                 setSnackbarOpen(true);
                 setSnackbarMessage('New device could not inserted successfully')
             })
@@ -140,6 +156,7 @@ export default function DialogBox(props) {
                 setDeviceSn(null);
                 setDeviceName(null);
                 setProtocol(null);
+                setAsset(null);
                 setMaxTemp(null);
                 setModel(null);
                 setMaxHum(null);
@@ -147,7 +164,7 @@ export default function DialogBox(props) {
                 setDescriptionValue(null);
                 setTimeout(function () {
                     handleclose();
-                }, 300)
+                }, 500)
             })
     }
 
@@ -157,18 +174,24 @@ export default function DialogBox(props) {
                 open={snackbarOpen}
                 onClose={snackbarClose}
                 autoHideDuration={3000}
-                message={snackbarMessage}
-                action={[
-                    <Tooltip title="Close">
-                        <IconButton
-                            key='close'
-                            aria-label='Close'
-                            color='inherit'
-                            onClick={snackbarClose}
-                        >x</IconButton>
-                    </Tooltip>
-                ]}
-            />
+            >
+                <SnackbarContent
+                    style={{
+                        backgroundColor: snackbarColor,
+                    }}
+                    message={snackbarMessage}
+                    action={[
+                        <Tooltip title="Close">
+                            <IconButton
+                                key='close'
+                                aria-label='Close'
+                                color='inherit'
+                                onClick={snackbarClose}
+                            >x</IconButton>
+                        </Tooltip>
+                    ]}
+                />
+            </Snackbar>
             <Dialog open={open}
                 {...fullWidth}
                 maxWidth={maxWidth}
@@ -176,21 +199,21 @@ export default function DialogBox(props) {
                 <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Add new device</DialogTitle>
                 <DialogContent>
                     <TextFieldItem
-                        id="building"
+                        id="asset"
                         autoFocus
                         margin="dense"
                         select
                         fullWidth
                         variant="standard"
                         label="Select"
-                        value={building}
-                        onChange={handleBuildingChange}
-                        helperText="Please select your building"
+                        value={asset}
+                        onChange={handleAssetChange}
+                        helperText="Please select your asset"
                         required={true}
                     >
-                        {Assets.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        {assetName.map((option) => (
+                            <MenuItem key={option.id} value={option.id}>
+                                {option.name}
                             </MenuItem>
                         ))}
                     </TextFieldItem>
@@ -302,7 +325,7 @@ export default function DialogBox(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(building && deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(building && deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(asset && deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(asset && deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog >

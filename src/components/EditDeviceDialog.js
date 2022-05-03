@@ -8,26 +8,29 @@ import TextFieldItem from './TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import CancelIcon from '@mui/icons-material/Cancel';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import SnackbarContent from '@mui/material/SnackbarContent';
 import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
-    const [descriptionValue, setDescriptionValue] = useState('');
+    const { open, maxWidth, selectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
+    const [descriptionValue, setDescriptionValue] = useState();
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
-    const [deviceName, setDeviceName] = useState('');
+    const [deviceName, setDeviceName] = useState();
     const [deviceType, setDeviceType] = useState([]);
-    const [protocol, setProtocol] = useState('http');
-    const [deviceSn, setDeviceSn] = useState('');
-    const [model, setModel] = useState('');
+    const [protocol, setProtocol] = useState();
+    const [deviceSn, setDeviceSn] = useState();
+    const [assetName, setAssetName] = useState([]);
+    const [model, setModel] = useState();
     const [assetId, setAssetId] = useState();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarMessage, setSnackbarMessage] = useState();
+    const [snackbarColor, setSnackbarColor] = useState();
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
@@ -59,21 +62,20 @@ export default function EditDeviceDialog(props) {
             "asset_id": assetId,
         })
             .then(function (response) {
+                setSnackbarColor('#4caf50');
                 setIsChange(true);
-                console.log(response);
                 setSnackbarOpen(true);
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
-                console.log(error);
                 setSnackbarOpen(true);
+                setSnackbarColor('#ff5722');
                 setSnackbarMessage('The device could not edited successfully')
             })
             .finally(() => {
                 setTimeout(function () {
                     handleclose();
                 }, 300)
-
             })
     }
     const deviceTypes = [
@@ -126,24 +128,65 @@ export default function EditDeviceDialog(props) {
     const handleModelChange = (event) => {
         setModel(event.target.value);
     }
+    const handleAssetChange = (event) => {
+        setAssetId(event.target.value);
+    };
+
+    const getAssetsName = () => {
+        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
+            .then((response) => {
+                // Success 🎉
+                let temp = [];
+                response.data.forEach(elm => {
+                    const data = {
+                        id: elm.id,
+                        name: elm.name,
+                    };
+                    temp.push(data);
+                });
+                setAssetName(temp);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            });
+    }
+
+    useEffect(() => {
+        getAssetsName();
+    }, []);
     return (
         <>
             <Snackbar
                 open={snackbarOpen}
-                autoHideDuration={3000}
                 onClose={snackbarClose}
-                message={snackbarMessage}
-                action={[
-                    <Tooltip title="Close">
-                        <IconButton
-                            key='close'
-                            aria-label='Close'
-                            color='inherit'
-                            onClick={snackbarClose}
-                        >x</IconButton>
-                    </Tooltip>
-                ]}
-            />
+                autoHideDuration={3000}
+            >
+                <SnackbarContent
+                    style={{
+                        backgroundColor: snackbarColor,
+                    }}
+                    message={snackbarMessage}
+                    action={[
+                        <Tooltip title="Close">
+                            <IconButton
+                                key='close'
+                                aria-label='Close'
+                                color='inherit'
+                                onClick={snackbarClose}
+                            >x</IconButton>
+                        </Tooltip>
+                    ]}
+                />
+            </Snackbar>
             <Dialog open={open}
                 {...fullWidth}
                 maxWidth={maxWidth}
@@ -177,6 +220,25 @@ export default function EditDeviceDialog(props) {
                         required={true}
                         // error={true}
                         helperText="Name is required." />
+                    <TextFieldItem
+                        id="asset"
+                        autoFocus
+                        margin="dense"
+                        select
+                        fullWidth
+                        variant="standard"
+                        label="Select"
+                        value={assetId}
+                        onChange={handleAssetChange}
+                        helperText="Please select your asset"
+                        required={true}
+                    >
+                        {assetName.map((option) => (
+                            <MenuItem key={option.id} value={option.id}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextFieldItem>
                     <TextFieldItem
                         autoFocus
                         margin="dense"
@@ -258,7 +320,7 @@ export default function EditDeviceDialog(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog>

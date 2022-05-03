@@ -2,17 +2,14 @@ import { Container, Grid, Paper, Tab, Typography } from '@mui/material'
 import { Box } from '@mui/system';
 import React, { useState } from 'react'
 import LineChart from './LineChart';
-import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import axios from 'axios';
-import CloseIcon from '@mui/icons-material/Close';
-import { Tooltip } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import io from 'socket.io-client';
 import Button from '@mui/material/Button';
+import Badge from '@mui/material/Badge';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
@@ -22,7 +19,7 @@ const hum = [];
 const tempLabel = [];
 
 const Monitor = (props) => {
-    const { id, name, building_id, types, sn } = useParams()
+    const { sn, id, name, assetName, types } = useParams();
     const [selectedTab, setSelectedTab] = useState("1");
     const [updateHeat, setUpdateHeat] = useState(0);
     const [updateHum, setUpdateHum] = useState(0);
@@ -31,6 +28,9 @@ const Monitor = (props) => {
 
 
     const getAlerts = () => {
+        console.log(name);
+        console.log(assetName);
+        console.log(id);
         axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts?days=14`)
             .then((response) => {
                 let alerts = [];
@@ -46,8 +46,8 @@ const Monitor = (props) => {
                         }).format(elm.timestamp),
                         elm.message,
                         elm.sn,
-                        elm.status,
                         elm.telemetry_key,
+                        elm.status,
                         elm.type,
                     ];
                     alerts.push(data);
@@ -69,7 +69,7 @@ const Monitor = (props) => {
     };
 
     const getTelemetries = () => {
-        axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?days=14`)
+        axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?days=1`)
             .then((response) => {
                 let telemetry = [];
                 // console.log(JSON.stringify(response.data));
@@ -137,7 +137,7 @@ const Monitor = (props) => {
     }
     React.useEffect(() => {
         getAlerts();
-        //  getTelemetries();
+        getTelemetries();
         socket.emit("telemetry_topic", sn);
         socket.on("telemetry_topic_message", function (msg) {
 
@@ -191,9 +191,44 @@ const Monitor = (props) => {
         { name: "Created At" },
         { name: "Message" },
         { name: "Device Sn" },
-        { name: "Status", options: { display: false } },
         { name: "Telemetry Key" },
-        { name: "Type" },
+        {
+            name: "Status", options: {
+                customBodyRender: (val) => {
+                    return (
+                        <Badge badgeContent={val === false ? "active" : "cleared"}
+                            color={val === false ? "info" : "secondary"}
+                            overlap="circular"
+                            sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 3 } }}
+                        />
+                    )
+                },
+                setCellProps: value => ({
+                    style: {
+                        textAlign: 'center',
+                    }
+                })
+            }
+        },
+        {
+            name: "Type", options: {
+                customBodyRender: (val) => {
+                    return (
+                        <Badge badgeContent={val}
+                            color={val === 'warning' ? "warning" : "error"}
+                            overlap="circular"
+                            sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 3 } }}
+
+                        />
+                    )
+                },
+                setCellProps: value => ({
+                    style: {
+                        textAlign: 'center',
+                    }
+                })
+            }
+        },
     ];
     const telemetryColumn = [
         { name: "Created At" },
@@ -339,13 +374,13 @@ const Monitor = (props) => {
                                             sx={{ fontSize: "6rem", color: "primary.main" }}
                                         />
                                         <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
-                                            <Typography variant="modal">Building</Typography>
+                                            <Typography variant="modal">Asset</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
                                                 sx={{ color: "primary.main" }}
                                             >
-                                                {building_id === 'undefined' ? 'Not Assigned' : ''}
+                                                {assetName}
                                             </Typography>
                                         </Box>
                                     </Box>

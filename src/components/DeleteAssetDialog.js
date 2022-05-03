@@ -12,12 +12,13 @@ import axios from 'axios';
 import Tooltip from '@mui/material/Tooltip';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
+import SnackbarContent from '@mui/material/SnackbarContent';
 
-// <AlertComponent message={"test"} type={"error"} />
 export default function DeleteDialogBox(props) {
     const { open, maxWidth, selectedRowName, setIsChange, selectedRowId, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarColor, setSnackbarColor] = useState();
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         snackbarMessage(null);
@@ -26,40 +27,47 @@ export default function DeleteDialogBox(props) {
     const handleDelete = async () => {
         await axios.delete('http://176.235.202.77:4000/api/v1/assets/' + selectedRowId)
             .then(function (response) {
-                console.log(response);
+                setSnackbarColor('#4caf50');
                 setIsChange(true);
                 setSnackbarOpen(true);
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
-                console.log(error);
+                setSnackbarColor('#ff5722');
                 setSnackbarOpen(true);
                 setSnackbarMessage('The asset could not deleted successfully')
             })
             .finally(() => {
                 setTimeout(function () {
                     handleclose();
-                }, 500)
+                }, 300)
             });
     }
     return (
         <>
             <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 open={snackbarOpen}
-                autoHideDuration={3000}
                 onClose={snackbarClose}
-                message={snackbarMessage}
-                action={[
-                    <Tooltip title="Close">
-                        <IconButton
-                            key='close'
-                            aria-label='Close'
-                            color='inherit'
-                            onClick={snackbarClose}
-                        >x</IconButton>
-                    </Tooltip>
-                ]}
-            />
+                autoHideDuration={3000}
+            >
+                <SnackbarContent
+                    style={{
+                        backgroundColor: snackbarColor,
+                    }}
+                    message={snackbarMessage}
+                    action={[
+                        <Tooltip title="Close">
+                            <IconButton
+                                key='close'
+                                aria-label='Close'
+                                color='inherit'
+                                onClick={snackbarClose}
+                            >x</IconButton>
+                        </Tooltip>
+                    ]}
+                />
+            </Snackbar>
             <Dialog
                 open={open}
                 {...fullWidth}

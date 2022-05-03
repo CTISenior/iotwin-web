@@ -75,13 +75,6 @@ const Assets = (props) => {
             getAssets();
     }, [isChange]);
 
-    /*
-    useEffect(() => {
-        if (alertMessage !== null) {
-            console.log(alertMessage);
-        }
-    }, [alertMessage]);*/
-
     const options = {
         filterType: 'checkbox',
     };
@@ -93,7 +86,7 @@ const Assets = (props) => {
         { name: 'Location' },
         { name: 'Coordinates' },
         { name: 'Description' },
-        { name: 'Tenant' },
+        { name: 'Tenant', options: { display: false, viewColumns: false, filter: false } },
         {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
@@ -101,7 +94,7 @@ const Assets = (props) => {
                         <Box display={'flex'}
                             flexDirection={'row'}>
                             <Tooltip title="Edit">
-                                <IconButton color='warning' onClick={() => {
+                                <IconButton sx={{ color: '#14a37f' }} onClick={() => {
                                     const rowValue = tableData[rowIndex];
                                     setSelectedRow(rowValue);
                                     setOpenEditDialog(true);
@@ -135,9 +128,9 @@ const Assets = (props) => {
                 columns={columns}
                 options={options}
             />
-            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 10 } }}>
+            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 14 } }}>
                 <Tooltip title="Add">
-                    <Fab color='success' aria-label='add'>
+                    <Fab color='info' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
                             <AddIcon />
                         </IconButton>

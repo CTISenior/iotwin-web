@@ -15,8 +15,7 @@ const DashboardDevices = (props) => {
     const [devices, setDevices] = React.useState([]);
     const [topics, setTopics] = React.useState([]);
     const [graphList, setGraphList] = React.useState([]);
-
-    React.useEffect(async () => {
+    const getTenantDevices = () => {
         const tempDevices = [];
         const tempTopics = [];
         const tempGraphList = [];
@@ -24,17 +23,20 @@ const DashboardDevices = (props) => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`).then((response) => {
             if (response != null) {
                 response.data.forEach(element => {
-                    const temp = { name: element.name, id: element.id, sn: element.sn, building_id: element.building_id, types: element.types };
+                    const temp = {
+                        assetName: element.asset_name,
+                        id: element.id,
+                        name: element.name,
+                        sn: element.sn,
+                        types: element.types
+                    };
                     tempDevices.push(temp);
                     tempTopics.push(element.sn);
-                    console.log(element.types);
                     // tempGraphList.push({ id: element.sn, temperature: [], humidity: [] });
-
                 });
                 // setGraphList(tempGraphList);
                 setTopics(tempTopics);
                 setDevices(tempDevices);
-
             }
         }).catch((error) => {
             if (error.response) {
@@ -48,6 +50,10 @@ const DashboardDevices = (props) => {
             }
             console.log(error.config);
         });
+    }
+
+    React.useEffect(() => {
+        getTenantDevices();
     }, []);
 
 
@@ -68,7 +74,7 @@ const DashboardDevices = (props) => {
 
                     {devices.map(element => {
                         return (
-                            < DeviceCard name={element.name} id={element.id} sn={element.sn} building_id={element.building_id} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                            < DeviceCard name={element.name} id={element.id} sn={element.sn} assetName={element.assetName} types={element.types} socket={socket} list={sendGraphList(element.id)} />
                         );
                     })}
                 </Grid>

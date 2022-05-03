@@ -5,13 +5,13 @@ import ListItemText from '@mui/material/ListItemText';
 import ErrorIcon from '@mui/icons-material/Error';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import WarningIcon from '@mui/icons-material/Warning';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Box } from '@mui/system';
 import axios from 'axios';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import DoneIcon from '@mui/icons-material/Done';
+import SnackbarContent from '@mui/material/SnackbarContent';
 import { Typography } from "@mui/material";
 
 const NotificationList = (props) => {
@@ -20,6 +20,7 @@ const NotificationList = (props) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isChange, setIsChange] = useState(false);
+  const [snackbarColor, setSnackbarColor] = useState();
 
   const snackbarClose = (event) => {
     setSnackbarOpen(false);
@@ -28,9 +29,8 @@ const NotificationList = (props) => {
 
   const getNotification = () => {
     let notificationListItem = [];
-    axios.get('http://176.235.202.77:4000/api/v1/tenants/ctis/alerts')
+    axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/alerts`)
       .then((response) => {
-        console.log(response.data);
         response.data.forEach(element => {
           const temp = {
             id: element.id,
@@ -55,12 +55,17 @@ const NotificationList = (props) => {
         } else {
           console.log('Error', error.message);
         }
-        console.log(error.config);
       });
 
   }
   useEffect(() => {
     getNotification();
+  }, []);
+
+  useEffect(() => {
+    setInterval(function tick() {
+      getNotification();
+    }, 2500)
   }, []);
 
   useEffect(() => {
@@ -98,12 +103,7 @@ const NotificationList = (props) => {
             <Tooltip title="View">
               <ListItemIcon sx={{ ml: '15px' }} onClick={() => handleView(list.id, list.status)}
               >
-                <VisibilityIcon fontSize="medium" color='info' />
-              </ListItemIcon>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <ListItemIcon sx={{ ml: '10px' }} onClick={() => handleDelete(list.id)}>
-                <DeleteIcon fontSize="medium" color='error' />
+                <DoneIcon fontSize="medium" color='info' />
               </ListItemIcon>
             </Tooltip>
           </Box>
@@ -112,36 +112,19 @@ const NotificationList = (props) => {
     </>
 
   }
-  const handleDelete = (id) => {
-    axios.delete('http://176.235.202.77:4000/api/v1/alerts/' + id)
-      .then(function (response) {
-        console.log(response);
-        setSnackbarOpen(true);
-        setSnackbarMessage(response.data)
-      })
-      .catch(function (error) {
-        console.log(error);
-        setSnackbarOpen(true);
-        setSnackbarMessage('The alert could not deleted successfully')
-      }).finally(() => {
-        setTimeout(function () {
-          setIsChange(true);
-          handleClose();
-        }, 300)
-      })
-  }
+
   const handleView = (id, status) => {
-    axios.post('http://176.235.202.77:4000/api/v1/alerts/' + id, {
+    axios.put('http://176.235.202.77:4000/api/v1/alerts/' + id, {
       "status": !status
     })
       .then(function (response) {
-        console.log(response);
+        setSnackbarColor('#4caf50');
         setIsChange(true);
         setSnackbarOpen(true);
         setSnackbarMessage(response.data)
       })
       .catch(function (error) {
-        console.log(error);
+        setSnackbarColor('#ff5722');
         setSnackbarOpen(true);
         setSnackbarMessage('The alert status could not changed successfully')
       });
@@ -156,19 +139,24 @@ const NotificationList = (props) => {
         open={snackbarOpen}
         onClose={snackbarClose}
         autoHideDuration={3000}
-        message={snackbarMessage}
-        action={[
-          <Tooltip title="Close">
-            <IconButton
-              key='close'
-              aria-label='Close'
-              color='inherit'
-              onClick={snackbarClose}
-            >x</IconButton>
-          </Tooltip>
-        ]}
-      />
-
+      >
+        <SnackbarContent
+          style={{
+            backgroundColor: snackbarColor,
+          }}
+          message={snackbarMessage}
+          action={[
+            <Tooltip title="Close">
+              <IconButton
+                key='close'
+                aria-label='Close'
+                color='inherit'
+                onClick={snackbarClose}
+              >x</IconButton>
+            </Tooltip>
+          ]}
+        />
+      </Snackbar>
       <Menu
         anchorEl={anchorEl}
         open={open}

@@ -46,7 +46,7 @@ const Devices = (props) => {
                 let temp = [];
                 response.data.forEach(elm => {
                     //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
                     temp.push(data);
                 });
                 setTableData(temp);
@@ -84,7 +84,8 @@ const Devices = (props) => {
         { name: 'Types' },
         { name: 'Max Values' },
         { name: 'Description' },
-        { name: 'Asset', options: { display: true } },
+        { name: 'Asset ID', options: { display: false, viewColumns: false, filter: false } },
+        { name: 'Asset Name' },
         {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
@@ -92,9 +93,10 @@ const Devices = (props) => {
                         <Box display={'flex'}
                             flexDirection={'row'}>
                             <Tooltip title="Edit">
-                                <IconButton color='warning' onClick={() => {
+                                <IconButton sx={{ color: '#14a37f' }} onClick={() => {
                                     const rowValue = tableData[rowIndex];
                                     setSelectedRow(rowValue);
+                                    console.log(rowValue);
                                     const maxValues = rowValue[6];
                                     let splitMaxValues = maxValues.split("-");
                                     if (splitMaxValues[0] !== undefined)
@@ -145,29 +147,22 @@ const Devices = (props) => {
             }
         }
     ]
-
-
     const options = {
         filterType: 'select',
         //responsive: "scroll"
         //onRowClick: handleRowClick,// row
     };
-
-
     return (
-
         <>
-
             <MUIDataTable
                 title={'Device List'}
                 data={tableData}
                 columns={columns}
                 options={options}
             />
-
             <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 3 } }} >
                 <Tooltip title="Add">
-                    <Fab color='success' aria-label='add'>
+                    <Fab color='info' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
                             <AddIcon />
                         </IconButton>
@@ -175,11 +170,10 @@ const Devices = (props) => {
                 </Tooltip>
             </Box>
             <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} />
+            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} tenantID={tenantID} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
         </>
     )
 }
-
 export default Devices

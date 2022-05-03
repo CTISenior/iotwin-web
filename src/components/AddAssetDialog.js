@@ -7,11 +7,12 @@ import Button from '@mui/material/Button';
 import TextFieldItem from './TextField';
 import Stack from '@mui/material/Stack';
 import CancelIcon from '@mui/icons-material/Cancel';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function AddDialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
@@ -22,6 +23,7 @@ export default function AddDialogBox(props) {
     const [description, setDescription] = useState(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarColor, setSnackbarColor] = useState();
 
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
@@ -43,8 +45,6 @@ export default function AddDialogBox(props) {
         setDescription(event.target.value);
     }
 
-
-
     const handleadd = async () => {
         await axios.post('http://176.235.202.77:4000/api/v1/assets/', {
             "name": name,
@@ -55,13 +55,13 @@ export default function AddDialogBox(props) {
             "tenant_id": tenantID
         })
             .then(function (response) {
-                console.log(response);
+                setSnackbarColor('#4caf50');
                 setIsChange(true);
                 setSnackbarOpen(true);
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
-                console.log(error);
+                setSnackbarColor('#ff5722');
                 setSnackbarOpen(true);
                 setSnackbarMessage('New asset could not inserted successfully')
             })
@@ -73,7 +73,7 @@ export default function AddDialogBox(props) {
                 setDescription(null);
                 setTimeout(function () {
                     handleclose();
-                }, 500)
+                }, 300)
 
             })
     }
@@ -81,22 +81,27 @@ export default function AddDialogBox(props) {
     return (
         <>
             <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 open={snackbarOpen}
                 onClose={snackbarClose}
                 autoHideDuration={3000}
-                message={snackbarMessage}
-                action={[
-                    <Tooltip title="Close">
-                        <IconButton
-                            key='close'
-                            aria-label='Close'
-                            color='inherit'
-                            onClick={snackbarClose}
-                        >x</IconButton>
-                    </Tooltip>
-                ]}
-            />
+            >
+                <SnackbarContent
+                    style={{
+                        backgroundColor: snackbarColor,
+                    }}
+                    message={snackbarMessage}
+                    action={[
+                        <Tooltip title="Close">
+                            <IconButton
+                                key='close'
+                                aria-label='Close'
+                                color='inherit'
+                                onClick={snackbarClose}
+                            >x</IconButton>
+                        </Tooltip>
+                    ]}
+                />
+            </Snackbar>
             <Dialog open={open}
                 {...fullWidth}
                 maxWidth={maxWidth}
@@ -168,7 +173,7 @@ export default function AddDialogBox(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && coordinate)} startIcon={<SaveAltIcon />} style={{ backgroundColor: !(name && city && location && coordinate) ? 'gray' : '#228B22', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && coordinate)} startIcon={<SaveIcon />} style={{ backgroundColor: !(name && city && location && coordinate) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog >

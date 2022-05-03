@@ -1,12 +1,8 @@
 import {
   Container,
-  FormControl,
   Grid,
-  InputLabel,
   Paper,
   Typography,
-  MenuItem,
-  Select,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
@@ -16,18 +12,25 @@ import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Button from "@mui/material/Button";
+import Badge from '@mui/material/Badge';
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 
 const Dashboard = (props) => {
   const { tenantID } = props;
   const [totalAssets, setTotalAssets] = useState(0);
   const [totalDevice, setTotalDevice] = useState(0);
-  const [alert, setAlert] = useState(0);
-  const [telemetry, setTelemetry] = useState(0);
   const [latestAlerts, setLatestAlerts] = useState([]);
   const [latestTelemetry, setLatestTelemetry] = useState([]);
-  const [alertCount, setAlertCount] = useState([]);
-  const [telemetryCount, setTelemetryCount] = useState([]);
+  const [dailyAlert, setDailyAlert] = useState(0);
+  const [weeklyAlert, setWeeklyAlert] = useState(0);
+  const [monthlyAlert, setMonthlyAlert] = useState(0);
+  const [yearlyAlert, setYearlyAlert] = useState(0);
+  const [dailyTelemetry, setDailyTelemetry] = useState(0);
+  const [weeklyTelemetry, setWeeklyTelemetry] = useState(0);
+  const [monthlyTelemetry, setMonthlyTelemetry] = useState(0);
+  const [yearlyTelemetry, setYearlyTelemetry] = useState(0);
+
 
   const getDashboard = () => {
     axios
@@ -39,8 +42,6 @@ const Dashboard = (props) => {
         setTotalDevice(response.data.deviceCount);
         let alerts = [];
         let telemetry = [];
-        let alertCount = [];
-        let telemetryCount = [];
         response.data.latestAlerts.forEach((elm) => {
           const data = [
             new Intl.DateTimeFormat("en-US", {
@@ -77,45 +78,15 @@ const Dashboard = (props) => {
           telemetry.push(data);
         });
         setLatestTelemetry(telemetry);
-        const alert = [
-          { value: response.data.alertCount.daily_count, text: "Daily Alerts" },
-          {
-            value: response.data.alertCount.weekly_count,
-            text: "Weekly Alerts",
-          },
-          {
-            value: response.data.alertCount.monthly_count,
-            text: "Monthly Alerts",
-          },
-          {
-            value: response.data.alertCount.yearly_count,
-            text: "Yearly Alerts",
-          },
-        ];
-        alert.map((item) => alertCount.push(item));
-        console.log(alertCount);
-        setAlertCount(alertCount);
-        const telemetryData = [
-          {
-            value: response.data.telemetryCount.daily_count,
-            text: "Daily Telemetry",
-          },
-          {
-            value: response.data.telemetryCount.weekly_count,
-            text: "Weekly Telemetry",
-          },
-          {
-            value: response.data.telemetryCount.monthly_count,
-            text: "Monthly Telemetry",
-          },
-          {
-            value: response.data.telemetryCount.yearly_count,
-            text: "Yearly Telemetry",
-          },
-        ];
-        telemetryData.map((item) => telemetryCount.push(item));
-        console.log(telemetryCount);
-        setTelemetryCount(telemetryCount);
+        setDailyAlert(response.data.alertCount.daily_count);
+        setWeeklyAlert(response.data.alertCount.weekly_count);
+        setMonthlyAlert(response.data.alertCount.monthly_count);
+        setYearlyAlert(response.data.alertCount.yearly_count);
+
+        setDailyTelemetry(response.data.telemetryCount.daily_count);
+        setWeeklyTelemetry(response.data.telemetryCount.weekly_count);
+        setMonthlyTelemetry(response.data.telemetryCount.monthly_count);
+        setYearlyTelemetry(response.data.telemetryCount.yearly_count);
       })
       .catch((error) => {
         if (error.response) {
@@ -130,13 +101,10 @@ const Dashboard = (props) => {
         console.log(error.config);
       });
   };
-  const handleAlertChange = (event) => {
-    setAlert(event.target.value);
-  };
 
-  const handleTelemetryChange = (event) => {
-    setTelemetry(event.target.value);
-  };
+  useEffect(() => {
+    getDashboard();
+  }, []);
 
   useEffect(() => {
     setInterval(function tick() {
@@ -150,21 +118,42 @@ const Dashboard = (props) => {
     { name: "Created At" },
     { name: "Message" },
     { name: "Device Sn" },
-    { name: "Status", options: { display: false } },
+    {
+      name: "Status", options: {
+        customBodyRender: (val) => {
+          return (
+            <Badge badgeContent={val === false ? "active" : "cleared"}
+              color={val === false ? "info" : "secondary"}
+              overlap="circular"
+              sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 1 } }}
+            />
+          )
+        },
+        setCellProps: value => ({
+          style: {
+            textAlign: 'center',
+          }
+        })
+      }
+    },
     { name: "Telemetry Key" },
     {
       name: "Type", options: {
+        customBodyRender: (val) => {
+          return (
+            <Badge badgeContent={val}
+              color={val === 'warning' ? "warning" : "error"}
+              overlap="circular"
+              sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 1 } }}
+
+            />
+          )
+        },
         setCellProps: value => ({
           style: {
-            borderRadius: 25,
-            // borderWidth: 1,
-            margin: 20,
-            //borderColor: latestAlerts.type === 'abc' ? 'orange' : 'red',
-            height: '50px',
-            width: '50px',
-            textAlign: 'center'
+            textAlign: 'center',
           }
-        }),
+        })
       }
     },
   ];
@@ -185,8 +174,8 @@ const Dashboard = (props) => {
   const options = {
     filter: false,
     responsive: "standard",
-    rowsPerPage: 5,
-    rowsPerPageOptions: [5, 10, 20],
+    rowsPerPage: 20,
+    rowsPerPageOptions: [20],
     download: false,
     tableBodyHeight: "300px",
     print: false,
@@ -200,8 +189,6 @@ const Dashboard = (props) => {
       pagination: {
         next: "Next Page",
         previous: "Previous Page",
-        rowsPerPage: "Rows per page:",
-        displayRows: "of",
       },
     },
   };
@@ -263,42 +250,78 @@ const Dashboard = (props) => {
               p={1}
               display={"flex"}
               flexDirection={"row"}
-              justifyContent={"space-around"}
+              justifyContent={"space-evenly"}
             >
               <NotificationsIcon
-                sx={{ fontSize: "5rem", color: "primary.main" }}
+                sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
               />
-              <FormControl variant="standard" sx={{ marginTop: "25px", width: '100%' }}>
-                <InputLabel>Total Alerts</InputLabel>
-                <Select
-                  labelId="select-demo"
-                  id="select-totalAlert"
-                  value={alert === 0 ? '' : alert}
-                  onChange={handleAlertChange}
-                  autoWidth
-                  label="Select Total Alert"
+              <Box
+                display={"flex"}
+                flexDirection={"column"}
+                justifyContent={"space-around"}
+              >
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                  mt={1}
                 >
-                  {alertCount.map((option) => (
-                    <MenuItem key={option.id} value={option.value}>
-                      {option.text}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Box
-              p={1}
-              display={"flex"}
-              flexDirection={"row"}
-              justifyContent={"center"}
-            >
-              <Typography variant="modal">Total Alerts: </Typography>
-              <Typography
-                mx={1}
-                variant="side"
-                sx={{ color: "primary.main", marginTop: "5px" }}>
-                {alert}
-              </Typography>
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Alert:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {dailyAlert}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Alert:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {weeklyAlert}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Alert:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {monthlyAlert}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Alert:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {yearlyAlert}
+                  </Typography>
+                </Grid>
+              </Box>
             </Box>
           </Paper>
         </Grid>
@@ -309,47 +332,78 @@ const Dashboard = (props) => {
               p={1}
               display={"flex"}
               flexDirection={"row"}
-              justifyContent={"space-around"}
+              justifyContent={"space-evenly"}
             >
-              <ApartmentSharpIcon
-                sx={{ fontSize: "5rem", color: "primary.main" }}
+              <DataUsageIcon
+                sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
               />
-              <FormControl variant="standard" sx={{ marginTop: "25px", width: '100%' }}>
-                <InputLabel>Total Telemetry</InputLabel>
-                <Select
-                  labelId="select-Telemetry"
-                  id="select-totalTelemetry"
-                  value={telemetry === 0 ? '' : telemetry}
-                  onChange={handleTelemetryChange}
-                  autoWidth
-                  label="Select Total Telemetry"
-                >
-                  {telemetryCount.map((option) => (
-                    <MenuItem key={option.id} value={option.value}>
-                      {option.text}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Box
-              p={1}
-              display={"flex"}
-              flexDirection={"row"}
-              justifyContent={"center"}
-            >
-              <Typography variant="modal" sx={{ fontSize: "21px", marginTop: "5px" }}>Total Telemetry: </Typography>
-              <Typography
-                mx={1}
-                variant="side"
-                sx={{
-                  fontSize: "1em",
-                  color: "primary.main",
-                  marginTop: "12px",
-                }}
+              <Box
+                display={"flex"}
+                flexDirection={"column"}
+                justifyContent={"space-around"}
               >
-                {telemetry}
-              </Typography>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                  mt={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Telemetry:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {dailyTelemetry}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Telemetry:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {weeklyTelemetry}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Telemetry:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {monthlyTelemetry}
+                  </Typography>
+                </Grid>
+                <Grid
+                  display={"flex"}
+                  flexDirection={"row"}
+                  justifyContent={"flex-start"}
+                  mb={1}
+                >
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Telemetry:</Typography>
+                  <Typography
+                    mx={1}
+                    variant="side"
+                    sx={{ color: "primary.main", fontSize: "15px" }}
+                  >
+                    {yearlyTelemetry}
+                  </Typography>
+                </Grid>
+              </Box>
             </Box>
           </Paper>
         </Grid>
@@ -390,7 +444,7 @@ const Dashboard = (props) => {
           View All Devices
         </Button>
       </Grid>
-    </Container>
+    </Container >
   );
 };
 
