@@ -83,8 +83,8 @@ export default function DeleteDialogBox(props) {
                 </DialogContent>
                 <DialogActions>
                     <Stack direction="row" spacing={3}>
-                        <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>No</Button>
-                        <Button onClick={handleDelete} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>No</Button>
+                        <Button onClick={handleDelete} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
                     </Stack>
                 </DialogActions>
             </Dialog>

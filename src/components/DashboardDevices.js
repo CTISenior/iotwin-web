@@ -74,7 +74,7 @@ const DashboardDevices = (props) => {
 
                     {devices.map(element => {
                         return (
-                            < DeviceCard name={element.name} id={element.id} sn={element.sn} assetName={element.assetName} types={element.types} socket={socket} list={sendGraphList(element.id)} />
+                            < DeviceCard name={element.name} id={element.id} assetName={element.assetName} types={element.types} socket={socket} list={sendGraphList(element.id)} />
                         );
                     })}
                 </Grid>

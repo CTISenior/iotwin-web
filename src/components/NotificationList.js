@@ -58,20 +58,22 @@ const NotificationList = (props) => {
       });
 
   }
-  useEffect(() => {
-    getNotification();
-  }, []);
+  // useEffect(() => {
+  //   getNotification();
+  // }, []);
 
   useEffect(() => {
     setInterval(function tick() {
-      getNotification();
-    }, 2500)
-  }, []);
+      if (tenantID != undefined) {
+        getNotification();
+      }
+    }, 2000)
+  }, [tenantID]);
 
-  useEffect(() => {
-    if (isChange)
-      getNotification();
-  }, [isChange]);
+  // useEffect(() => {
+  //   if (isChange)
+  //     getNotification();
+  // }, [isChange]);
 
   function AllAlerts(props) {
     return <>
@@ -133,8 +135,8 @@ const NotificationList = (props) => {
     <>
       <Snackbar
         anchorOrigin={{
-          vertical: ' bottom',
-          horizontal: 'right'
+          vertical: ' top',
+          horizontal: 'center'
         }}
         open={snackbarOpen}
         onClose={snackbarClose}

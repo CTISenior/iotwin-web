@@ -19,7 +19,7 @@ export default function AddDialogBox(props) {
     const [name, setName] = useState(null);
     const [city, setCity] = useState(null);
     const [location, setLocation] = useState(null);
-    const [coordinate, setCoordinate] = useState(null);
+    const [capacity, setCapacity] = useState(null);
     const [description, setDescription] = useState(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -38,8 +38,8 @@ export default function AddDialogBox(props) {
     const handleLocationChange = (event) => {
         setLocation(event.target.value);
     };
-    const handleCoordinateChange = (event) => {
-        setCoordinate(event.target.value);
+    const handleCapacityChange = (event) => {
+        setCapacity(event.target.value);
     }
     const handleDescriptionChange = (event) => {
         setDescription(event.target.value);
@@ -50,7 +50,7 @@ export default function AddDialogBox(props) {
             "name": name,
             "city": city,
             "location": location,
-            "coordinates": coordinate,
+            "capacity": capacity,
             "description": description,
             "tenant_id": tenantID
         })
@@ -69,7 +69,7 @@ export default function AddDialogBox(props) {
                 setName(null);
                 setCity(null);
                 setLocation(null);
-                setCoordinate(null);
+                setCapacity(null);
                 setDescription(null);
                 setTimeout(function () {
                     handleclose();
@@ -150,16 +150,16 @@ export default function AddDialogBox(props) {
                     <TextFieldItem
                         autoFocus
                         margin="dense"
-                        id="coordinate"
-                        label="Coordinate"
-                        type="text"
+                        id="capacity"
+                        label="Capacity"
+                        type="number"
                         fullWidth
                         variant="standard"
-                        value={coordinate}
-                        onChange={handleCoordinateChange}
+                        value={capacity}
+                        onChange={handleCapacityChange}
                         required={true}
                         // error={true}
-                        helperText="Coordinates is required." />
+                        helperText="Capacity is required." />
                     <TextFieldItem
                         id="description"
                         label="Description"
@@ -172,8 +172,8 @@ export default function AddDialogBox(props) {
                 </DialogContent>
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
-                        <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#FF0000', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && coordinate)} startIcon={<SaveIcon />} style={{ backgroundColor: !(name && city && location && coordinate) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(name && city && location && capacity)} startIcon={<SaveIcon />} style={{ backgroundColor: !(name && city && location && capacity) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog >

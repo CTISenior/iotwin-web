@@ -129,7 +129,7 @@ const Devices = (props) => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Delete">
-                                <IconButton color='error' onClick={() => {
+                                <IconButton sx={{ color: '#f44336' }} onClick={() => {
                                     //const rowValue = tableData[rowIndex];
                                     console.log(tableData[rowIndex][1]);
                                     setSelectedRowId(tableData[rowIndex][0]);
