@@ -3,6 +3,8 @@ import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale
 import { Line } from 'react-chartjs-2'
 import io from 'socket.io-client';
 import Alert from './Alert';
+import { Box } from "@mui/system";
+import { Grid, Paper } from "@mui/material";
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
@@ -23,73 +25,7 @@ const tempLabel = [];
 
 const LineChart = (props) => {
 
-  const { id, types } = props;
-  React.useEffect(() => {
-    socket.emit("telemetry_topic", id);
-    socket.on("telemetry_topic_message", function (msg) {
-      let info = JSON.parse(msg);
-      console.log(info.values);
-      const date = new Date();
-      if (tempLabel.length > 15) {
-        tempLabel.shift();
-        if (temp.length > 0)
-          temp.shift();
-        if (hum.length > 0)
-          hum.shift();
-      }
-      temp.push(info.values.temperature);
-      hum.push(info.values.humidity);
-      tempLabel.push(date.getHours() + ":" + date.getMinutes());
-    });
-  }, []);
-
-  const [openAlert, setOpenAlert] = useState(true);
-  const handleCloseAlert = () => {
-    setOpenAlert(false);
-  };
-  const currentDate = new Date().toLocaleString();
-
-
-  const [chart, setChart] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Temperature",
-        data: [],
-        borderColor: "#FF0000",
-        fill: true,
-      },
-      {
-        label: "Humidity",
-        data: [],
-        borderColor: "#3e95cd",
-        fill: true,
-      },
-    ],
-  })
-  useEffect(() => {
-    setTimeout(function () {
-      setChart({
-        labels: tempLabel,
-        datasets: [
-          {
-            label: "Temperature",
-            data: temp,
-            borderColor: "#FF0000",
-            fill: true,
-          },
-          {
-            label: "Humidity",
-            data: hum,
-            borderColor: "#3e95cd",
-            fill: true,
-          },
-        ],
-      }, [tempLabel, temp]);
-
-    }, 2000);
-  })
-
+  const { id, types, disconnect, chart } = props;
 
   var options = {
     responsive: true,
@@ -116,20 +52,13 @@ const LineChart = (props) => {
     },
   }
   return (
-    <div style={{ width: '80%' }}>
-      <Line
-        data={chart}
-        height={400}
-        width={600}
-        options={options}
-      />
-      <Line
-        data={chart}
-        height={400}
-        width={600}
-        options={options}
-      />
-    </div>
+
+    <Line
+      data={chart}
+      height={400}
+      width={600}
+      options={options}
+    />
   )
 }
 

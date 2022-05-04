@@ -27,13 +27,15 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import { Link } from '@mui/material';
-import Dashboard from './Dashboard';
+import DashboardDevices from './DashboardDevices';
+import Dashboard from './Dashboard'
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
 import Devices from './Devices';
 import Assets from './Assets';
 import NotificationList from './NotificationList';
-import AlertComponent from './Alert';
+import Monitor from './Monitor';
+import Settings from './Settings';
 
 const drawerWidth = 200;
 
@@ -86,8 +88,9 @@ export default function PersistentDrawerLeft() {
     const isAdmin = keycloak.hasRealmRole("admin");
     const isCreator = keycloak.hasRealmRole("creator");
     const tenantID = keycloak.realm;
+    const clientID = keycloak.clientId;
+    const [alertCount, setAlertCount] = React.useState(null);
     console.log(keycloak.realm);
-
     let DrawerContent = [];
     if (isAdmin) {
         DrawerContent = [
@@ -148,8 +151,8 @@ export default function PersistentDrawerLeft() {
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
-            sx={{ mt: '30px' }}
-            marginLeft={"auto"}
+            sx={{ mt: '30px', marginLeft: "auto" }}
+
             anchorEl={anchorEl}
             anchorOrigin={{
                 vertical: 'top',
@@ -187,7 +190,7 @@ export default function PersistentDrawerLeft() {
                         IoTwin
                     </Typography>}
 
-                    <Box marginLeft={"auto"}>
+                    <Box sx={{ marginLeft: "auto" }} >
 
                         {(isAdmin || isObserver) && (
                             <IconButton
@@ -196,8 +199,8 @@ export default function PersistentDrawerLeft() {
                                 variant="layout"
                                 onClick={handleClickNotificationOpen}
                             >
-                                <Badge badgeContent={5} color="error"
-                                    onCanchorOrigin={{
+                                <Badge badgeContent={alertCount} color="error"
+                                    anchorOrigin={{
                                         vertical: 'top',
                                         horizontal: 'right',
                                     }}
@@ -206,7 +209,7 @@ export default function PersistentDrawerLeft() {
                                 </Badge>
                             </IconButton>
                         )}
-                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} tenantID={tenantID} />
+                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} tenantID={tenantID} setAlertCount={setAlertCount} />
                         <IconButton
                             size="large"
                             edge="end"
@@ -271,42 +274,56 @@ export default function PersistentDrawerLeft() {
 
                 </List>
             </Drawer>
-            {isAdmin && (
+            <Main sx={{ mt: "60px" }} open={open}>
 
-                <Main sx={{ mt: "60px" }} open={open}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<>
+                            <Navigation />
 
-                    <AlertComponent message={"test"} type={"error"} />
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<>
-                                <Navigation />
+                        </>
+                        } />
+                        <Route path="/dashboard" element={<>
+                            <PrivateRoute>
+                                <Dashboard tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/dashboard/devices" element={<>
+                            <PrivateRoute>
+                                <DashboardDevices tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/dashboard/monitor/:id/:name/:assetName/:types" element={<>
+                            <PrivateRoute>
+                                <Monitor />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/assets" element={<>
+                            <PrivateRoute>
+                                <Assets tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/devices" element={<>
+                            <PrivateRoute>
+                                <Devices tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/settings" element={<>
+                            <PrivateRoute>
+                                <Settings tenantID={tenantID} clientID={clientID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                    </Routes>
+                </BrowserRouter>
 
-                            </>
-                            } />
-   
-                            <Route path="/dashboard" element={<>
-                                <PrivateRoute>
-                                    <Dashboard tenantID={tenantID} />
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/assets" element={<>
-                                <PrivateRoute>
-                                    <Assets  tenantID={tenantID}/>
-                                </PrivateRoute>
-                            </>
-                            } />
-                            <Route path="/devices" element={<>
-                                <PrivateRoute>
-                                    <Devices  tenantID={tenantID}/>
-                                </PrivateRoute>
-                            </>
-                            } />
-                        </Routes>
-                    </BrowserRouter>
+            </Main>
 
-                </Main>
-            )}
 
         </Box >
     );

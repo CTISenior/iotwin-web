@@ -3,7 +3,7 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 
 export default function TextFieldItem(props) {
-    const { margin, id, label, type, variant, error, onChange, helperText, ...required } = props;
+    const { margin, id, label, type, variant, placeholder, error, pattern, onChange, helperText, ...required } = props;
     let element;
     if ({ ...required && error }) {
         element = (
@@ -31,7 +31,9 @@ export default function TextFieldItem(props) {
                 type={type}
                 fullWidth
                 variant={variant}
-                onChange={onChange} />
+                onChange={onChange}
+                pattern={pattern}
+                placeholder={placeholder} />
         );
     }
     return (

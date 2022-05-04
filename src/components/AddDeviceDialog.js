@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,76 +7,35 @@ import Button from '@mui/material/Button';
 import TextFieldItem from './TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
-import CancelIcon from '@mui/icons-material/Cancel';
-import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveIcon from '@mui/icons-material/Save';
 import SnackbarContent from '@mui/material/SnackbarContent';
 import axios from 'axios';
 
-export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
+
+export default function DialogBox(props) {
+    const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
+    //const [error,setError]=React.useState(true);
     const [descriptionValue, setDescriptionValue] = useState();
-    const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState();
+    const [asset, setAsset] = useState();
     const [deviceType, setDeviceType] = useState([]);
     const [protocol, setProtocol] = useState();
     const [deviceSn, setDeviceSn] = useState();
-    const [assetName, setAssetName] = useState([]);
-    const [model, setModel] = useState();
-    const [assetId, setAssetId] = useState();
+    const [model, setModel] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState();
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
+    const [assetName, setAssetName] = useState([]);
+
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
-    }
-
-    useEffect(() => {
-        setID(selectedRow[0]);
-        setDeviceSn(selectedRow[1]);
-        setDeviceName(selectedRow[2]);
-        setModel(selectedRow[3]);
-        setProtocol(selectedRow[4]);
-        setDeviceType(selectedDeviceType);
-        setMaxTemp(selectedRowMaxTemp);
-        setMaxHum(selectedRowMaxHum);
-        setDescriptionValue(selectedRow[7]);
-        setAssetId(selectedRow[8]);
-    }, [selectedRow]);
-
-    const handleadd = async () => {
-        console.log(id) //selected row id
-        console.log(selectedRow); //selected row data can be observed 
-        await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
-            "name": deviceName,
-            "protocol": protocol,
-            "model": model,
-            "types": deviceType,
-            "max_values": [maxTemp, maxHum],
-            "description": descriptionValue,
-            "asset_id": assetId,
-        })
-            .then(function (response) {
-                setSnackbarColor('#4caf50');
-                setIsChange(true);
-                setSnackbarOpen(true);
-                setSnackbarMessage(response.data)
-            })
-            .catch(function (error) {
-                setSnackbarOpen(true);
-                setSnackbarColor('#ff5722');
-                setSnackbarMessage('The device could not edited successfully')
-            })
-            .finally(() => {
-                setTimeout(function () {
-                    handleclose();
-                }, 300)
-            })
     }
     const deviceTypes = [
         {
@@ -101,6 +60,10 @@ export default function EditDeviceDialog(props) {
         },
     ];
 
+
+    const handleAssetChange = (event) => {
+        setAsset(event.target.value);
+    };
     const handleDeviceTypeChange = (event) => {
         if (event.target.value.includes(','))
             setDeviceType(event.target.value.split(','));
@@ -128,10 +91,10 @@ export default function EditDeviceDialog(props) {
     const handleModelChange = (event) => {
         setModel(event.target.value);
     }
-    const handleAssetChange = (event) => {
-        setAssetId(event.target.value);
-    };
-
+    /*
+    const handleErrorChange = () => {
+        setError(true);
+    }*/
     const getAssetsName = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
@@ -145,6 +108,7 @@ export default function EditDeviceDialog(props) {
                     temp.push(data);
                 });
                 setAssetName(temp);
+                console.log(temp)
             })
             .catch((error) => {
                 if (error.response) {
@@ -163,6 +127,47 @@ export default function EditDeviceDialog(props) {
     useEffect(() => {
         getAssetsName();
     }, []);
+
+    const handleadd = async () => {
+        await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
+            "sn": deviceSn,
+            "name": deviceName,
+            "protocol": protocol,
+            "model": model,
+            "types": deviceType,
+            "max_values": [maxTemp, maxHum],
+            "description": descriptionValue,
+            "asset_id": asset,
+            "tenant_id": tenantID
+        })
+            .then(function (response) {
+                setSnackbarColor('#4caf50');
+                setIsChange(true);
+                setSnackbarOpen(true);
+                setSnackbarMessage(response.data)
+            })
+            .catch(function (error) {
+                setSnackbarColor('#ff5722');
+                setSnackbarOpen(true);
+                setSnackbarMessage('New device could not inserted successfully')
+            })
+
+            .finally(() => {
+                setDeviceSn(null);
+                setDeviceName(null);
+                setProtocol(null);
+                setAsset(null);
+                setMaxTemp(null);
+                setModel(null);
+                setMaxHum(null);
+                setDeviceType(null);
+                setDescriptionValue(null);
+                setTimeout(function () {
+                    handleclose();
+                }, 500)
+            })
+    }
+
     return (
         <>
             <Snackbar
@@ -191,22 +196,27 @@ export default function EditDeviceDialog(props) {
                 {...fullWidth}
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
-                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device {deviceSn}</DialogTitle>
+                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Add new device</DialogTitle>
                 <DialogContent>
                     <TextFieldItem
+                        id="asset"
                         autoFocus
                         margin="dense"
-                        id="serial-number"
-                        label="Serial Number"
-                        type="text"
+                        select
                         fullWidth
                         variant="standard"
-                        value={deviceSn}
-                        onChange={handleDeviceSnChange}
+                        label="Select"
+                        value={asset}
+                        onChange={handleAssetChange}
+                        helperText="Please select your asset"
                         required={true}
-                        disabled
-                        // error={true}
-                        helperText="Serial Number is required." />
+                    >
+                        {assetName.map((option) => (
+                            <MenuItem key={option.id} value={option.id}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextFieldItem>
                     <TextFieldItem
                         autoFocus
                         margin="dense"
@@ -221,24 +231,18 @@ export default function EditDeviceDialog(props) {
                         // error={true}
                         helperText="Name is required." />
                     <TextFieldItem
-                        id="asset"
                         autoFocus
                         margin="dense"
-                        select
+                        id="serial-number"
+                        label="Serial Number"
+                        type="text"
                         fullWidth
                         variant="standard"
-                        label="Select"
-                        value={assetId}
-                        onChange={handleAssetChange}
-                        helperText="Please select your asset"
+                        value={deviceSn}
+                        onChange={handleDeviceSnChange}
                         required={true}
-                    >
-                        {assetName.map((option) => (
-                            <MenuItem key={option.id} value={option.id}>
-                                {option.name}
-                            </MenuItem>
-                        ))}
-                    </TextFieldItem>
+                        // error={true}
+                        helperText="Serial Number is required." />
                     <TextFieldItem
                         autoFocus
                         margin="dense"
@@ -248,7 +252,27 @@ export default function EditDeviceDialog(props) {
                         fullWidth
                         variant="standard"
                         value={model}
-                        onChange={handleModelChange} />
+                        onChange={handleModelChange}
+                    />
+                    <TextFieldItem
+                        id="deviceType"
+                        autoFocus
+                        margin="dense"
+                        select
+                        fullWidth
+                        variant="standard"
+                        label="Select"
+                        value={deviceType}
+                        onChange={handleDeviceTypeChange}
+                        helperText="Please select your device type"
+                        required={true}
+                    >
+                        {deviceTypes.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </TextFieldItem>
                     <TextFieldItem
                         id="protocol"
                         autoFocus
@@ -268,25 +292,6 @@ export default function EditDeviceDialog(props) {
                             </MenuItem>
                         ))}
                     </TextFieldItem>
-                    <TextFieldItem
-                        id="deviceType"
-                        autoFocus
-                        margin="dense"
-                        select
-                        fullWidth
-                        variant="standard"
-                        label="Select"
-                        value={deviceType}
-                        onChange={handleDeviceTypeChange}
-                        helperText="Please select your device type"
-                        required={true}>
-                        {deviceTypes.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextFieldItem>
-
                     <TextFieldItem
                         id="description"
                         label="Description"
@@ -320,11 +325,10 @@ export default function EditDeviceDialog(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(asset && deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(asset && deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
         </>
-
     );
 }
