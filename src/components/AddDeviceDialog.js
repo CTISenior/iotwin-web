@@ -147,6 +147,7 @@ export default function DialogBox(props) {
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
+                console.log(error);
                 setSnackbarColor('#ff5722');
                 setSnackbarOpen(true);
                 setSnackbarMessage('New device could not inserted successfully')

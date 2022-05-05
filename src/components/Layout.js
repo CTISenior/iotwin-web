@@ -89,8 +89,7 @@ export default function PersistentDrawerLeft() {
     const isCreator = keycloak.hasRealmRole("creator");
     const tenantID = keycloak.realm;
     const clientID = keycloak.clientId;
-    const [alertCount, setAlertCount] = React.useState(null);
-    console.log(keycloak.realm);
+    const [alertCount, setAlertCount] = React.useState(0);
     let DrawerContent = [];
     if (isAdmin) {
         DrawerContent = [
@@ -220,7 +219,7 @@ export default function PersistentDrawerLeft() {
                                 </Badge>
                             </IconButton>
                         )}
-                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} tenantID={tenantID} setAlertCount={setAlertCount} />
+                        <NotificationList anchorEl={anchorElNotification} open={openNotification} handleClose={handleClickNotificationClose} tenantID={tenantID} setAlertCount={setAlertCount} setAnchorElNotification={setAnchorElNotification} />
                         <IconButton
                             size="large"
                             edge="end"
@@ -306,7 +305,7 @@ export default function PersistentDrawerLeft() {
                             </PrivateRoute>
                         </>
                         } />
-                        <Route path="/dashboard/monitor/:id/:name/:assetName/:types" element={<>
+                        <Route path="/dashboard/monitor/:sn/:id/:name/:assetName/:types" element={<>
                             <PrivateRoute>
                                 <Monitor />
                             </PrivateRoute>
@@ -332,10 +331,7 @@ export default function PersistentDrawerLeft() {
                         } />
                     </Routes>
                 </BrowserRouter>
-
             </Main>
-
-
         </Box >
     );
 }
