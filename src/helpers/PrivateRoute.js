@@ -14,6 +14,11 @@ const PrivateRoute = ({ children }) => {
         return (isAdmin || isCreator) ? children : null;
     } else if (window.location.pathname === "/assets") {
         return (isAdmin || isCreator) ? children : null;
+    } else if (window.location.pathname === "/timeseries") {
+        return (isAdmin || isObserver) ? children : null;
+    }
+    else if (window.location.pathname === "/settings") {
+        return (isAdmin) ? children : null;
     }
 };
 

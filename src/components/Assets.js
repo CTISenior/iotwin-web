@@ -11,6 +11,7 @@ import EditAssetDialog from './EditAssetDialog';
 import DeleteAssetDialog from './DeleteAssetDialog';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
+import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
 
 const Assets = (props) => {
     const tenantID = props.tenantID;
@@ -101,7 +102,12 @@ const Assets = (props) => {
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
-                        </Box>
+                            <Tooltip title="Monitor">
+                                <IconButton sx={{ color: '#f44336' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                    <RemoveRedEyeSharpIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Box >
 
                     )
                 }

@@ -36,6 +36,9 @@ import Assets from './Assets';
 import NotificationList from './NotificationList';
 import Monitor from './Monitor';
 import Settings from './Settings';
+import UnivariateStepper from './Timeseries/UnivariateStepper';
+import TipsAndUpdatesSharpIcon from '@mui/icons-material/TipsAndUpdatesSharp';
+import AssetsDevices from './AssetsDevices';
 
 const drawerWidth = 200;
 
@@ -97,6 +100,7 @@ export default function PersistentDrawerLeft() {
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
             { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
+            { text: "Timeseries", Icon: <TipsAndUpdatesSharpIcon fontSize='large' />, path: "/timeseries" },
             { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
@@ -104,13 +108,13 @@ export default function PersistentDrawerLeft() {
         DrawerContent = [
             { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
-            { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
     else if (isObserver) {
         DrawerContent = [
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
-            { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
+            { text: "Timeseries", Icon: <TipsAndUpdatesSharpIcon fontSize='large' />, path: "/timeseries" },
+
         ];
     }
 
@@ -318,9 +322,21 @@ export default function PersistentDrawerLeft() {
                             </PrivateRoute>
                         </>
                         } />
+                        <Route path="/assets/devices/:sn" element={<>
+                            <PrivateRoute>
+                                <AssetsDevices />
+                            </PrivateRoute>
+                        </>
+                        } />
                         <Route path="/devices" element={<>
                             <PrivateRoute>
                                 <Devices tenantID={tenantID} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/timeseries" element={<>
+                            <PrivateRoute>
+                                <UnivariateStepper />
                             </PrivateRoute>
                         </>
                         } />
