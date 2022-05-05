@@ -103,7 +103,7 @@ const Assets = (props) => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Monitor">
-                                <IconButton sx={{ color: '#f44336' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                <IconButton sx={{ color: 'primary' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
                                     <RemoveRedEyeSharpIcon />
                                 </IconButton>
                             </Tooltip>
