@@ -171,6 +171,17 @@ export default function PersistentDrawerLeft() {
         </Menu>
     );
 
+    const [username, setUsername] = React.useState("null");
+
+    const getUserInfo = () => {
+        keycloak.loadUserInfo().then(userInfo => {
+            setUsername(userInfo.preferred_username);
+        })
+    };
+    React.useEffect(() => {
+        getUserInfo();
+    }, [clientID]);
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -225,7 +236,7 @@ export default function PersistentDrawerLeft() {
                         >
                             <AccountCircle />
                             <Typography sx={{ ml: "10px" }} variant="nav" noWrap component="div">
-                                Admin
+                                {username}
                             </Typography>
                         </IconButton>
 
