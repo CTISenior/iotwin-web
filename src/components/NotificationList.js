@@ -12,19 +12,31 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DoneIcon from '@mui/icons-material/Done';
 import SnackbarContent from '@mui/material/SnackbarContent';
-import { Typography } from "@mui/material";
+import ClearAllIcon from '@mui/icons-material/ClearAll';
+import { Grid, Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import ClearAllTenantAlert from './ClearAllTenantAlert';
+import Moment from 'react-moment';
 
 const NotificationList = (props) => {
-  const { anchorEl, open, handleClose, setAlertCount, tenantID } = props;
+  const { anchorEl, open, handleClose, setAnchorElNotification, setAlertCount, tenantID } = props;
   const [notificationList, setNotificationList] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isChange, setIsChange] = useState(false);
   const [snackbarColor, setSnackbarColor] = useState();
+  const [openClearAllDialog, setOpenClearAllDialog] = useState(false);
 
   const snackbarClose = (event) => {
     setSnackbarOpen(false);
     setSnackbarMessage(null);
+  }
+  const handleOpenClearAll = () => {
+    setOpenClearAllDialog(true);
+  }
+  const handleCloseClearAll = () => {
+    setAlertCount(0);
+    setOpenClearAllDialog(false);
   }
 
   const getNotification = () => {
@@ -37,7 +49,7 @@ const NotificationList = (props) => {
             message: element.message,
             createdTime: element.created_at,
             status: element.status,
-            timestamp: element.timestamp
+            timestamptz: element.timestamptz
           };
           setAlertCount(response.data.length);
           notificationListItem.push(temp);
@@ -70,10 +82,10 @@ const NotificationList = (props) => {
     }, 2000)
   }, [tenantID]);
 
-  // useEffect(() => {
-  //   if (isChange)
-  //     getNotification();
-  // }, [isChange]);
+  useEffect(() => {
+    if (isChange)
+      getNotification();
+  }, [isChange]);
 
   function AllAlerts(props) {
     return <>
@@ -90,20 +102,11 @@ const NotificationList = (props) => {
           )}
           <Box>
             <ListItemText>{list.message}</ListItemText>
-            <ListItemText>{
-              new Intl.DateTimeFormat("en-US", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(list.timestamp)
-            }</ListItemText>
+            <ListItemText><Moment format='Do MMMM YYYY, h:mm:ss a'>{list.timestamptz}</Moment></ListItemText>
           </Box>
           <Box sx={{ justifyContent: "right", display: "flex" }}>
-            <Tooltip title="View">
-              <ListItemIcon sx={{ ml: '15px' }} onClick={() => handleView(list.id, list.status)}
+            <Tooltip title="Clear">
+              <ListItemIcon sx={{ ml: '15px' }} onClick={() => handleClear(list.id, list.status)}
               >
                 <DoneIcon fontSize="medium" color='info' />
               </ListItemIcon>
@@ -115,7 +118,7 @@ const NotificationList = (props) => {
 
   }
 
-  const handleView = (id, status) => {
+  const handleClear = (id, status) => {
     axios.put('http://176.235.202.77:4000/api/v1/alerts/' + id, {
       "status": !status
     })
@@ -164,10 +167,39 @@ const NotificationList = (props) => {
         open={open}
         onClose={handleClose}
       >
-        <Typography variant="modal" sx={{ marginLeft: 1 }}>
-          Notifications
-        </Typography>
+        <Grid
+          item
+          xs={5}
+          md={5}
+          lg={5}
+          sx={{ justifyContent: "space-around", display: "flex", marginTop: 2 }}
+        >
+          {notificationList.length > 0 ? (
+            <>
+              <Typography variant="modal" sx={{ marginLeft: 1 }}>
+                Notifications
+              </Typography>
+              <Box>
+                <Tooltip title="Clear All">
+                  <Button variant="contained" onClick={handleOpenClearAll} color="info" startIcon={<ClearAllIcon />} style={{ color: '#FFF', textTransform: 'capitalize' }}>Clear All</Button>
+                </Tooltip>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Box display={'flex'} flexDirection={'column'}>
+                <Typography variant="modal" sx={{ marginLeft: 8 }}>
+                  Notifications
+                </Typography>
+                <Typography sx={{ margin: 2 }}>
+                  There is no unread notification
+                </Typography>
+              </Box>
+            </>
+          )}
+        </Grid>
         <AllAlerts />
+        <ClearAllTenantAlert open={openClearAllDialog} handleclose={handleCloseClearAll} fullWidth={true} maxWidth='md' setIsChange={setIsChange} tenantID={tenantID} setAnchorElNotification={setAnchorElNotification} />
       </Menu>
     </>
 

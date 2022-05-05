@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function ClearDialogBox(props) {
-    const { open, maxWidth, setIsChange, id, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, setAnchorElNotification, tenantID, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
@@ -25,11 +25,12 @@ export default function ClearDialogBox(props) {
         setSnackbarMessage(null);
     }
     const handleClearAll = async () => {
-        await axios.put(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts`)
+        await axios.put(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
                 setIsChange(true);
                 setSnackbarOpen(true);
+                setAnchorElNotification(null);
                 setSnackbarMessage(response.data)
             })
             .catch(function (error) {
@@ -73,11 +74,11 @@ export default function ClearDialogBox(props) {
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
                 <DialogTitle style={{ fontWeight: 'bold' }}>
-                    {"Are you sure you want to clear all device alerts?"}
+                    {"Are you sure you want to clear all tenant alerts?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        After the confirmation the device alerts and alert status will changed.
+                        After the confirmation the tenant alerts and alert status will changed.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

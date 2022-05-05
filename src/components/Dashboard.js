@@ -15,6 +15,7 @@ import Button from "@mui/material/Button";
 import Badge from '@mui/material/Badge';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import Moment from 'react-moment';
 
 const Dashboard = (props) => {
   const { tenantID } = props;
@@ -38,14 +39,7 @@ const Dashboard = (props) => {
         let telemetry = [];
         response.data.latestAlerts.forEach((elm) => {
           const data = [
-            new Intl.DateTimeFormat("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(elm.timestamp),
+            elm.timestamptz,
             elm.message,
             elm.device_name,
             elm.status,
@@ -57,14 +51,7 @@ const Dashboard = (props) => {
         setLatestAlerts(alerts);
         response.data.latestTelemetry.forEach((elm) => {
           const data = [
-            new Intl.DateTimeFormat("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            }).format(elm.timestamp),
+            elm.timestamptz,
             elm.device_name,
             elm.value.humidity,
             elm.value.temperature,
@@ -104,7 +91,15 @@ const Dashboard = (props) => {
 
 
   const alertsColumn = [
-    { name: "Created At" },
+    {
+      name: "Created At", options: {
+        customBodyRender: (val) => {
+          return (
+            <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
+          )
+        }
+      }
+    },
     { name: "Message" },
     { name: "Device Name" },
     {
@@ -147,7 +142,15 @@ const Dashboard = (props) => {
     },
   ];
   const telemetryColumn = [
-    { name: "Created At" },
+    {
+      name: "Created At", options: {
+        customBodyRender: (val) => {
+          return (
+            <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
+          )
+        }
+      }
+    },
     { name: "Device Name" },
     {
       name: "Temperature Value", options: {
