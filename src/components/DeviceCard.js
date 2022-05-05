@@ -7,7 +7,7 @@ import SensorsSharpIcon from '@mui/icons-material/SensorsSharp';
 
 export default function DeviceCard(props) {
 
-    const { name, id, assetName, types } = props;
+    const { name, id, assetName, types, sn } = props;
     return (
         <Grid item xs={12} sm={6} md={3}>
             <Paper elevation={3}>
@@ -25,7 +25,7 @@ export default function DeviceCard(props) {
                         alignItems={'center'}
                     >
                         <Tooltip title="Display Device Details">
-                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/${name}/${assetName}/${types}/`}>
+                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${sn}/${id}/${name}/${assetName}/${types}/`}>
                                 <ShowChartIcon fontSize='large' />
                             </IconButton>
                         </Tooltip>

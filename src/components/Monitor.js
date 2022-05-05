@@ -23,6 +23,7 @@ import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearAllDeviceAlert from './ClearAllDeviceAlert';
 import DeleteAllDeviceAlert from './DeleteAllDeviceAlert';
+import Moment from 'react-moment';
 
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 const temp = [];
@@ -96,18 +97,10 @@ const Monitor = (props) => {
         axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts?days=${alertValue}`)
             .then((response) => {
                 setIsChange(false);
-                console.log(response.data)
                 let alerts = [];
                 response.data.latestAlerts.forEach((elm) => {
                     const data = [
-                        new Intl.DateTimeFormat("en-US", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                        }).format(elm.timestamp),
+                        elm.timestamptz,
                         elm.message,
                         elm.telemetry_key,
                         elm.status,
@@ -141,19 +134,11 @@ const Monitor = (props) => {
     const getTelemetries = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?limit=200`)
             .then((response) => {
-                console.log(response.data);
                 let telemetry = [];
-                // console.log(JSON.stringify(response.data));
+                console.log(response.data);
                 response.data.latestTelemetry.forEach((elm) => {
                     const data = [
-                        new Intl.DateTimeFormat("en-US", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                        }).format(elm.timestamp),
+                        elm.timestamptz,
                         elm.value.humidity,
                         elm.value.temperature,
                     ];
@@ -302,7 +287,15 @@ const Monitor = (props) => {
 
 
     const alertsColumn = [
-        { name: "Created At" },
+        {
+            name: "Created At", options: {
+                customBodyRender: (val) => {
+                    return (
+                        <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
+                    )
+                }
+            }
+        },
         { name: "Message" },
         { name: "Telemetry Key" },
         {
@@ -373,16 +366,34 @@ const Monitor = (props) => {
         }
     ];
     const telemetryColumn = [
-        { name: "Created At" },
+        {
+            name: "Created At", options: {
+                customBodyRender: (val) => {
+                    return (
+                        <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
+                    )
+                }
+            }
+        },
         { name: "Device Sn", options: { display: false } },
         {
             name: "Temperature Value", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
+                customBodyRender: (val) => {
+                    return (
+                        <Typography>{val}</Typography>
+                    )
+                },
             }
         },
         {
             name: "Humidity Value", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
+                customBodyRender: (val) => {
+                    return (
+                        <Typography>{val}</Typography>
+                    )
+                },
             }
         },
     ];
