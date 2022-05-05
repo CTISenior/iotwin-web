@@ -321,9 +321,9 @@ export default function PersistentDrawerLeft() {
                             </PrivateRoute>
                         </>
                         } />
-                        <Route path="/assets/devices/:sn" element={<>
+                        <Route path="/assets/devices/:id" element={<>
                             <PrivateRoute>
-                                <AssetsDevices />
+                                <AssetsDevices isCreator={isCreator} />
                             </PrivateRoute>
                         </>
                         } />

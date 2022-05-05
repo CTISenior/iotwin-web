@@ -8,7 +8,7 @@ const PrivateRoute = ({ children }) => {
     const isObserver = keycloak.hasRealmRole("observer");
     const isAdmin = keycloak.hasRealmRole("admin");
     const isCreator = keycloak.hasRealmRole("creator");
-    if (window.location.pathname === "/dashboard" || "/dashboard/devices") {
+    if (window.location.pathname === ("/dashboard" || "/dashboard/devices")) {
         return (isAdmin || isObserver) ? children : null;
     } else if (window.location.pathname === "/devices") {
         return (isAdmin || isCreator) ? children : null;
