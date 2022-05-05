@@ -171,7 +171,7 @@ export default function PersistentDrawerLeft() {
         </Menu>
     );
 
-    const [username, setUsername] = React.useState("null");
+    const [username, setUsername] = React.useState();
 
     const getUserInfo = () => {
         keycloak.loadUserInfo().then(userInfo => {
