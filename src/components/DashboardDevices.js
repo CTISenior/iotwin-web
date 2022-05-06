@@ -5,7 +5,7 @@ import DeviceCard from './DeviceCard';
 import { SnackbarProvider } from 'notistack';
 import io from 'socket.io-client';
 import Button from '@mui/material/Button';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BackspaceIcon from '@mui/icons-material/Backspace';
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
@@ -65,7 +65,7 @@ const DashboardDevices = (props) => {
             <SnackbarProvider maxSnack={3}>
                 <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 5 }}>
                     <Button href="/dashboard" variant="contained"
-                        startIcon={<ArrowBackIcon style={{ borderRight: '1px solid white', borderRightWidth: '1px' }} />} style={{ color: '#FFF' }}>
+                        startIcon={<BackspaceIcon />} style={{ color: '#FFF' }}>
                         Back to dashboard
                     </Button>
                 </Grid>

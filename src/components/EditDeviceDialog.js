@@ -17,7 +17,7 @@ import axios from 'axios';
 
 export default function EditDeviceDialog(props) {
     const { open, maxWidth, selectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
-    const [descriptionValue, setDescriptionValue] = useState();
+    const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);

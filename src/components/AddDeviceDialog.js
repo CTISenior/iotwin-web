@@ -19,7 +19,7 @@ import axios from 'axios';
 export default function DialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
     //const [error,setError]=React.useState(true);
-    const [descriptionValue, setDescriptionValue] = useState();
+    const [descriptionValue, setDescriptionValue] = useState('');
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState();
@@ -108,7 +108,6 @@ export default function DialogBox(props) {
                     temp.push(data);
                 });
                 setAssetName(temp);
-                console.log(temp)
             })
             .catch((error) => {
                 if (error.response) {

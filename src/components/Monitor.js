@@ -1,6 +1,6 @@
 import { Container, FormControl, Grid, MenuItem, InputLabel, Select, Paper, Tab, Typography } from '@mui/material'
 import { Box } from '@mui/system';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import LineChart from './LineChart';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -11,7 +11,7 @@ import io from 'socket.io-client';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BackspaceIcon from '@mui/icons-material/Backspace';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import DoneIcon from '@mui/icons-material/Done';
 import Tooltip from '@mui/material/Tooltip';
@@ -24,6 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ClearAllDeviceAlert from './ClearAllDeviceAlert';
 import DeleteAllDeviceAlert from './DeleteAllDeviceAlert';
 import Moment from 'react-moment';
+import BalanceIcon from '@mui/icons-material/Balance';
 
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 const temp = [];
@@ -54,7 +55,22 @@ const Monitor = (props) => {
     const [snackbarColor, setSnackbarColor] = useState();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [dailyMax, setDailyMax] = useState(0);
+    const [weeklyMax, setWeeklyMax] = useState(0);
+    const [monthlyMax, setMonthlyMax] = useState(0);
+    const [yearlyMax, setYearlyMax] = useState(0);
+    const [dailyAvg, setDailyAvg] = useState(0);
+    const [weeklyAvg, setWeeklyAvg] = useState(0);
+    const [monthlyAvg, setMonthlyAvg] = useState(0);
+    const [yearlyAvg, setYearlyAvg] = useState(0);
+    const [deviceType, setDeviceType] = useState("temperature");
+    const [deviceTypes, setDeviceTypes] = useState([]);
 
+    let type = [];
+    const data = [
+        { value: "temperature", text: "Temperature" },
+        { value: "humidity", text: "Humidity" },
+    ];
     const handleOpenClearAll = () => {
         setOpenClearAllDialog(true);
     }
@@ -74,6 +90,77 @@ const Monitor = (props) => {
     const handleAlertChange = (event) => {
         setAlertValue(event.target.value);
         setIsChange(true);
+    };
+    const handleDeviceTypeChange = (event) => {
+        setDeviceType(event.target.value);
+    };
+    React.useEffect(() => {
+        if (isChange)
+            getAlerts();
+    }, [isChange]);
+    React.useEffect(() => {
+        getTelemetryMax();
+        getTelemetryAvg();
+    }, [deviceType])
+
+    const getTelemetryMax = () => {
+        let types = [];
+        const data = [
+            { value: "temperature", text: "Temperature" },
+            { value: "humidity", text: "Humidity" },
+        ];
+        data.map((item) => types.push(item));
+        setDeviceTypes(types);
+        axios
+            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?type=${deviceType}`)
+            .then((response) => {
+                setDailyMax(response.data.daily_max);
+                setWeeklyMax(response.data.weekly_max);
+                setMonthlyMax(response.data.monthly_max);
+                setYearlyMax(response.data.yearly_max);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log("Error", error.message);
+                }
+                console.log(error.config);
+            });
+    };
+
+    const getTelemetryAvg = () => {
+        let types = [];
+        const data = [
+            { value: "temperature", text: "Temperature" },
+            { value: "humidity", text: "Humidity" },
+        ];
+        data.map((item) => types.push(item));
+        setDeviceTypes(types);
+        axios
+            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?type=${deviceType}`)
+            .then((response) => {
+                setDailyAvg(response.data.daily_avg);
+                setWeeklyAvg(response.data.weekly_avg);
+                setMonthlyAvg(response.data.monthly_avg);
+                setYearlyAvg(response.data.yearly_avg);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log("Error", error.message);
+                }
+                console.log(error.config);
+            });
     };
     const getAlerts = () => {
         let alertCount = [];
@@ -164,12 +251,6 @@ const Monitor = (props) => {
             });
     };
 
-    React.useEffect(() => {
-        if (isChange)
-            getAlerts();
-    }, [isChange]);
-
-
     const [tempChart, setTempChart] = useState({
         labels: [],
         datasets: [
@@ -198,6 +279,10 @@ const Monitor = (props) => {
         setSelectedTab(newValue);
     }
     React.useEffect(() => {
+        if (types === 'temperature,humidity')
+            setDeviceType("temperature");
+        else
+            setDeviceType(types);
         getAlerts();
         getTelemetries();
         socket.emit("telemetry_topic", sn);
@@ -250,8 +335,6 @@ const Monitor = (props) => {
     }, [updateHum])
 
     const handleClearAlert = async (id, status) => {
-        console.log(id);
-        console.log(status);
         axios.put('http://176.235.202.77:4000/api/v1/alerts/' + id, {
             "status": !status
         })
@@ -344,7 +427,6 @@ const Monitor = (props) => {
                             <Tooltip title="Clear">
                                 <IconButton color='info' onClick={() => {
                                     const rowValue = latestAlerts[rowIndex];
-                                    console.log(rowValue[3]);
                                     handleClearAlert(rowValue[5], rowValue[3]);
                                 }}>
                                     <DoneIcon />
@@ -375,9 +457,8 @@ const Monitor = (props) => {
                 }
             }
         },
-        { name: "Device Sn", options: { display: false } },
         {
-            name: "Temperature Value", options: {
+            name: "Humidity Value", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
                 customBodyRender: (val) => {
                     return (
@@ -387,7 +468,7 @@ const Monitor = (props) => {
             }
         },
         {
-            name: "Humidity Value", options: {
+            name: "Temperature Value", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
                 customBodyRender: (val) => {
                     return (
@@ -450,7 +531,7 @@ const Monitor = (props) => {
             </Snackbar>
             <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
                 <Button href="/dashboard/devices" variant="contained"
-                    startIcon={<ArrowBackIcon style={{ borderRight: '1px solid white', borderRightWidth: '1px' }} />} style={{ color: '#FFF' }}>
+                    startIcon={<BackspaceIcon />} style={{ color: '#FFF' }}>
                     Back to Devices
                 </Button>
             </Grid>
@@ -464,29 +545,64 @@ const Monitor = (props) => {
                 </TabList>
 
                 <TabPanel value="1">
-                    <Paper sx={{ mt: 2, p: 5 }} elevation={3}>
+                    <Box
+                        p={1}
+                        display={"flex"}
+                        flexDirection={"row"}
+                        alignItems={"left"}
+                    >
 
+                        <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
+                            <Typography
+                                mx={1}
+                                p={1}
+                                variant="side"
+                                sx={{ color: "primary.main", borderRight: '1px solid black' }}>
+                                {name}
+                            </Typography>
+                            <Typography
+                                mx={1}
+                                variant="side"
+                                sx={{ color: "primary.main" }}
+                            >
+                                {assetName}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Paper sx={{ mt: 2, p: 5 }} elevation={3}>
                         <Grid container spacing={2} xs={12} width={1}>
                             <Grid item xs={12} md={6} lg={3}>
                                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                                     <Box
-                                        p={1}
+                                        p={2}
                                         display={"flex"}
                                         flexDirection={"column"}
                                         alignItems={"center"}
                                     >
                                         <SensorsSharpIcon
-                                            sx={{ fontSize: "6rem", color: "primary.main" }}
+                                            sx={{ fontSize: "4rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
-                                            <Typography variant="modal">Name</Typography>
-                                            <Typography
-                                                mx={1}
-                                                variant="side"
-                                                sx={{ color: "primary.main" }}
-                                            >
-                                                {name}
-                                            </Typography>
+                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                                            <Typography variant="modal">Types</Typography>
+                                            <Box sx={{ marginLeft: 2 }}>
+                                                <FormControl variant="standard">
+                                                    <InputLabel>Device Type</InputLabel>
+                                                    <Select
+                                                        labelId="select-Type"
+                                                        id="select-TotalType"
+                                                        value={deviceType}
+                                                        onChange={handleDeviceTypeChange}
+                                                        autoWidth
+                                                        label="Select Device Type"
+                                                    >
+                                                        {deviceTypes.map((option) => (
+                                                            <MenuItem key={option.id} value={option.value}>
+                                                                {option.text}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </Box>
                                         </Box>
                                     </Box>
                                 </Paper>
@@ -500,43 +616,180 @@ const Monitor = (props) => {
                                         alignItems={"center"}
                                     >
                                         <SensorsSharpIcon
-                                            sx={{ fontSize: "6rem", color: "primary.main" }}
-                                        />
-                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
-                                            <Typography variant="modal">Asset</Typography>
-                                            <Typography
-                                                mx={1}
-                                                variant="side"
-                                                sx={{ color: "primary.main" }}
-                                            >
-                                                {assetName}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={6} lg={3}>
-                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
-                                    <Box
-                                        p={1}
-                                        display={"flex"}
-                                        flexDirection={"column"}
-                                        alignItems={"center"}
-                                    >
-                                        <SensorsSharpIcon
-                                            sx={{ fontSize: "6rem", color: "primary.main" }}
+                                            sx={{ fontSize: "4rem", color: "primary.main" }}
                                         />
                                         <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-                                            <Typography variant="modal">Types</Typography>
-
-
+                                            <Typography variant="modal">Max Values</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
                                                 sx={{ color: "primary.main", textTransform: 'capitalize' }}
                                             >
-                                                {types.replace(',', '&')}
+                                                Max Values
                                             </Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={1}
+                                        display={"flex"}
+                                        flexDirection={"row"}
+                                        justifyContent={"space-evenly"}
+                                    >
+                                        <NotificationsIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
+                                        />
+                                        <Box
+                                            display={"flex"}
+                                            flexDirection={"column"}
+                                            justifyContent={"space-around"}
+                                        >
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                                mt={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Max:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {dailyMax == null ? 0 : dailyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Max:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {weeklyMax == null ? 0 : weeklyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Max:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {monthlyMax == null ? 0 : monthlyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Max:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {yearlyMax == null ? 0 : yearlyMax}
+                                                </Typography>
+                                            </Grid>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={1}
+                                        display={"flex"}
+                                        flexDirection={"row"}
+                                        justifyContent={"space-evenly"}
+                                    >
+                                        <BalanceIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
+                                        />
+                                        <Box
+                                            display={"flex"}
+                                            flexDirection={"column"}
+                                            justifyContent={"space-around"}
+                                        >
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                                mt={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Avg:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {dailyAvg == null ? 0 : Number(dailyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Avg:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {weeklyAvg == null ? 0 : Number(weeklyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Avg:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {monthlyAvg == null ? 0 : Number(monthlyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Avg:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {yearlyAvg == null ? 0 : Number(yearlyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
                                         </Box>
                                     </Box>
                                 </Paper>
@@ -860,10 +1113,8 @@ const Monitor = (props) => {
                         </Grid>
                     </Paper>
                 </TabPanel>
-
             </TabContext >
         </Container >
     )
 }
-
 export default Monitor
