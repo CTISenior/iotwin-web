@@ -280,10 +280,13 @@ const Monitor = (props) => {
         setSelectedTab(newValue);
     }
     React.useEffect(() => {
-        if (types === 'temperature,humidity')
-            setDeviceType("temperature");
-        else
-            setDeviceType(types);
+
+        // Erdem ?????
+
+        // if (types === 'temperature,humidity')
+        //     setDeviceType("temperature");
+        // else
+        //     setDeviceType(types);
         getAlerts();
         getTelemetries();
         socket.emit("telemetry_topic", sn);
@@ -298,12 +301,16 @@ const Monitor = (props) => {
                 if (hum.length > 0)
                     hum.shift();
             }
-            temp.push(Number(info.values.temperature).toFixed(2));
-            hum.push(Number(info.values.humidity).toFixed(2));
-            setUpdateHeat(hum);
+            if (!info.values.temperature.includes("{")) {
+                temp.push(Number(info.values.temperature).toFixed(2));
+                setUpdateHeat((prev) => prev + 1);
+            }
+            if (!info.values.humidity.includes("{")) {
+                hum.push(Number(info.values.humidity).toFixed(2));
+                setUpdateHum((prev) => prev + 1);
+                console.log("Hum is " + hum);
+            }
             tempLabel.push(date.getHours() + ":" + date.getMinutes());
-            setUpdateHum((prev) => prev + 1);
-
         });
     }, []);
 
@@ -802,31 +809,51 @@ const Monitor = (props) => {
                                 </Paper>
                             </Grid>
 
-                            {types.includes('temperature') &&
-                                <Grid item xs={12} md={6}>
+                            {types.length > 1 ? (
+                                <>
+                                    <Grid item xs={12} md={6}>
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={types} chart={tempChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6}>
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={types} chart={humChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+
+                                </>
+                            ) : (
+                                <Grid item xs={12} >
                                     <Paper elevation={3}>
                                         <Box
                                             display={'flex'}
                                             flexDirection={'column'}
                                             alignItems={'center'}
                                         >
-                                            <LineChart id={sn} types={types} chart={tempChart} />
+                                            {types == "temperature" &&
+                                                <LineChart id={sn} types={types} chart={tempChart} />
+                                            }
+                                            {types == "humidity" &&
+                                                <LineChart id={sn} types={types} chart={humChart} />
+                                            }
                                         </Box>
                                     </Paper>
                                 </Grid>
-                            }
-                            {types.includes('humidity') &&
-                                <Grid item xs={12} md={6}>
-                                    <Paper elevation={3}>
-                                        <Box
-                                            display={'flex'}
-                                            flexDirection={'column'}
-                                            alignItems={'center'}
-                                        >
-                                            <LineChart id={sn} types={types} chart={humChart} />
-                                        </Box>
-                                    </Paper>
-                                </Grid>
+                            )
                             }
 
 
