@@ -24,8 +24,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ClearAllDeviceAlert from './ClearAllDeviceAlert';
 import DeleteAllDeviceAlert from './DeleteAllDeviceAlert';
 import Moment from 'react-moment';
-import ThermostatAutoIcon from '@mui/icons-material/ThermostatAuto';
-import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
+import BalanceIcon from '@mui/icons-material/Balance';
 
 const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 const temp = [];
@@ -546,35 +545,30 @@ const Monitor = (props) => {
                 </TabList>
 
                 <TabPanel value="1">
-                    <Paper sx={{ mt: 1 }} elevation={3}>
-                        <Grid container>
-                            <Grid>
-                                <Box
-                                    p={1}
-                                    display={"flex"}
-                                    flexDirection={"row"}
-                                    justifyContent={"center"}
-                                >
-                                    <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
-                                        <Typography
-                                            mx={1}
-                                            p={1}
-                                            variant="side"
-                                            sx={{ color: "primary.main", borderRight: '1px solid black' }}>
-                                            {name}
-                                        </Typography>
-                                        <Typography
-                                            mx={1}
-                                            variant="side"
-                                            sx={{ color: "primary.main" }}
-                                        >
-                                            {assetName}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </Paper>
+                    <Box
+                        p={1}
+                        display={"flex"}
+                        flexDirection={"row"}
+                        alignItems={"left"}
+                    >
+
+                        <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
+                            <Typography
+                                mx={1}
+                                p={1}
+                                variant="side"
+                                sx={{ color: "primary.main", borderRight: '1px solid black' }}>
+                                {name}
+                            </Typography>
+                            <Typography
+                                mx={1}
+                                variant="side"
+                                sx={{ color: "primary.main" }}
+                            >
+                                {assetName}
+                            </Typography>
+                        </Box>
+                    </Box>
                     <Paper sx={{ mt: 2, p: 5 }} elevation={3}>
                         <Grid container spacing={2} xs={12} width={1}>
                             <Grid item xs={12} md={6} lg={3}>
@@ -645,7 +639,7 @@ const Monitor = (props) => {
                                         flexDirection={"row"}
                                         justifyContent={"space-evenly"}
                                     >
-                                        <DeviceThermostatIcon
+                                        <NotificationsIcon
                                             sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
                                         />
                                         <Box
@@ -727,8 +721,7 @@ const Monitor = (props) => {
                                         flexDirection={"row"}
                                         justifyContent={"space-evenly"}
                                     >
-
-                                        <ThermostatAutoIcon
+                                        <BalanceIcon
                                             sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
                                         />
                                         <Box
