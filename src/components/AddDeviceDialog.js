@@ -14,11 +14,11 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import SnackbarContent from '@mui/material/SnackbarContent';
 import axios from 'axios';
-
+import conf from "../conf.json";
+import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox } from '@mui/material';
 
 export default function DialogBox(props) {
-    const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
-    //const [error,setError]=React.useState(true);
+    const { open, maxWidth, setIsChange, tenantID, setOpenAddDialog, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [maxTemp, setMaxTemp] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
@@ -32,43 +32,36 @@ export default function DialogBox(props) {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
     const [assetName, setAssetName] = useState([]);
+    const [protocols, setProtocols] = useState([]);
+    const [models, setModels] = useState([]);
+    const [deviceTypes, setDeviceTypes] = useState([]);
 
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
-    const deviceTypes = [
-        {
-            value: 'temperature',
-            label: 'Temperature',
-        },
-        {
-            value: 'humidity',
-            label: 'Humidity',
-        }, {
-            value: 'temperature,humidity',
-            label: 'Temperature & Humidity',
-        },
-    ];
-    const protocols = [
-        {
-            value: 'http',
-            label: 'HTTP',
-        }, {
-            value: 'mqtt',
-            label: 'MQTT',
-        },
-    ];
-
-
+    const handleclose = (event) => {
+        setOpenAddDialog(false);
+        setDeviceSn(null);
+        setDeviceName(null);
+        setProtocol([]);
+        setAsset(null);
+        setMaxTemp(null);
+        setModel([]);
+        setMaxHum(null);
+        setDeviceType([]);
+        setDescriptionValue(null);
+    }
     const handleAssetChange = (event) => {
         setAsset(event.target.value);
     };
     const handleDeviceTypeChange = (event) => {
-        if (event.target.value.includes(','))
-            setDeviceType(event.target.value.split(','));
-        else
-            setDeviceType(event.target.value.split(' '));
+        const value = event.target.value;
+        if (value[value.length - 1] === "all") {
+            setDeviceType(deviceType.length === deviceTypes.length ? [] : deviceTypes);
+            return;
+        }
+        setDeviceType(value);
     };
     const handleProtocolChange = (event) => {
         setProtocol(event.target.value);
@@ -91,10 +84,6 @@ export default function DialogBox(props) {
     const handleModelChange = (event) => {
         setModel(event.target.value);
     }
-    /*
-    const handleErrorChange = () => {
-        setError(true);
-    }*/
     const getAssetsName = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
@@ -125,9 +114,57 @@ export default function DialogBox(props) {
 
     useEffect(() => {
         getAssetsName();
+        let protocols = [];
+        let models = [];
+        let deviceTypes = [];
+        conf.protocols.forEach(elm => {
+            const data = {
+                value: elm.value,
+                label: elm.label,
+            };
+            protocols.push(data);
+        });
+        setProtocols(protocols);
+        conf.models.forEach(elm => {
+            const data = {
+                value: elm.value,
+                label: elm.label,
+            };
+            models.push(data);
+        });
+        setModels(models);
+        conf.sensor_types.forEach(elm => {
+            const data = {
+                value: elm.value,
+                label: elm.label,
+            };
+            deviceTypes.push(data);
+        });
+        setDeviceTypes(deviceTypes);
     }, []);
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 250
+            }
+        },
+        getContentAnchorEl: null,
+        anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center"
+        },
+        transformOrigin: {
+            vertical: "top",
+            horizontal: "center"
+        },
+        variant: "menu"
+    };
 
     const handleadd = async () => {
+
         await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
             "sn": deviceSn,
             "name": deviceName,
@@ -153,15 +190,6 @@ export default function DialogBox(props) {
             })
 
             .finally(() => {
-                setDeviceSn(null);
-                setDeviceName(null);
-                setProtocol(null);
-                setAsset(null);
-                setMaxTemp(null);
-                setModel(null);
-                setMaxHum(null);
-                setDeviceType(null);
-                setDescriptionValue(null);
                 setTimeout(function () {
                     handleclose();
                 }, 500)
@@ -241,38 +269,49 @@ export default function DialogBox(props) {
                         value={deviceSn}
                         onChange={handleDeviceSnChange}
                         required={true}
-                        // error={true}
-                        helperText="Serial Number is required." />
+                        helperText="Serial number must be unique" />
                     <TextFieldItem
-                        autoFocus
-                        margin="dense"
                         id="model"
-                        label="Model"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={model}
-                        onChange={handleModelChange}
-                    />
-                    <TextFieldItem
-                        id="deviceType"
                         autoFocus
                         margin="dense"
                         select
                         fullWidth
                         variant="standard"
-                        label="Select"
-                        value={deviceType}
-                        onChange={handleDeviceTypeChange}
-                        helperText="Please select your device type"
+                        label="Model"
+                        value={model}
+                        onChange={handleModelChange}
+                        helperText="Please select your model"
                         required={true}
                     >
-                        {deviceTypes.map((option) => (
+                        {models.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                                 {option.label}
                             </MenuItem>
                         ))}
                     </TextFieldItem>
+
+                    <FormControl fullWidth sx={{ marginTop: 2 }}>
+                        <InputLabel id="mutiple-select-label">Sensor Types</InputLabel>
+                        <Select
+                            labelId="mutiple-select-label"
+                            multiple
+                            variant="standard"
+                            value={deviceType}
+                            onChange={handleDeviceTypeChange}
+                            renderValue={(selected) => selected.join(", ")}
+                            helperText="Please select your sensor types"
+                            MenuProps={MenuProps}
+                        >
+                            {deviceTypes.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    <ListItemIcon>
+                                        <Checkbox checked={deviceType.indexOf(option.value) > -1} />
+                                    </ListItemIcon>
+                                    <ListItemText primary={option.label} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <TextFieldItem
                         id="protocol"
                         autoFocus
@@ -280,7 +319,7 @@ export default function DialogBox(props) {
                         select
                         fullWidth
                         variant="standard"
-                        label="Select"
+                        label="Protocol"
                         value={protocol}
                         onChange={handleProtocolChange}
                         helperText="Please select your protocol"

@@ -131,8 +131,8 @@ const Assets = (props) => {
                     </Fab>
                 </Tooltip>
             </Box>
-            <AddAssetDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditAssetDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} />
+            <AddAssetDialog open={openAddDialog} setOpenAddDialog={setOpenAddDialog} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditAssetDialog open={openEditDialog} setOpenEditDialog={setOpenEditDialog} fullWidth={true} maxWidth='md' setSelectedRow={setSelectedRow} selectedRow={selectedRow} setIsChange={setIsChange} />
             <DeleteAssetDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
         </>

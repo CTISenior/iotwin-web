@@ -25,14 +25,6 @@ const Devices = (props) => {
     const [isChange, setIsChange] = useState(false);
     const [selectedRowMaxTemp, setSelectedRowMaxTemp] = useState(0);
     const [selectedRowMaxHum, setSelectedRowMaxHum] = useState(0);
-    const [selectedDeviceType, setSelectedDeviceType] = useState([]);
-
-    const handleCloseAdd = () => {
-        setOpenAddDialog(false);
-    };
-    const handleCloseEdit = () => {
-        setOpenEditDialog(false);
-    }
     const handleCloseDelete = () => {
         setOpenDeleteDialog(false);
     }
@@ -46,7 +38,7 @@ const Devices = (props) => {
                 let temp = [];
                 response.data.forEach(elm => {
                     //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(', '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
                     temp.push(data);
                 });
                 setTableData(temp);
@@ -79,9 +71,13 @@ const Devices = (props) => {
         { name: 'ID', options: { display: false, viewColumns: false, filter: false } },
         { name: 'SN' },
         { name: 'Name' },
-        { name: 'Model' },
+        {
+            name: 'Model', options: {
+                setCellProps: value => ({ style: { textTransform: 'capitalize', width: '11%' } }),
+            }
+        },
         { name: 'Protocol' },
-        { name: 'Types' },
+        { name: 'Sensor Types' },
         { name: 'Max Values' },
         { name: 'Description' },
         { name: 'Asset ID', options: { display: false, viewColumns: false, filter: false } },
@@ -112,22 +108,6 @@ const Devices = (props) => {
                                         setSelectedRowMaxHum(splitMaxValues[1].trim());
                                     else
                                         setSelectedRowMaxHum(0);
-                                    let deviceType = rowValue[5];
-                                    let splitDeviceType = [];
-                                    let trimmedDeviceType = [];
-                                    if (deviceType.includes('&')) {
-                                        splitDeviceType = deviceType.split('&');
-                                        trimmedDeviceType = splitDeviceType.map(element => {
-                                            return element.trim();
-                                        });
-                                    }
-                                    else {
-                                        splitDeviceType = deviceType.split(' ');
-                                        trimmedDeviceType = splitDeviceType.map(element => {
-                                            return element.trim();
-                                        });
-                                    }
-                                    setSelectedDeviceType(trimmedDeviceType);
                                     setOpenEditDialog(true);
                                 }}>
                                     <EditIcon />
@@ -173,8 +153,8 @@ const Devices = (props) => {
                     </Fab>
                 </Tooltip>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} tenantID={tenantID} />
+            <AddDialog open={openAddDialog} setOpenAddDialog={setOpenAddDialog} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditDeviceDialog open={openEditDialog} setOpenEditDialog={setOpenEditDialog} fullWidth={true} maxWidth='md' setSelectedRow={setSelectedRow} selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} tenantID={tenantID} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
         </>

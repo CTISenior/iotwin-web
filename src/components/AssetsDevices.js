@@ -11,7 +11,7 @@ import io from 'socket.io-client';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BackspaceIcon from '@mui/icons-material/Backspace';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import DoneIcon from '@mui/icons-material/Done';
 import Tooltip from '@mui/material/Tooltip';
@@ -98,10 +98,11 @@ function AssetsDevices() {
                 response.data.latestAlerts.forEach((elm) => {
                     const data = [
                         elm.timestamptz,
+                        elm.device_name,
                         elm.message,
                         elm.telemetry_key,
                         elm.status,
-                        elm.type,
+                        elm.severity,
                         elm.id,
                     ];
                     alerts.push(data);
@@ -136,8 +137,8 @@ function AssetsDevices() {
                 response.data.latestTelemetry.forEach((elm) => {
                     const data = [
                         elm.timestamptz,
-                        elm.value.humidity,
-                        elm.value.temperature,
+                        elm.device_name,
+                        JSON.stringify(elm.values)
                     ];
                     telemetry.push(data);
                 });
@@ -174,7 +175,7 @@ function AssetsDevices() {
                         types: element.types
                     };
                     tempDevices.push(temp);
-
+                    console.log(tempDevices);
                 });
                 setDevices(tempDevices);
             }
@@ -263,6 +264,7 @@ function AssetsDevices() {
                 }
             }
         },
+        { name: "Device Name" },
         { name: "Message" },
         { name: "Telemetry Key" },
         {
@@ -284,7 +286,7 @@ function AssetsDevices() {
             }
         },
         {
-            name: "Type", options: {
+            name: "Severity", options: {
                 customBodyRender: (val) => {
                     return (
                         <Badge badgeContent={val}
@@ -342,10 +344,11 @@ function AssetsDevices() {
                 }
             }
         },
-        { name: "Device Sn", options: { display: false } },
+        { name: "Device Name" },
         {
-            name: "Temperature Value", options: {
+            name: "Values", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
+                setCellHeaderProps: () => ({ justifyContent: 'center' }),
                 customBodyRender: (val) => {
                     return (
                         <Typography>{val}</Typography>
@@ -353,16 +356,7 @@ function AssetsDevices() {
                 },
             }
         },
-        {
-            name: "Humidity Value", options: {
-                setCellProps: value => ({ style: { textAlign: 'left' } }),
-                customBodyRender: (val) => {
-                    return (
-                        <Typography>{val}</Typography>
-                    )
-                },
-            }
-        },
+
     ];
     const options = {
         filter: false,
@@ -416,6 +410,12 @@ function AssetsDevices() {
                     ]}
                 />
             </Snackbar>
+            <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
+                <Button href="/assets" variant="contained"
+                    startIcon={<BackspaceIcon />} style={{ color: '#FFF' }}>
+                    Back to Assets
+                </Button>
+            </Grid>
 
             <TabContext value={selectedTab}>
 
@@ -426,16 +426,15 @@ function AssetsDevices() {
                 </TabList>
 
                 <TabPanel value="1">
-                    <Container>
+                    <Paper sx={{ p: 3 }} elevation={3}>
                         <Grid container spacing={3}>
-
                             {devices.map(element => {
                                 return (
                                     < DeviceCard name={element.name} status={"asset"} />
                                 );
                             })}
                         </Grid>
-                    </Container>
+                    </Paper>
                 </TabPanel>
                 <TabPanel value="2">
                     <Paper sx={{ p: 5 }} elevation={3}>

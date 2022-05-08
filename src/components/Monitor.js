@@ -579,33 +579,9 @@ const Monitor = (props) => {
                 </TabList>
 
                 <TabPanel value="1">
-                    <Box
-                        p={1}
-                        display={"flex"}
-                        flexDirection={"row"}
-                        alignItems={"left"}
-                    >
-
-                        <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
-                            <Typography
-                                mx={1}
-                                p={1}
-                                variant="side"
-                                sx={{ color: "primary.main", borderRight: '1px solid black' }}>
-                                {name}
-                            </Typography>
-                            <Typography
-                                mx={1}
-                                variant="side"
-                                sx={{ color: "primary.main" }}
-                            >
-                                {assetName}
-                            </Typography>
-                        </Box>
-                    </Box>
                     <Paper sx={{ mt: 2, p: 5 }} elevation={3}>
                         <Grid container spacing={2} xs={12} width={1}>
-                            <Grid item xs={12} md={6} lg={3}>
+                            <Grid item xs={12} md={6} lg={2}>
                                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                                     <Box
                                         p={2}
@@ -614,7 +590,7 @@ const Monitor = (props) => {
                                         alignItems={"center"}
                                     >
                                         <SensorsSharpIcon
-                                            sx={{ fontSize: "4rem", color: "primary.main" }}
+                                            sx={{ fontSize: "3rem", color: "primary.main" }}
                                         />
                                         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
                                             <Box sx={{ marginLeft: 2 }}>
@@ -636,6 +612,55 @@ const Monitor = (props) => {
                                                     </Select>
                                                 </FormControl>
                                             </Box>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={2}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={2}
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+
+                                    >
+                                        <SensorsSharpIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main" }}
+                                        />
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
+                                            <Typography variant="modal" sx={{ fontSize: "15px" }}>Device Name</Typography>
+                                            <Typography
+                                                mx={1}
+                                                variant="side"
+                                                sx={{ color: "primary.main", fontSize: "15px" }}
+                                            >
+                                                {name}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={2}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={2}
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+                                    >
+                                        <SensorsSharpIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main" }}
+                                        />
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
+                                            <Typography variant="modal" sx={{ fontSize: "15px" }}>Asset Name</Typography>
+                                            <Typography
+                                                mx={1}
+                                                variant="side"
+                                                sx={{ color: "primary.main", fontSize: "15px" }}
+                                            >
+                                                {assetName}
+                                            </Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
@@ -665,11 +690,11 @@ const Monitor = (props) => {
                                                 mb={1}
                                                 mt={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily MAX:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Daily MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {dailyMax == null ? 0 : dailyMax}
                                                 </Typography>
@@ -680,11 +705,11 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly MAX:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Weekly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {weeklyMax == null ? 0 : weeklyMax}
                                                 </Typography>
@@ -695,11 +720,11 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly MAX:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Monthly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {monthlyMax == null ? 0 : monthlyMax}
                                                 </Typography>
@@ -708,13 +733,13 @@ const Monitor = (props) => {
                                                 display={"flex"}
                                                 flexDirection={"row"}
                                                 justifyContent={"flex-start"}
-                                                mb={1}
+                                                sx={{ marginBottom: '5px' }}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly MAX:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Yearly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {yearlyMax == null ? 0 : yearlyMax}
                                                 </Typography>
@@ -747,11 +772,11 @@ const Monitor = (props) => {
                                                 mb={1}
                                                 mt={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily AVG:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Daily AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {dailyAvg == null ? 0 : Number(dailyAvg).toFixed(2)}
                                                 </Typography>
@@ -762,11 +787,11 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly AVG:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Weekly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {weeklyAvg == null ? 0 : Number(weeklyAvg).toFixed(2)}
                                                 </Typography>
@@ -777,11 +802,11 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly AVG:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Monthly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {monthlyAvg == null ? 0 : Number(monthlyAvg).toFixed(2)}
                                                 </Typography>
@@ -790,13 +815,13 @@ const Monitor = (props) => {
                                                 display={"flex"}
                                                 flexDirection={"row"}
                                                 justifyContent={"flex-start"}
-                                                mb={1}
+                                                sx={{ marginBottom: '5px' }}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly AVG:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "12px" }}>Yearly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
-                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                    sx={{ color: "primary.main", fontSize: "12px" }}
                                                 >
                                                     {yearlyAvg == null ? 0 : Number(yearlyAvg).toFixed(2)}
                                                 </Typography>
