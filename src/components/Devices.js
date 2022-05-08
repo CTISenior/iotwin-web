@@ -11,6 +11,7 @@ import AddDialog from './AddDeviceDialog';
 import EditDeviceDialog from './EditDeviceDialog';
 import DeleteDeviceDialog from './DeleteDevice';
 import Tooltip from '@mui/material/Tooltip';
+import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
 
 const Devices = (props) => {
     const { tenantID } = props;
@@ -21,7 +22,6 @@ const Devices = (props) => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
-    const [selectedRowSn, setSelectedRowSn] = useState('');
     const [isChange, setIsChange] = useState(false);
     const [selectedRowMaxTemp, setSelectedRowMaxTemp] = useState(0);
     const [selectedRowMaxHum, setSelectedRowMaxHum] = useState(0);
@@ -46,7 +46,7 @@ const Devices = (props) => {
                 let temp = [];
                 response.data.forEach(elm => {
                     //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
                     temp.push(data);
                 });
                 setTableData(temp);
@@ -92,6 +92,11 @@ const Devices = (props) => {
                     return (
                         <Box display={'flex'}
                             flexDirection={'row'}>
+                            <Tooltip title="View">
+                                <IconButton sx={{ color: 'primary' }} href={`/dashboard/monitor/${tableData[rowIndex][0]}`} >
+                                    <RemoveRedEyeSharpIcon />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip title="Edit">
                                 <IconButton sx={{ color: '#14a37f' }} onClick={() => {
                                     const rowValue = tableData[rowIndex];
@@ -133,7 +138,6 @@ const Devices = (props) => {
                                     //const rowValue = tableData[rowIndex];
                                     console.log(tableData[rowIndex][1]);
                                     setSelectedRowId(tableData[rowIndex][0]);
-                                    setSelectedRowSn(tableData[rowIndex][1]);
                                     setSelectedRowName(tableData[rowIndex][2]);
                                     setOpenDeleteDialog(true);
                                 }}>
@@ -172,7 +176,7 @@ const Devices = (props) => {
             <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
             <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} tenantID={tenantID} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
-                selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
         </>
     )
 }

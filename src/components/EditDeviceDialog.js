@@ -49,14 +49,14 @@ export default function EditDeviceDialog(props) {
         setAssetId(selectedRow[8]);
     }, [selectedRow]);
 
-    const handleadd = async () => {
+    const handleEdit = async () => {
         console.log(id) //selected row id
         console.log(selectedRow); //selected row data can be observed 
         await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": deviceType,
+            "sensor_types": deviceType,
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": assetId,
@@ -286,16 +286,6 @@ export default function EditDeviceDialog(props) {
                             </MenuItem>
                         ))}
                     </TextFieldItem>
-
-                    <TextFieldItem
-                        id="description"
-                        label="Description"
-                        multiline
-                        maxRows={10}
-                        fullWidth
-                        value={descriptionValue}
-                        onChange={handleDescriptionChange}
-                        variant="standard" />
                     <TextFieldItem
                         id="maxValuesTemp"
                         label="Max Temperature Values"
@@ -316,11 +306,20 @@ export default function EditDeviceDialog(props) {
                         value={maxHum}
                         onChange={handleMaxHumValueChange}
                         margin="normal" />
+                    <TextFieldItem
+                        id="description"
+                        label="Description"
+                        multiline
+                        maxRows={10}
+                        fullWidth
+                        value={descriptionValue}
+                        onChange={handleDescriptionChange}
+                        variant="standard" />
                 </DialogContent>
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleEdit} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog>

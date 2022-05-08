@@ -44,7 +44,7 @@ const Dashboard = (props) => {
             elm.device_name,
             elm.status,
             elm.telemetry_key,
-            elm.type,
+            elm.severity,
           ];
           alerts.push(data);
         });
@@ -53,8 +53,7 @@ const Dashboard = (props) => {
           const data = [
             elm.timestamptz,
             elm.device_name,
-            elm.value.humidity,
-            elm.value.temperature,
+            JSON.stringify(elm.values)
           ];
           telemetry.push(data);
         });
@@ -122,7 +121,7 @@ const Dashboard = (props) => {
     },
     { name: "Telemetry Key", options: { display: false, viewColumns: false, filter: false } },
     {
-      name: "Type", options: {
+      name: "Severity", options: {
         customBodyRender: (val) => {
           return (
             <Badge badgeContent={val}
@@ -153,15 +152,10 @@ const Dashboard = (props) => {
     },
     { name: "Device Name" },
     {
-      name: "Temperature Value", options: {
+      name: "Values", options: {
         setCellProps: value => ({ style: { textAlign: 'center' } }),
       }
-    },
-    {
-      name: "Humidity Value", options: {
-        setCellProps: value => ({ style: { textAlign: 'center' } }),
-      }
-    },
+    }
   ];
   const options = {
     filter: false,

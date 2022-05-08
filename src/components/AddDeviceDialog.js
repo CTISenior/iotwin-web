@@ -133,7 +133,7 @@ export default function DialogBox(props) {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": deviceType,
+            "sensor_types": deviceType,
             "max_values": [maxTemp, maxHum],
             "description": descriptionValue,
             "asset_id": asset,
@@ -293,15 +293,6 @@ export default function DialogBox(props) {
                         ))}
                     </TextFieldItem>
                     <TextFieldItem
-                        id="description"
-                        label="Description"
-                        multiline
-                        maxRows={10}
-                        fullWidth
-                        value={descriptionValue}
-                        onChange={handleDescriptionChange}
-                        variant="standard" />
-                    <TextFieldItem
                         id="maxValuesTemp"
                         label="Max Temperature Values"
                         type="number"
@@ -321,6 +312,15 @@ export default function DialogBox(props) {
                         value={maxHum}
                         onChange={handleMaxHumValueChange}
                         margin="normal" />
+                    <TextFieldItem
+                        id="description"
+                        label="Description"
+                        multiline
+                        maxRows={10}
+                        fullWidth
+                        value={descriptionValue}
+                        onChange={handleDescriptionChange}
+                        variant="standard" />
                 </DialogContent>
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>

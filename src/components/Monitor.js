@@ -112,7 +112,7 @@ const Monitor = (props) => {
         data.map((item) => types.push(item));
         setDeviceTypes(types);
         axios
-            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?type=${deviceType}`)
+            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?sensorType=${deviceType}`)
             .then((response) => {
                 setDailyMax(response.data.daily_max);
                 setWeeklyMax(response.data.weekly_max);
@@ -142,7 +142,7 @@ const Monitor = (props) => {
         data.map((item) => types.push(item));
         setDeviceTypes(types);
         axios
-            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?type=${deviceType}`)
+            .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?sensorType=${deviceType}`)
             .then((response) => {
                 setDailyAvg(response.data.daily_avg);
                 setWeeklyAvg(response.data.weekly_avg);
@@ -191,7 +191,7 @@ const Monitor = (props) => {
                         elm.message,
                         elm.telemetry_key,
                         elm.status,
-                        elm.type,
+                        elm.severity,
                         elm.id,
                     ];
                     alerts.push(data);
@@ -226,8 +226,7 @@ const Monitor = (props) => {
                 response.data.latestTelemetry.forEach((elm) => {
                     const data = [
                         elm.timestamptz,
-                        elm.value.humidity,
-                        elm.value.temperature,
+                        JSON.stringify(elm.values)
                     ];
                     telemetry.push(data);
                 });
@@ -400,7 +399,7 @@ const Monitor = (props) => {
             }
         },
         {
-            name: "Type", options: {
+            name: "Severity", options: {
                 customBodyRender: (val) => {
                     return (
                         <Badge badgeContent={val}
@@ -458,25 +457,10 @@ const Monitor = (props) => {
             }
         },
         {
-            name: "Humidity Value", options: {
+            name: "Values", options: {
                 setCellProps: value => ({ style: { textAlign: 'left' } }),
-                customBodyRender: (val) => {
-                    return (
-                        <Typography>{val}</Typography>
-                    )
-                },
             }
-        },
-        {
-            name: "Temperature Value", options: {
-                setCellProps: value => ({ style: { textAlign: 'left' } }),
-                customBodyRender: (val) => {
-                    return (
-                        <Typography>{val}</Typography>
-                    )
-                },
-            }
-        },
+        }
     ];
     const options = {
         filter: false,

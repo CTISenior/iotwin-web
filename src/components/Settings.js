@@ -21,13 +21,13 @@ const Settings = (props) => {
     const [snackbarMessage, setSnackbarMessage] = useState();
     const [snackbarColor, setSnackbarColor] = useState();
     const [tenantName, setTenantName] = useState('');
-    const [country, setCountry] = useState();
-    const [city, setCity] = useState();
-    const [address, setAddress] = useState();
-    const [postcode, setPostcode] = useState();
-    const [email, setEmail] = useState();
+    const [country, setCountry] = useState('');
+    const [city, setCity] = useState('');
+    const [address, setAddress] = useState('');
+    const [postcode, setPostcode] = useState('');
+    const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [description, setDescription] = useState();
+    const [description, setDescription] = useState('');
     const [tenantCount, setTenantCount] = useState(0);
 
 
@@ -38,8 +38,8 @@ const Settings = (props) => {
 
     const handleAdd = async () => {
         await axios.post('http://176.235.202.77:4000/api/v1/tenants/', {
-            "realm_id": "ctis",
-            "client_id": "test",
+            "realm_id": tenantID,
+            "client_id": clientID,
             "name": tenantName,
             "country": country,
             "city": city,

@@ -85,7 +85,7 @@ export default class TimeSeriesData {
   async loadData(deviceID, deviceType) {
     if (deviceID != "" && deviceType != "") {
       console.log("Device type is : " + deviceType);
-      const response = await axios.get(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry2?type=${deviceType}&limit=2000`);
+      const response = await axios.get(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry2?sensorType=${deviceType}&limit=2000`);
       const parsedData = JSON.parse(JSON.stringify(response.data));
 
       const df = new DataFrame(parsedData)

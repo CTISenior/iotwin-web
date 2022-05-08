@@ -84,6 +84,11 @@ const Assets = (props) => {
                     return (
                         <Box display={'flex'}
                             flexDirection={'row'}>
+                            <Tooltip title="View">
+                                <IconButton sx={{ color: 'primary' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                    <RemoveRedEyeSharpIcon />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip title="Edit">
                                 <IconButton sx={{ color: '#14a37f' }} onClick={() => {
                                     const rowValue = tableData[rowIndex];
@@ -100,11 +105,6 @@ const Assets = (props) => {
                                     setOpenDeleteDialog(true);
                                 }}>
                                     <DeleteIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Monitor">
-                                <IconButton sx={{ color: 'primary' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
-                                    <RemoveRedEyeSharpIcon />
                                 </IconButton>
                             </Tooltip>
                         </Box >
