@@ -32,7 +32,7 @@ export default function DeviceCard(props) {
                             </Tooltip>
                         ) : (
                             <Tooltip title="Display Device Details">
-                                <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${sn}/${id}/${name}/${assetName}/${types}/`}>
+                                <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/`}>
                                     <ShowChartIcon fontSize='large' />
                                 </IconButton>
                             </Tooltip>

@@ -21,8 +21,8 @@ import SnackbarContent from '@mui/material/SnackbarContent';
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
-import ClearAllDeviceAlert from './ClearAllDeviceAlert';
-import DeleteAllDeviceAlert from './DeleteAllDeviceAlert';
+import ClearAllDeviceAlert from './ClearEntityAlerts';
+import DeleteAllDeviceAlert from './DeleteEntityAlerts';
 import Moment from 'react-moment';
 
 function AssetsDevices() {
@@ -207,6 +207,14 @@ function AssetsDevices() {
     const handleChange = (event, newValue) => {
         setSelectedTab(newValue);
     }
+
+    useEffect(() => {
+        if (selectedTab == "2")
+            getAlerts();
+        else if (selectedTab == "3")
+            getTelemetries();
+
+    }, [selectedTab])
 
     const handleClearAlert = async (id, status) => {
         console.log(id);
@@ -412,7 +420,7 @@ function AssetsDevices() {
             <TabContext value={selectedTab}>
 
                 <TabList onChange={handleChange}>
-                    <Tab label='Dashboard' value='1'></Tab>
+                    <Tab label='Devices' value='1'></Tab>
                     <Tab label='Alerts' value='2'></Tab>
                     <Tab label='Telemetry' value='3'></Tab>
                 </TabList>
@@ -602,8 +610,8 @@ function AssetsDevices() {
                             </Box>
                         </Grid>
                     </Paper>
-                    <ClearAllDeviceAlert open={openClearAllDialog} handleclose={handleCloseClearAll} fullWidth={true} maxWidth='md' setIsChange={setIsChange} id={id} />
-                    <DeleteAllDeviceAlert open={openDeleteAllDialog} handleclose={handleCloseDeleteAll} fullWidth={true} maxWidth='md' setIsChange={setIsChange} id={id} />
+                    <ClearAllDeviceAlert open={openClearAllDialog} isAsset={true} handleclose={handleCloseClearAll} fullWidth={true} maxWidth='md' setIsChange={setIsChange} id={id} />
+                    <DeleteAllDeviceAlert open={openDeleteAllDialog} isAsset={true} handleclose={handleCloseDeleteAll} fullWidth={true} maxWidth='md' setIsChange={setIsChange} id={id} />
                 </TabPanel>
                 <TabPanel value="3">
                     <Paper sx={{ p: 5 }} elevation={3}>

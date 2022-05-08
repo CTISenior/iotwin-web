@@ -21,8 +21,8 @@ import SnackbarContent from '@mui/material/SnackbarContent';
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
-import ClearAllDeviceAlert from './ClearAllDeviceAlert';
-import DeleteAllDeviceAlert from './DeleteAllDeviceAlert';
+import ClearAllDeviceAlert from './ClearEntityAlerts';
+import DeleteAllDeviceAlert from './DeleteEntityAlerts';
 import Moment from 'react-moment';
 import BalanceIcon from '@mui/icons-material/Balance';
 
@@ -31,8 +31,13 @@ const temp = [];
 const hum = [];
 const tempLabel = [];
 
+
 const Monitor = (props) => {
-    const { sn, id, name, assetName, types } = useParams();
+    const { id } = useParams();
+    const [sn, setSn] = useState("");
+    const [assetName, setAssetName] = useState("");
+    const [name, setName] = useState("");
+    const [sensorTypes, setSensorTypes] = useState([]);
     const [selectedTab, setSelectedTab] = useState("1");
     const [updateHeat, setUpdateHeat] = useState(0);
     const [updateHum, setUpdateHum] = useState(0);
@@ -63,8 +68,9 @@ const Monitor = (props) => {
     const [weeklyAvg, setWeeklyAvg] = useState(0);
     const [monthlyAvg, setMonthlyAvg] = useState(0);
     const [yearlyAvg, setYearlyAvg] = useState(0);
-    const [deviceType, setDeviceType] = useState("temperature");
+    const [deviceType, setDeviceType] = useState("");
     const [deviceTypes, setDeviceTypes] = useState([]);
+    const [telemetryColumn, setTelemetryColumn] = useState([]);
 
     let type = [];
     const data = [
@@ -99,18 +105,71 @@ const Monitor = (props) => {
             getAlerts();
     }, [isChange]);
     React.useEffect(() => {
+        console.log("The Device Type is : " + deviceType);
         getTelemetryMax();
         getTelemetryAvg();
     }, [deviceType])
+    React.useEffect(() => {
+        let tempTypes = [
+
+        ];
+
+        const tempTelemetryColumn = [
+            {
+                name: "Created At", options: {
+                    customBodyRender: (val) => {
+                        return (
+                            <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
+                        )
+                    }
+                }
+            },
+
+        ];
+        sensorTypes.forEach(element => {
+            tempTypes.push({ value: element, text: element });
+            tempTelemetryColumn.push({
+                name: element, options: {
+                    setCellProps: value => ({ style: { textAlign: 'left' } }),
+                }
+            })
+        });
+        setTelemetryColumn(tempTelemetryColumn);
+        setDeviceTypes(tempTypes);
+        setDeviceType(sensorTypes[0]);
+
+
+
+    }, [sensorTypes])
+
+
+    const getDeviceInformation = async () => {
+        axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}`)
+            .then((response) => {
+                setSn(response.data.sn);
+                setName(response.data.name);
+                setAssetName(response.data.asset_name);
+                setSensorTypes(response.data.sensor_types);
+
+
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log("Error", error.message);
+                }
+                console.log(error.config);
+            });
+    };
+
 
     const getTelemetryMax = () => {
-        let types = [];
-        const data = [
-            { value: "temperature", text: "Temperature" },
-            { value: "humidity", text: "Humidity" },
-        ];
-        data.map((item) => types.push(item));
-        setDeviceTypes(types);
+
         axios
             .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?sensorType=${deviceType}`)
             .then((response) => {
@@ -134,13 +193,6 @@ const Monitor = (props) => {
     };
 
     const getTelemetryAvg = () => {
-        let types = [];
-        const data = [
-            { value: "temperature", text: "Temperature" },
-            { value: "humidity", text: "Humidity" },
-        ];
-        data.map((item) => types.push(item));
-        setDeviceTypes(types);
         axios
             .get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?sensorType=${deviceType}`)
             .then((response) => {
@@ -162,7 +214,7 @@ const Monitor = (props) => {
                 console.log(error.config);
             });
     };
-    const getAlerts = () => {
+    const getAlerts = async () => {
         let alertCount = [];
         const alert = [
             { value: 1, text: "Daily Alerts" },
@@ -218,7 +270,7 @@ const Monitor = (props) => {
             });
     };
 
-    const getTelemetries = () => {
+    const getTelemetries = async () => {
         axios.get(`http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?limit=200`)
             .then((response) => {
                 let telemetry = [];
@@ -226,8 +278,16 @@ const Monitor = (props) => {
                 response.data.latestTelemetry.forEach((elm) => {
                     const data = [
                         elm.timestamptz,
-                        JSON.stringify(elm.values)
                     ];
+                    if ('temperature' in elm.values)
+                        data.push(elm.values.temperature);
+                    else
+                        data.push("-");
+                    if ('humidity' in elm.values)
+                        data.push(elm.values.humidity);
+                    else
+                        data.push("-");
+
                     telemetry.push(data);
                 });
                 setLatestTelemetry(telemetry);
@@ -278,13 +338,10 @@ const Monitor = (props) => {
         setSelectedTab(newValue);
     }
     React.useEffect(() => {
-        if (types === 'temperature,humidity')
-            setDeviceType("temperature");
-        else
-            setDeviceType(types);
+        getDeviceInformation();
         getAlerts();
         getTelemetries();
-        socket.emit("telemetry_topic", sn);
+        socket.emit("telemetry_topic", id);
         socket.on("telemetry_topic_message", function (msg) {
 
             let info = JSON.parse(msg);
@@ -332,6 +389,14 @@ const Monitor = (props) => {
             ],
         });
     }, [updateHum])
+
+    useEffect(() => {
+        if (selectedTab == "2")
+            getAlerts();
+        else if (selectedTab == "3")
+            getTelemetries();
+
+    }, [selectedTab])
 
     const handleClearAlert = async (id, status) => {
         axios.put('http://176.235.202.77:4000/api/v1/alerts/' + id, {
@@ -446,22 +511,7 @@ const Monitor = (props) => {
             }
         }
     ];
-    const telemetryColumn = [
-        {
-            name: "Created At", options: {
-                customBodyRender: (val) => {
-                    return (
-                        <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
-                    )
-                }
-            }
-        },
-        {
-            name: "Values", options: {
-                setCellProps: value => ({ style: { textAlign: 'left' } }),
-            }
-        }
-    ];
+
     const options = {
         filter: false,
         responsive: "standard",
@@ -567,10 +617,9 @@ const Monitor = (props) => {
                                             sx={{ fontSize: "4rem", color: "primary.main" }}
                                         />
                                         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                                            <Typography variant="modal">Types</Typography>
                                             <Box sx={{ marginLeft: 2 }}>
                                                 <FormControl variant="standard">
-                                                    <InputLabel>Device Type</InputLabel>
+                                                    <InputLabel>Sensor Type</InputLabel>
                                                     <Select
                                                         labelId="select-Type"
                                                         id="select-TotalType"
@@ -591,32 +640,10 @@ const Monitor = (props) => {
                                     </Box>
                                 </Paper>
                             </Grid>
+
                             <Grid item xs={12} md={6} lg={3}>
                                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
-                                    <Box
-                                        p={1}
-                                        display={"flex"}
-                                        flexDirection={"column"}
-                                        alignItems={"center"}
-                                    >
-                                        <SensorsSharpIcon
-                                            sx={{ fontSize: "4rem", color: "primary.main" }}
-                                        />
-                                        <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
-                                            <Typography variant="modal">Max Values</Typography>
-                                            <Typography
-                                                mx={1}
-                                                variant="side"
-                                                sx={{ color: "primary.main", textTransform: 'capitalize' }}
-                                            >
-                                                Max Values
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={6} lg={3}>
-                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+
                                     <Box
                                         p={1}
                                         display={"flex"}
@@ -638,7 +665,7 @@ const Monitor = (props) => {
                                                 mb={1}
                                                 mt={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Max:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -653,7 +680,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Max:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -668,7 +695,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Max:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -683,7 +710,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Max:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly MAX:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -720,7 +747,7 @@ const Monitor = (props) => {
                                                 mb={1}
                                                 mt={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Avg:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -735,7 +762,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Avg:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -750,7 +777,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Avg:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -765,7 +792,7 @@ const Monitor = (props) => {
                                                 justifyContent={"flex-start"}
                                                 mb={1}
                                             >
-                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Avg:</Typography>
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly AVG:</Typography>
                                                 <Typography
                                                     mx={1}
                                                     variant="side"
@@ -779,31 +806,61 @@ const Monitor = (props) => {
                                 </Paper>
                             </Grid>
 
-                            {types.includes('temperature') &&
-                                <Grid item xs={12} md={6}>
-                                    <Paper elevation={3}>
-                                        <Box
-                                            display={'flex'}
-                                            flexDirection={'column'}
-                                            alignItems={'center'}
-                                        >
-                                            <LineChart id={sn} types={types} chart={tempChart} />
-                                        </Box>
-                                    </Paper>
-                                </Grid>
-                            }
-                            {types.includes('humidity') &&
-                                <Grid item xs={12} md={6}>
-                                    <Paper elevation={3}>
-                                        <Box
-                                            display={'flex'}
-                                            flexDirection={'column'}
-                                            alignItems={'center'}
-                                        >
-                                            <LineChart id={sn} types={types} chart={humChart} />
-                                        </Box>
-                                    </Paper>
-                                </Grid>
+                            {sensorTypes.length > 1 ? (
+                                <>
+                                    <Grid item xs={12} md={6}>
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={sensorTypes} chart={tempChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={sensorTypes} chart={humChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+                                </>
+                            ) : (
+                                sensorTypes == "temperature" ? (
+                                    <Grid item xs={12} >
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={sensorTypes} chart={tempChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+                                ) : (
+                                    <Grid item xs={12}>
+                                        <Paper elevation={3}>
+                                            <Box
+                                                display={'flex'}
+                                                flexDirection={'column'}
+                                                alignItems={'center'}
+                                            >
+                                                <LineChart id={sn} types={sensorTypes} chart={humChart} />
+                                            </Box>
+                                        </Paper>
+                                    </Grid>
+                                )
+
+                            )
+
+
                             }
 
 
