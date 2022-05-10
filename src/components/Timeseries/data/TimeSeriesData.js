@@ -15,21 +15,8 @@ export class Configuration {
     return this.n_lags;
   }
 
-
   get epochs() {
     return this.n_epochs;
-  }
-
-  get timeID() {
-    return this._timeID;
-  }
-
-  get depVar() {
-    return this._depVar;
-  }
-
-  get indVars() {
-    return this._indVars;
   }
 
   set lags(lags) {
@@ -40,17 +27,6 @@ export class Configuration {
     this.n_epochs = epochs;
   }
 
-  set timeID(timeID) {
-    this._timeID = timeID;
-  }
-
-  set depVar(depVar) {
-    this._depVar = depVar;
-  }
-
-  set indVars(indVars) {
-    this._indVars = indVars;
-  }
 }
 
 export class Data {
@@ -85,8 +61,10 @@ export default class TimeSeriesData {
   async loadData(deviceID, deviceType) {
     if (deviceID != "" && deviceType != "") {
       console.log("Device type is : " + deviceType);
-      const response = await axios.get(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry2?sensorType=${deviceType}&limit=2000`);
-      const parsedData = JSON.parse(JSON.stringify(response.data));
+      console.log(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry/timeseries?sensorType=${deviceType}`)
+
+      const response = await axios.get(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry/timeseries?sensorType=${deviceType}`);
+      const parsedData = JSON.parse(JSON.stringify(response.data.timeSeriesData));
 
       const df = new DataFrame(parsedData)
 

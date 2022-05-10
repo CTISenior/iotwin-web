@@ -36,7 +36,7 @@ import Assets from './Assets';
 import NotificationList from './NotificationList';
 import Monitor from './Monitor';
 import Settings from './Settings';
-import UnivariateStepper from './Timeseries/UnivariateStepper';
+import Timeseries from './Timeseries/Stepper';
 import TipsAndUpdatesSharpIcon from '@mui/icons-material/TipsAndUpdatesSharp';
 import AssetsDevices from './AssetsDevices';
 
@@ -336,7 +336,7 @@ export default function PersistentDrawerLeft() {
                         } />
                         <Route path="/timeseries" element={<>
                             <PrivateRoute>
-                                <UnivariateStepper />
+                                <Timeseries />
                             </PrivateRoute>
                         </>
                         } />

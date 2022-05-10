@@ -3,7 +3,7 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 
-const DepVarStep = props => {
+const DateTimeStep = props => {
 
   return (
     <form noValidate autoComplete="off">
@@ -11,7 +11,7 @@ const DepVarStep = props => {
         <TextField
           id="selectDepVar"
           select
-          label="Select Dependent Variable"
+          label="Select DateTime"
           value={props.depVar}
           onChange={e => props.clicked(e.target.value)}
         >
@@ -21,4 +21,4 @@ const DepVarStep = props => {
   );
 };
 
-export default DepVarStep;
+export default DateTimeStep;

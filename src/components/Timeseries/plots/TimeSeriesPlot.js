@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import Container from "@mui/material/Container";
-import { useId } from "react-id-generator";
 import Plotly from "plotly.js-basic-dist-min";
 import createPlotlyComponent from "react-plotly.js/factory";
 
@@ -8,7 +7,6 @@ const Plot = createPlotlyComponent(Plotly);
 
 const TimeSeriesPlot = props => {
   const datasets = props.datasets;
-  const [plotId] = useId();
   let chart = useRef(null);
 
   useEffect(() => {

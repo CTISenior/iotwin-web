@@ -22,14 +22,14 @@ const PredictionPlot = props => {
   //console.log(last_date)
   
 
-  /*let last_date = new Date(datasets[1]["X"][datasets[1]["X"].length - 1]);
+  let last_date = new Date(datasets[1]["X"][datasets[1]["X"].length - 1]);
   console.log("11111111")
   console.log(datasets[1]["X"][datasets[1]["X"].length - 1])
   console.log(last_date)
   last_date = addHours(1, last_date)
   console.log("000000000")
   console.log(last_date);
-  datasets[1]["X"][datasets[1]["X"].length] = last_date;*/
+  datasets[1]["X"][datasets[1]["X"].length] = last_date;
   
 
   useEffect(() => {
@@ -43,14 +43,14 @@ const PredictionPlot = props => {
         data={[
           {
             x: datasets[0]["X"],
-            y: datasets[1]["y"],
+            y: datasets[0]["y"],
             type: 'scatter',
             mode: 'lines',
             name: datasets[0]["y_label"]
           },
           {
             x: datasets[1]["X"],
-            y: datasets[0]["y"],
+            y: datasets[1]["y"],
             type: 'scatter',
             mode: 'lines',
             name: "Prediction"
