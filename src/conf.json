@@ -3,5 +3,49 @@
         "IP":"http://176.235.202.77",
         "PORT":"8080",
         "clientId":"IoTwin-auth"
-    }
+    },
+    "protocols": [
+        {
+            "value": "mqtt",
+            "label": "MQTT"
+        },
+        {
+            "value": "http",
+            "label": "HTTP"
+        }
+    ],
+    "models": [
+        {
+            "value": "arduino",
+            "label": "Arduino"
+        },
+        {
+            "value": "raspberry-pi",
+            "label": "Raspberry Pi"
+        },
+        {
+            "value": "nodeMCU",
+            "label": "NodeMCU"
+        }
+    ],
+    "sensor_types": [
+        {
+            "value": "temperature",
+            "label": "temperature",
+            "default_max_value": 40,
+            "default_min_value": 15
+        },
+        {
+            "value": "humidity",
+            "label": "humidity",
+            "default_max_value": 60,
+            "default_min_value": 30
+        },
+        {
+            "value": "light",
+            "label": "light",
+            "default_max_value": 950,
+            "default_min_value": 250
+        }
+    ]
 }

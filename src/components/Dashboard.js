@@ -1,9 +1,4 @@
-import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Container, Grid, Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -12,10 +7,10 @@ import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Button from "@mui/material/Button";
-import Badge from '@mui/material/Badge';
+import Badge from "@mui/material/Badge";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import Moment from 'react-moment';
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import Moment from "react-moment";
 
 const Dashboard = (props) => {
   const { tenantID } = props;
@@ -40,11 +35,12 @@ const Dashboard = (props) => {
         response.data.latestAlerts.forEach((elm) => {
           const data = [
             elm.timestamptz,
-            elm.message,
+            elm.asset_name,
             elm.device_name,
+            elm.message,
             elm.status,
             elm.telemetry_key,
-            elm.type,
+            elm.severity,
           ];
           alerts.push(data);
         });
@@ -52,9 +48,9 @@ const Dashboard = (props) => {
         response.data.latestTelemetry.forEach((elm) => {
           const data = [
             elm.timestamptz,
+            elm.asset_name,
             elm.device_name,
-            elm.value.humidity,
-            elm.value.temperature,
+            JSON.stringify(elm.values),
           ];
           telemetry.push(data);
         });
@@ -85,82 +81,100 @@ const Dashboard = (props) => {
   useEffect(() => {
     setInterval(function tick() {
       getDashboard();
-    }, 10000)
+    }, 10000);
   }, []);
-
-
 
   const alertsColumn = [
     {
-      name: "Created At", options: {
+      name: "Created At",
+      options: {
         customBodyRender: (val) => {
-          return (
-            <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
-          )
-        }
-      }
+          return <Moment format="Do MMMM YYYY, h:mm:ss a">{val}</Moment>;
+        },
+      },
     },
-    { name: "Message" },
+    { name: "Asset Name" },
     { name: "Device Name" },
+    { name: "Message" },
     {
-      name: "Status", options: {
+      name: "Status",
+      options: {
         customBodyRender: (val) => {
           return (
-            <Badge badgeContent={val === false ? "active" : "cleared"}
+            <Badge
+              badgeContent={val === false ? "active" : "cleared"}
               color={val === false ? "info" : "secondary"}
               overlap="circular"
-              sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 1 } }}
+              sx={{
+                "& .MuiBadge-badge": {
+                  fontSize: 12,
+                  height: 30,
+                  width: 55,
+                  padding: 1,
+                  textTransform: "capitalize",
+                  marginRight: 1,
+                },
+              }}
             />
-          )
+          );
         },
-        setCellProps: value => ({
+        setCellProps: (value) => ({
           style: {
-            textAlign: 'center',
-          }
-        })
-      }
+            textAlign: "center",
+          },
+        }),
+      },
     },
-    { name: "Telemetry Key", options: { display: false, viewColumns: false, filter: false } },
     {
-      name: "Type", options: {
+      name: "Telemetry Key",
+      options: { display: false, viewColumns: false, filter: false },
+    },
+    {
+      name: "Severity",
+      options: {
         customBodyRender: (val) => {
           return (
-            <Badge badgeContent={val}
-              color={val === 'warning' ? "warning" : "error"}
+            <Badge
+              badgeContent={val}
+              color={val === "warning" ? "warning" : "error"}
               overlap="circular"
-              sx={{ "& .MuiBadge-badge": { fontSize: 12, height: 30, width: 55, padding: 1, textTransform: 'capitalize', marginRight: 1 } }}
-
+              sx={{
+                "& .MuiBadge-badge": {
+                  fontSize: 12,
+                  height: 30,
+                  width: 55,
+                  padding: 1,
+                  textTransform: "capitalize",
+                  marginRight: 1,
+                },
+              }}
             />
-          )
+          );
         },
-        setCellProps: value => ({
+        setCellProps: (value) => ({
           style: {
-            textAlign: 'center',
-          }
-        })
-      }
+            textAlign: "center",
+          },
+        }),
+      },
     },
   ];
   const telemetryColumn = [
     {
-      name: "Created At", options: {
+      name: "Created At",
+      options: {
         customBodyRender: (val) => {
-          return (
-            <Moment format='Do MMMM YYYY, h:mm:ss a'>{val}</Moment>
-          )
-        }
-      }
+          return <Moment format="Do MMMM YYYY, h:mm:ss a">{val}</Moment>;
+        },
+      },
     },
+    { name: "Asset Name" },
     { name: "Device Name" },
     {
-      name: "Temperature Value", options: {
-        setCellProps: value => ({ style: { textAlign: 'center' } }),
-      }
-    },
-    {
-      name: "Humidity Value", options: {
-        setCellProps: value => ({ style: { textAlign: 'center' } }),
-      }
+      name: "Values",
+      options: {
+        setCellProps: (value) => ({ style: { textAlign: "center" } }),
+      },
     },
   ];
   const options = {
@@ -176,7 +190,7 @@ const Dashboard = (props) => {
     viewColumns: false,
     textLabels: {
       body: {
-        noMatch: "Sorry, no matching records found"
+        noMatch: "Sorry, no matching records found",
       },
       pagination: {
         next: "Next Page",
@@ -186,7 +200,7 @@ const Dashboard = (props) => {
   };
 
   return (
-    <Container>
+    <>
       <Grid container spacing={2} xs={12} width={1}>
         <Grid item xs={12} md={6} lg={3}>
           <Paper sx={{ bgcolor: "white" }} elevation={3}>
@@ -204,7 +218,7 @@ const Dashboard = (props) => {
                 <Typography
                   mx={1}
                   variant="side"
-                  sx={{ color: "primary.main", textTransform: 'uppercase' }}
+                  sx={{ color: "primary.main", textTransform: "uppercase" }}
                 >
                   {tenantID}
                 </Typography>
@@ -283,7 +297,9 @@ const Dashboard = (props) => {
                   mb={1}
                   mt={1}
                 >
-                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily Alert:</Typography>
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>
+                    Daily Alert:
+                  </Typography>
                   <Typography
                     mx={1}
                     variant="side"
@@ -298,7 +314,9 @@ const Dashboard = (props) => {
                   justifyContent={"flex-start"}
                   mb={1}
                 >
-                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly Alert:</Typography>
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>
+                    Weekly Alert:
+                  </Typography>
                   <Typography
                     mx={1}
                     variant="side"
@@ -313,7 +331,9 @@ const Dashboard = (props) => {
                   justifyContent={"flex-start"}
                   mb={1}
                 >
-                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly Alert:</Typography>
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>
+                    Monthly Alert:
+                  </Typography>
                   <Typography
                     mx={1}
                     variant="side"
@@ -328,7 +348,9 @@ const Dashboard = (props) => {
                   justifyContent={"flex-start"}
                   mb={1}
                 >
-                  <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly Alert:</Typography>
+                  <Typography variant="modal" sx={{ fontSize: "15px" }}>
+                    Yearly Alert:
+                  </Typography>
                   <Typography
                     mx={1}
                     variant="side"
@@ -361,24 +383,7 @@ const Dashboard = (props) => {
           />
         </Grid>
       </Grid>
-
-      <Grid
-        item
-        xs={12}
-        md={6}
-        lg={6}
-        sx={{ justifyContent: "center", display: "flex", marginTop: 5 }}
-      >
-        <Button
-          href="/dashboard/devices"
-          variant="contained"
-          startIcon={<VisibilityIcon />}
-          style={{ color: "#FFF" }}
-        >
-          View All Devices
-        </Button>
-      </Grid>
-    </Container >
+    </>
   );
 };
 

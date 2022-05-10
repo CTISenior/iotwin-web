@@ -47,9 +47,11 @@ const NotificationList = (props) => {
           const temp = {
             id: element.id,
             message: element.message,
+            deviceName: element.device_name,
             createdTime: element.created_at,
-            status: element.status,
-            timestamptz: element.timestamptz
+            severity: element.severity,
+            timestamptz: element.timestamptz,
+            status: element.status
           };
           setAlertCount(response.data.length);
           notificationListItem.push(temp);
@@ -90,21 +92,23 @@ const NotificationList = (props) => {
   function AllAlerts(props) {
     return <>
       {notificationList.map((list) => (
-        <MenuItem key={list.id} sx={{ backgroundColor: list.status === false ? '#F6F2F2' : 'white', margin: 1 }}>
-          {list.status === 'error' ? (
-            <ListItemIcon>
-              <ErrorIcon fontSize="medium" color="error" />
-            </ListItemIcon>
-          ) : (
-            <ListItemIcon>
-              <WarningIcon fontSize="medium" color="warning" />
-            </ListItemIcon>
-          )}
+        <MenuItem key={list.id} sx={{ backgroundColor: list.status === false ? '#F6F2F2' : 'white', margin: 1, justifyContent: 'space-between', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <Box>
-            <ListItemText>{list.message}</ListItemText>
+            {list.severity === "critical" ? (
+              <ListItemIcon>
+                <ErrorIcon color="error" />
+              </ListItemIcon>
+            ) : (
+              <ListItemIcon>
+                <WarningIcon color="warning" />
+              </ListItemIcon>
+            )}
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+            <ListItemText>[{list.deviceName}] - {list.message}</ListItemText>
             <ListItemText><Moment format='Do MMMM YYYY, h:mm:ss a'>{list.timestamptz}</Moment></ListItemText>
           </Box>
-          <Box sx={{ justifyContent: "right", display: "flex" }}>
+          <Box>
             <Tooltip title="Clear">
               <ListItemIcon sx={{ ml: '15px' }} onClick={() => handleClear(list.id, list.status)}
               >
@@ -138,7 +142,7 @@ const NotificationList = (props) => {
     <>
       <Snackbar
         anchorOrigin={{
-          vertical: ' top',
+          vertical: 'top',
           horizontal: 'center'
         }}
         open={snackbarOpen}
@@ -172,14 +176,14 @@ const NotificationList = (props) => {
           xs={5}
           md={5}
           lg={5}
-          sx={{ justifyContent: "space-around", display: "flex", marginTop: 2 }}
+          sx={{ justifyContent: "space-between", display: "flex", marginTop: 2 }}
         >
           {notificationList.length > 0 ? (
             <>
               <Typography variant="modal" sx={{ marginLeft: 1 }}>
                 Notifications
               </Typography>
-              <Box>
+              <Box sx={{ marginRight: 1 }}>
                 <Tooltip title="Clear All">
                   <Button variant="contained" onClick={handleOpenClearAll} color="info" startIcon={<ClearAllIcon />} style={{ color: '#FFF', textTransform: 'capitalize' }}>Clear All</Button>
                 </Tooltip>

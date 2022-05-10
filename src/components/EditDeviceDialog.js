@@ -13,51 +13,104 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
+import conf from "../conf.json";
 import axios from 'axios';
+import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox } from '@mui/material';
+
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setIsChange, handleclose, ...fullWidth } = props;
-    const [descriptionValue, setDescriptionValue] = useState();
+    const { open, maxWidth, selectedRow, setSelectedRow, tenantID, selectedRowMinTemp, selectedRowMinHum, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setOpenEditDialog, setIsChange, ...fullWidth } = props;
+    const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
-    const [maxTemp, setMaxTemp] = useState(0);
-    const [maxHum, setMaxHum] = useState(0);
+    const [minTemp, setMinTemp] = useState();
+    const [maxTemp, setMaxTemp] = useState();
+    const [minHum, setMinHum] = useState();
+    const [maxHum, setMaxHum] = useState();
     const [deviceName, setDeviceName] = useState();
     const [deviceType, setDeviceType] = useState([]);
     const [protocol, setProtocol] = useState();
-    const [deviceSn, setDeviceSn] = useState();
     const [assetName, setAssetName] = useState([]);
     const [model, setModel] = useState();
     const [assetId, setAssetId] = useState();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState();
     const [snackbarColor, setSnackbarColor] = useState();
+    const [models, setModels] = useState([]);
+    const [protocols, setProtocols] = useState([]);
+    const [deviceTypes, setDeviceTypes] = useState([]);
+    const [tempVisibility, setTempVisibility] = useState(false);
+    const [humVisibility, setHumVisibility] = useState(false);
+
+    const handleclose = (event) => {
+        setOpenEditDialog(false);
+        setSelectedRow([]);
+    }
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
 
     useEffect(() => {
-        setID(selectedRow[0]);
-        setDeviceSn(selectedRow[1]);
-        setDeviceName(selectedRow[2]);
-        setModel(selectedRow[3]);
-        setProtocol(selectedRow[4]);
-        setDeviceType(selectedDeviceType);
-        setMaxTemp(selectedRowMaxTemp);
-        setMaxHum(selectedRowMaxHum);
-        setDescriptionValue(selectedRow[7]);
-        setAssetId(selectedRow[8]);
+        if (selectedRow.length > 0) {
+            setID(selectedRow[0]);
+            setDeviceName(selectedRow[2]);
+            setModel(selectedRow[3]);
+            setProtocol(selectedRow[4]);
+            setDeviceType(selectedRow[5].split(', '));
+            setMinTemp(selectedRowMinTemp);
+            setMinHum(selectedRowMinHum);
+            setMaxTemp(selectedRowMaxTemp);
+            setMaxHum(selectedRowMaxHum);
+            setDescriptionValue(selectedRow[8]);
+            setAssetId(selectedRow[9]);
+            let protocols = [];
+            let models = [];
+            let sensorTypes = [];
+            conf.protocols.forEach(elm => {
+                const data = {
+                    value: elm.value,
+                    label: elm.label,
+                };
+                protocols.push(data);
+            });
+            setProtocols(protocols);
+            conf.models.forEach(elm => {
+                const data = {
+                    value: elm.value,
+                    label: elm.label,
+                };
+                models.push(data);
+            });
+            setModels(models);
+            conf.sensor_types.forEach(elm => {
+                const data = {
+                    value: elm.value,
+                    label: elm.label,
+                };
+                sensorTypes.push(data);
+            });
+            setDeviceTypes(sensorTypes);
+        }
     }, [selectedRow]);
 
-    const handleadd = async () => {
-        console.log(id) //selected row id
-        console.log(selectedRow); //selected row data can be observed 
+    const handleEdit = async () => {
+        let maxValues = [];
+        let minValues = [];
+        if (maxTemp != null)
+            maxValues.push(maxTemp)
+        if (maxHum != null)
+            maxValues.push(maxHum)
+        if (minTemp != null)
+            minValues.push(minTemp)
+        if (minHum != null)
+            minValues.push(minHum)
         await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
-            "types": deviceType,
-            "max_values": [maxTemp, maxHum],
+            "sensor_types": deviceType,
+            "max_values": maxValues,
+            "min_values": minValues,
             "description": descriptionValue,
             "asset_id": assetId,
         })
@@ -78,34 +131,13 @@ export default function EditDeviceDialog(props) {
                 }, 300)
             })
     }
-    const deviceTypes = [
-        {
-            value: 'temperature',
-            label: 'Temperature',
-        },
-        {
-            value: 'humidity',
-            label: 'Humidity',
-        }, {
-            value: 'temperature,humidity',
-            label: 'Temperature & Humidity',
-        },
-    ];
-    const protocols = [
-        {
-            value: 'http',
-            label: 'HTTP',
-        }, {
-            value: 'mqtt',
-            label: 'MQTT',
-        },
-    ];
-
     const handleDeviceTypeChange = (event) => {
-        if (event.target.value.includes(','))
-            setDeviceType(event.target.value.split(','));
-        else
-            setDeviceType(event.target.value.split(' '));
+        const value = event.target.value;
+        if (value[value.length - 1] === "all") {
+            setDeviceType(deviceType.length === deviceTypes.length ? [] : deviceTypes);
+            return;
+        }
+        setDeviceType(value);
     };
     const handleProtocolChange = (event) => {
         setProtocol(event.target.value);
@@ -113,8 +145,14 @@ export default function EditDeviceDialog(props) {
     const handleDescriptionChange = (event) => {
         setDescriptionValue(event.target.value);
     }
+    const handleMinTempValueChange = (event) => {
+        setMinTemp(event.target.value);
+    }
     const handleMaxTempValueChange = (event) => {
         setMaxTemp(event.target.value);
+    }
+    const handleMinHumValueChange = (event) => {
+        setMinHum(event.target.value);
     }
     const handleMaxHumValueChange = (event) => {
         setMaxHum(event.target.value);
@@ -122,16 +160,12 @@ export default function EditDeviceDialog(props) {
     const handleDeviceNameChange = (event) => {
         setDeviceName(event.target.value);
     }
-    const handleDeviceSnChange = (event) => {
-        setDeviceSn(event.target.value);
-    }
     const handleModelChange = (event) => {
         setModel(event.target.value);
     }
     const handleAssetChange = (event) => {
         setAssetId(event.target.value);
     };
-
     const getAssetsName = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
@@ -159,10 +193,47 @@ export default function EditDeviceDialog(props) {
                 console.log(error.config);
             });
     }
-
     useEffect(() => {
         getAssetsName();
     }, []);
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 250
+            }
+        },
+        getContentAnchorEl: null,
+        anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "center"
+        },
+        transformOrigin: {
+            vertical: "top",
+            horizontal: "center"
+        },
+        variant: "menu"
+    };
+    useEffect(() => {
+        if (deviceType.includes("temperature") && deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(false);
+        }
+        else if (deviceType.includes("temperature")) {
+            setTempVisibility(false);
+            setHumVisibility(true);
+        }
+        else if (deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(true);
+        }
+        else {
+            setTempVisibility(true);
+            setHumVisibility(true);
+        }
+    }, [deviceType]);
     return (
         <>
             <Snackbar
@@ -191,22 +262,8 @@ export default function EditDeviceDialog(props) {
                 {...fullWidth}
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
-                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device {deviceSn}</DialogTitle>
+                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device</DialogTitle>
                 <DialogContent>
-                    <TextFieldItem
-                        autoFocus
-                        margin="dense"
-                        id="serial-number"
-                        label="Serial Number"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={deviceSn}
-                        onChange={handleDeviceSnChange}
-                        required={true}
-                        disabled
-                        // error={true}
-                        helperText="Serial Number is required." />
                     <TextFieldItem
                         autoFocus
                         margin="dense"
@@ -240,15 +297,24 @@ export default function EditDeviceDialog(props) {
                         ))}
                     </TextFieldItem>
                     <TextFieldItem
+                        id="model"
                         autoFocus
                         margin="dense"
-                        id="model"
-                        label="Model"
-                        type="text"
+                        select
                         fullWidth
                         variant="standard"
+                        label="Model"
                         value={model}
-                        onChange={handleModelChange} />
+                        onChange={handleModelChange}
+                        helperText="Please select your model"
+                        required={true}
+                    >
+                        {models.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </TextFieldItem>
                     <TextFieldItem
                         id="protocol"
                         autoFocus
@@ -256,7 +322,7 @@ export default function EditDeviceDialog(props) {
                         select
                         fullWidth
                         variant="standard"
-                        label="Select"
+                        label="Protocol"
                         value={protocol}
                         onChange={handleProtocolChange}
                         helperText="Please select your protocol"
@@ -268,25 +334,72 @@ export default function EditDeviceDialog(props) {
                             </MenuItem>
                         ))}
                     </TextFieldItem>
+                    <FormControl fullWidth sx={{ marginTop: 2 }}>
+                        <InputLabel id="mutiple-select-label">Sensor Types</InputLabel>
+                        <Select
+                            labelId="mutiple-select-label"
+                            multiple
+                            variant="standard"
+                            value={deviceType}
+                            onChange={handleDeviceTypeChange}
+                            renderValue={(selected) => selected.join(", ")}
+                            helperText="Please select your sensor types"
+                            MenuProps={MenuProps}
+                        >
+                            {deviceTypes.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    <ListItemIcon>
+                                        <Checkbox checked={deviceType.indexOf(option.value) > -1} />
+                                    </ListItemIcon>
+                                    <ListItemText primary={option.label} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <TextFieldItem
-                        id="deviceType"
+                        id="minValuesTemp"
+                        label="Temperature - Minimum Value"
+                        type="number"
                         autoFocus
-                        margin="dense"
-                        select
+                        hidden={tempVisibility}
                         fullWidth
                         variant="standard"
-                        label="Select"
-                        value={deviceType}
-                        onChange={handleDeviceTypeChange}
-                        helperText="Please select your device type"
-                        required={true}>
-                        {deviceTypes.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextFieldItem>
-
+                        value={minTemp}
+                        onChange={handleMinTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
+                        id="maxValuesTemp"
+                        label="Temperature - Maximum Value"
+                        type="number"
+                        autoFocus
+                        fullWidth
+                        variant="standard"
+                        value={maxTemp}
+                        hidden={tempVisibility}
+                        onChange={handleMaxTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
+                        id="minValuesHum"
+                        label="Humidity - Minimum Value"
+                        type="number"
+                        autoFocus
+                        fullWidth
+                        hidden={humVisibility}
+                        variant="standard"
+                        value={minHum}
+                        onChange={handleMinHumValueChange}
+                        margin="normal" />
+                    <TextFieldItem
+                        id="maxValuesHum"
+                        label="Humidity - Maximum Value"
+                        type="number"
+                        autoFocus
+                        fullWidth
+                        hidden={humVisibility}
+                        variant="standard"
+                        value={maxHum}
+                        onChange={handleMaxHumValueChange}
+                        margin="normal" />
                     <TextFieldItem
                         id="description"
                         label="Description"
@@ -296,35 +409,14 @@ export default function EditDeviceDialog(props) {
                         value={descriptionValue}
                         onChange={handleDescriptionChange}
                         variant="standard" />
-                    <TextFieldItem
-                        id="maxValuesTemp"
-                        label="Max Temperature Values"
-                        type="number"
-                        autoFocus
-                        fullWidth
-                        variant="standard"
-                        value={maxTemp}
-                        onChange={handleMaxTempValueChange}
-                        margin="normal" />
-                    <TextFieldItem
-                        id="maxValuesHum"
-                        label="Max Humidity Values"
-                        type="number"
-                        autoFocus
-                        fullWidth
-                        variant="standard"
-                        value={maxHum}
-                        onChange={handleMaxHumValueChange}
-                        margin="normal" />
                 </DialogContent>
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleEdit} variant="contained" disabled={!(deviceName && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog>
         </>
-
     );
 }

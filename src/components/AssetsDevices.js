@@ -11,24 +11,23 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState, useEffect } from "react";
-import LineChart from "./LineChart";
+import DeviceCard from "./DeviceCard";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import io from "socket.io-client";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import Badge from "@mui/material/Badge";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
-import PriorityHighTwoToneIcon from "@mui/icons-material/PriorityHighTwoTone";
 import DoneIcon from "@mui/icons-material/Done";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import Snackbar from "@mui/material/Snackbar";
 import SnackbarContent from "@mui/material/SnackbarContent";
+import PriorityHighTwoToneIcon from "@mui/icons-material/PriorityHighTwoTone";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import CloseIcon from "@mui/icons-material/Close";
@@ -36,23 +35,11 @@ import ClearAllDeviceAlert from "./ClearEntityAlerts";
 import DeleteAllDeviceAlert from "./DeleteEntityAlerts";
 import Moment from "react-moment";
 import BalanceIcon from "@mui/icons-material/Balance";
-
-const socket = io("http://176.235.202.77:4001/", {
-  transports: ["websocket", "polling", "flashsocket"],
-});
-const temp = [];
-const hum = [];
-const tempLabel = [];
-
-const Monitor = (props) => {
+function AssetsDevices(props) {
   const { id } = useParams();
-  const [sn, setSn] = useState("");
-  const [assetName, setAssetName] = useState("");
-  const [name, setName] = useState("");
-  const [sensorTypes, setSensorTypes] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [asset, setAsset] = useState([]);
   const [selectedTab, setSelectedTab] = useState("1");
-  const [updateHeat, setUpdateHeat] = useState(0);
-  const [updateHum, setUpdateHum] = useState(0);
   const [latestAlerts, setLatestAlerts] = useState([]);
   const [latestTelemetry, setLatestTelemetry] = useState([]);
   const [dailyTelemetry, setDailyTelemetry] = useState(0);
@@ -80,39 +67,8 @@ const Monitor = (props) => {
   const [weeklyAvg, setWeeklyAvg] = useState(0);
   const [monthlyAvg, setMonthlyAvg] = useState(0);
   const [yearlyAvg, setYearlyAvg] = useState(0);
-  const [deviceType, setDeviceType] = useState("");
+  const [deviceType, setDeviceType] = useState("temperature");
   const [deviceTypes, setDeviceTypes] = useState([]);
-  const [telemetryColumn, setTelemetryColumn] = useState([]);
-  const [staticChartSelect, setStaticChartSelect] = React.useState(1);
-
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const data = [
-    { value: "temperature", text: "Temperature" },
-    { value: "humidity", text: "Humidity" },
-  ];
   const handleOpenClearAll = () => {
     setOpenClearAllDialog(true);
   };
@@ -136,186 +92,8 @@ const Monitor = (props) => {
   const handleDeviceTypeChange = (event) => {
     setDeviceType(event.target.value);
   };
-  const handleStaticChartSelectChange = (event) => {
-    setStaticChartSelect(event.target.value);
-  };
-  React.useEffect(() => {
-    getStaticGraph();
-  }, [staticChartSelect]);
-  React.useEffect(() => {
-    if (isChange) getAlerts();
-  }, [isChange]);
-  React.useEffect(() => {
-    console.log("The Device Type is : " + deviceType);
-    getTelemetryMax();
-    getTelemetryAvg();
-  }, [deviceType]);
-  React.useEffect(() => {
-    let tempTypes = [];
 
-    const tempTelemetryColumn = [
-      {
-        name: "Created At",
-        options: {
-          customBodyRender: (val) => {
-            return <Moment format="Do MMMM YYYY, h:mm:ss a">{val}</Moment>;
-          },
-        },
-      },
-    ];
-    sensorTypes.forEach((element) => {
-      tempTypes.push({ value: element, text: element });
-      tempTelemetryColumn.push({
-        name: element,
-        options: {
-          setCellProps: (value) => ({ style: { textAlign: "left" } }),
-        },
-      });
-    });
-    setTelemetryColumn(tempTelemetryColumn);
-    setDeviceTypes(tempTypes);
-    setDeviceType(sensorTypes[0]);
-  }, [sensorTypes]);
-
-  const getStaticGraph = async () => {
-    let tempHumStatic = [];
-    let tempHeatStatic = [];
-    let tempLabelStatic = [];
-    axios
-      .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/chart?sensorType=temperature&sensorType2=humidity&days=${staticChartSelect}`
-      )
-      .then((response) => {
-        response.data.chartTelemetries.forEach((elm) => {
-          if (elm.temperature != null) {
-            tempHeatStatic.push(elm.temperature);
-          }
-          if (elm.humidity != null) {
-            tempHumStatic.push(elm.humidity);
-          }
-
-          let date = new Date(elm.date);
-          let hour = date.getUTCHours();
-          let day = date.getUTCDay();
-          let month = date.getMonth();
-          let year = date.getFullYear();
-          console.log("Static chart select is : " + staticChartSelect);
-          if (staticChartSelect == 1) tempLabelStatic.push(hour + ":00");
-          else if (staticChartSelect == 7) tempLabelStatic.push(days[day]);
-          else if (staticChartSelect == 30) tempLabelStatic.push(days[day]);
-          else if (staticChartSelect == 365)
-            tempLabelStatic.push(months[month]);
-        });
-
-        setStaticHumChart({
-          labels: tempLabelStatic,
-          datasets: [
-            {
-              label: "Humidity",
-              data: tempHumStatic,
-              borderColor: "#3e95cd",
-              fill: true,
-            },
-          ],
-        });
-        setStaticTempChart({
-          labels: tempLabelStatic,
-          datasets: [
-            {
-              label: "Temperature",
-              data: tempHeatStatic,
-              borderColor: "#FF0000",
-              fill: true,
-            },
-          ],
-        });
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
-  };
-  const getDeviceInformation = async () => {
-    axios
-      .get(`http://176.235.202.77:4000/api/v1/devices/${id}`)
-      .then((response) => {
-        setSn(response.data.sn);
-        setName(response.data.name);
-        setAssetName(response.data.asset_name);
-        setSensorTypes(response.data.sensor_types);
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
-  };
-
-  const getTelemetryMax = () => {
-    axios
-      .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?sensorType=${deviceType}`
-      )
-      .then((response) => {
-        setDailyMax(response.data.daily_max);
-        setWeeklyMax(response.data.weekly_max);
-        setMonthlyMax(response.data.monthly_max);
-        setYearlyMax(response.data.yearly_max);
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
-  };
-
-  const getTelemetryAvg = () => {
-    axios
-      .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?sensorType=${deviceType}`
-      )
-      .then((response) => {
-        setDailyAvg(response.data.daily_avg);
-        setWeeklyAvg(response.data.weekly_avg);
-        setMonthlyAvg(response.data.monthly_avg);
-        setYearlyAvg(response.data.yearly_avg);
-      })
-      .catch((error) => {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      });
-  };
-  const getAlerts = async () => {
+  const getAlerts = () => {
     let alertCount = [];
     const alert = [
       { value: 1, text: "Daily Alerts" },
@@ -336,7 +114,7 @@ const Monitor = (props) => {
     setAlertCount(alertCount);
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/alerts?days=${alertValue}`
+        `http://176.235.202.77:4000/api/v1/assets/${id}/alerts?days=${alertValue}`
       )
       .then((response) => {
         setIsChange(false);
@@ -344,6 +122,7 @@ const Monitor = (props) => {
         response.data.latestAlerts.forEach((elm) => {
           const data = [
             elm.timestamptz,
+            elm.device_name,
             elm.message,
             elm.telemetry_key,
             elm.status,
@@ -373,21 +152,17 @@ const Monitor = (props) => {
       });
   };
 
-  const getTelemetries = async () => {
+  const getTelemetries = () => {
     axios
-      .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?limit=200`
-      )
+      .get(`http://176.235.202.77:4000/api/v1/assets/${id}/telemetry?limit=200`)
       .then((response) => {
         let telemetry = [];
-        console.log(response.data);
         response.data.latestTelemetry.forEach((elm) => {
-          const data = [elm.timestamptz];
-          if ("temperature" in elm.values) data.push(elm.values.temperature);
-          else data.push("-");
-          if ("humidity" in elm.values) data.push(elm.values.humidity);
-          else data.push("-");
-
+          const data = [
+            elm.timestamptz,
+            elm.device_name,
+            JSON.stringify(elm.values),
+          ];
           telemetry.push(data);
         });
         setLatestTelemetry(telemetry);
@@ -410,108 +185,154 @@ const Monitor = (props) => {
       });
   };
 
-  const [tempChart, setTempChart] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Temperature",
-        data: [],
-        borderColor: "#FF0000",
-        fill: true,
-      },
-    ],
-  });
-  const [humChart, setHumChart] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Humidity",
-        data: [],
-        borderColor: "#3e95cd",
-        fill: true,
-      },
-    ],
-  });
-  const [staticTempChart, setStaticTempChart] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Temperature",
-        data: [],
-        borderColor: "#FF0000",
-        fill: true,
-      },
-    ],
-  });
-  const [staticHumChart, setStaticHumChart] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Humidity",
-        data: [],
-        borderColor: "#3e95cd",
-        fill: true,
-      },
-    ],
-  });
+  const getTelemetryMax = () => {
+    axios
+      .get(
+        `http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/max?sensorType=${deviceType}`
+      )
+      .then((response) => {
+        setDailyMax(response.data.daily_max);
+        setWeeklyMax(response.data.weekly_max);
+        setMonthlyMax(response.data.monthly_max);
+        setYearlyMax(response.data.yearly_max);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+  const getTelemetryAvg = () => {
+    axios
+      .get(
+        `http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/avg?sensorType=${deviceType}`
+      )
+      .then((response) => {
+        setDailyAvg(response.data.daily_avg);
+        setWeeklyAvg(response.data.weekly_avg);
+        setMonthlyAvg(response.data.monthly_avg);
+        setYearlyAvg(response.data.yearly_avg);
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+  React.useEffect(() => {
+    console.log("The Device Type is : " + deviceType);
+    getTelemetryMax();
+    getTelemetryAvg();
+  }, [deviceType]);
+
+  const getAssetName = () => {
+    const assetInfo = [];
+    axios
+      .get(`http://176.235.202.77:4000/api/v1/assets/${id}`)
+      .then((response) => {
+        if (response != null) {
+          response.data.forEach((element) => {
+            const temp = {
+              id: element.id,
+              name: element.name,
+            };
+            assetInfo.push(temp);
+          });
+          setAsset(assetInfo);
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+  const getAssetDevices = () => {
+    const tempDevices = [];
+    axios
+      .get(`http://176.235.202.77:4000/api/v1/assets/${id}/devices`)
+      .then((response) => {
+        if (response != null) {
+          response.data.forEach((element) => {
+            const temp = {
+              id: element.id,
+              name: element.name,
+              sn: element.sn,
+              types: element.types,
+            };
+            tempDevices.push(temp);
+          });
+          setIsChange(false);
+          setDevices(tempDevices);
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
+
+  useEffect(() => {
+    const types = [];
+    const data = [
+      { value: "temperature", text: "Temperature" },
+      { value: "humidity", text: "Humidity" },
+    ];
+    data.map((item) => types.push(item));
+    setDeviceTypes(types);
+    getAssetName();
+    getAssetDevices();
+    getTelemetries();
+    getAlerts();
+  }, []);
+
+  useEffect(() => {
+    if (isChange) getAlerts();
+  }, [isChange]);
 
   const handleChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
-  React.useEffect(() => {
-    getDeviceInformation();
-    getAlerts();
-    getTelemetries();
-    socket.emit("telemetry_topic", id);
-    socket.on("telemetry_topic_message", function (msg) {
-      let info = JSON.parse(msg);
-      const date = new Date();
-      if (tempLabel.length > 15) {
-        tempLabel.shift();
-        if (temp.length > 0) temp.shift();
-        if (hum.length > 0) hum.shift();
-      }
-      temp.push(Number(info.values.temperature).toFixed(2));
-      hum.push(Number(info.values.humidity).toFixed(2));
-      setUpdateHeat(hum);
-      tempLabel.push(date.getHours() + ":" + date.getMinutes());
-      setUpdateHum((prev) => prev + 1);
-    });
-  }, []);
-
-  React.useEffect(() => {
-    setTempChart({
-      labels: tempLabel,
-      datasets: [
-        {
-          label: "Temperature",
-          data: temp,
-          borderColor: "#FF0000",
-          fill: true,
-        },
-      ],
-    });
-  }, [updateHeat]);
-  React.useEffect(() => {
-    setHumChart({
-      labels: tempLabel,
-      datasets: [
-        {
-          label: "Humidity",
-          data: hum,
-          borderColor: "#3e95cd",
-          fill: true,
-        },
-      ],
-    });
-  }, [updateHum]);
 
   useEffect(() => {
-    if (selectedTab == "2") getAlerts();
-    else if (selectedTab == "3") getTelemetries();
+    if (selectedTab === "2") getAlerts();
+    else if (selectedTab === "3") getTelemetries();
   }, [selectedTab]);
 
   const handleClearAlert = async (id, status) => {
+    console.log(id);
+    console.log(status);
     axios
       .put("http://176.235.202.77:4000/api/v1/alerts/" + id, {
         status: !status,
@@ -556,6 +377,7 @@ const Monitor = (props) => {
         },
       },
     },
+    { name: "Device Name" },
     { name: "Message" },
     { name: "Telemetry Key" },
     {
@@ -627,6 +449,7 @@ const Monitor = (props) => {
                   color="info"
                   onClick={() => {
                     const rowValue = latestAlerts[rowIndex];
+                    console.log(rowValue[3]);
                     handleClearAlert(rowValue[5], rowValue[3]);
                   }}
                 >
@@ -650,7 +473,27 @@ const Monitor = (props) => {
       },
     },
   ];
-
+  const telemetryColumn = [
+    {
+      name: "Created At",
+      options: {
+        customBodyRender: (val) => {
+          return <Moment format="Do MMMM YYYY, h:mm:ss a">{val}</Moment>;
+        },
+      },
+    },
+    { name: "Device Name" },
+    {
+      name: "Values",
+      options: {
+        setCellProps: (value) => ({ style: { textAlign: "left" } }),
+        setCellHeaderProps: () => ({ justifyContent: "center" }),
+        customBodyRender: (val) => {
+          return <Typography>{val}</Typography>;
+        },
+      },
+    },
+  ];
   const options = {
     filter: false,
     responsive: "standard",
@@ -674,6 +517,7 @@ const Monitor = (props) => {
       },
     },
   };
+
   return (
     <>
       <Snackbar
@@ -706,12 +550,12 @@ const Monitor = (props) => {
       </Snackbar>
       <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
         <Button
-          href="/devices"
+          href="/assets"
           variant="contained"
           startIcon={<BackspaceIcon />}
           style={{ color: "#FFF" }}
         >
-          Back to Devices
+          Back to Assets
         </Button>
       </Grid>
 
@@ -723,9 +567,9 @@ const Monitor = (props) => {
         </TabList>
 
         <TabPanel value="1">
-          <Paper sx={{ mt: 2, p: 5 }} elevation={3}>
+          <Paper sx={{ p: 3, mb: 2 }} elevation={3}>
             <Grid container spacing={2} xs={12} width={1}>
-              <Grid item xs={12} md={6} lg={2}>
+              <Grid item xs={12} md={6} lg={3}>
                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                   <Box
                     p={2}
@@ -734,75 +578,49 @@ const Monitor = (props) => {
                     alignItems={"center"}
                   >
                     <SensorsSharpIcon
-                      sx={{ fontSize: "3rem", color: "primary.main" }}
+                      sx={{ fontSize: "4rem", color: "primary.main" }}
                     />
                     <Box
                       flexDirection={"column"}
                       display={"flex"}
                       alignItems={"center"}
-                      mt={1}
+                      mx={2}
                     >
-                      <Typography variant="modal" sx={{ fontSize: "16px" }}>
-                        Device Name
-                      </Typography>
-                      <Typography
-                        mx={1}
-                        variant="side"
-                        sx={{ color: "primary.main", fontSize: "14px" }}
-                      >
-                        {name}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={6} lg={2}>
-                <Paper sx={{ bgcolor: "white" }} elevation={3}>
-                  <Box
-                    p={2}
-                    display={"flex"}
-                    flexDirection={"column"}
-                    alignItems={"center"}
-                  >
-                    <SensorsSharpIcon
-                      sx={{ fontSize: "3rem", color: "primary.main" }}
-                    />
-                    <Box
-                      flexDirection={"column"}
-                      display={"flex"}
-                      alignItems={"center"}
-                      mt={1}
-                    >
-                      <Typography variant="modal" sx={{ fontSize: "16px" }}>
+                      <Typography variant="modal" sx={{ fontSize: "18px" }}>
                         Asset Name
                       </Typography>
-                      <Typography
-                        mx={1}
-                        variant="side"
-                        sx={{ color: "primary.main", fontSize: "14px" }}
-                      >
-                        {assetName}
-                      </Typography>
+                      {asset.map((element) => {
+                        return (
+                          <Typography
+                            mx={2}
+                            mt={1}
+                            variant="side"
+                            sx={{ color: "primary.main", fontSize: "18px" }}
+                          >
+                            {" "}
+                            {element.name}
+                          </Typography>
+                        );
+                      })}
                     </Box>
                   </Box>
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={6} lg={2}>
+              <Grid item xs={12} md={6} lg={3}>
                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                   <Box
-                    p={2}
+                    p={3}
                     display={"flex"}
                     flexDirection={"column"}
                     alignItems={"center"}
                   >
                     <SensorsSharpIcon
-                      sx={{ fontSize: "3rem", color: "primary.main" }}
+                      sx={{ fontSize: "4rem", color: "primary.main" }}
                     />
                     <Box
                       display={"flex"}
                       flexDirection={"row"}
                       alignItems={"center"}
-                      mt={1}
                     >
                       <Box sx={{ marginLeft: 2 }}>
                         <FormControl variant="standard">
@@ -830,10 +648,10 @@ const Monitor = (props) => {
               <Grid item xs={12} md={6} lg={3}>
                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                   <Box
-                    p={1}
+                    p={2}
                     display={"flex"}
                     flexDirection={"row"}
-                    justifyContent={"space-around"}
+                    justifyContent={"space-between"}
                   >
                     <PriorityHighTwoToneIcon
                       sx={{
@@ -854,13 +672,13 @@ const Monitor = (props) => {
                         mb={1}
                         mt={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Daily MAX:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {dailyMax == null ? 0 : dailyMax}
                         </Typography>
@@ -871,13 +689,13 @@ const Monitor = (props) => {
                         justifyContent={"flex-start"}
                         mb={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Weekly MAX:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {weeklyMax == null ? 0 : weeklyMax}
                         </Typography>
@@ -888,13 +706,13 @@ const Monitor = (props) => {
                         justifyContent={"flex-start"}
                         mb={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Monthly MAX:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {monthlyMax == null ? 0 : monthlyMax}
                         </Typography>
@@ -903,15 +721,15 @@ const Monitor = (props) => {
                         display={"flex"}
                         flexDirection={"row"}
                         justifyContent={"flex-start"}
-                        sx={{ marginBottom: "15px" }}
+                        sx={{ marginBottom: "5px" }}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Yearly MAX:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {yearlyMax == null ? 0 : yearlyMax}
                         </Typography>
@@ -920,26 +738,26 @@ const Monitor = (props) => {
                   </Box>
                 </Paper>
               </Grid>
-
               <Grid item xs={12} md={6} lg={3}>
                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
                   <Box
                     p={1}
                     display={"flex"}
                     flexDirection={"row"}
-                    justifyContent={"space-around"}
+                    justifyContent={"space-between"}
                   >
                     <BalanceIcon
                       sx={{
                         fontSize: "3rem",
                         color: "primary.main",
-                        marginTop: 4,
+                        marginTop: 5,
                       }}
                     />
                     <Box
                       display={"flex"}
                       flexDirection={"column"}
                       justifyContent={"space-around"}
+                      p={1}
                     >
                       <Grid
                         display={"flex"}
@@ -948,13 +766,13 @@ const Monitor = (props) => {
                         mb={1}
                         mt={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Daily AVG:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {dailyAvg == null ? 0 : Number(dailyAvg).toFixed(2)}
                         </Typography>
@@ -965,13 +783,13 @@ const Monitor = (props) => {
                         justifyContent={"flex-start"}
                         mb={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Weekly AVG:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {weeklyAvg == null ? 0 : Number(weeklyAvg).toFixed(2)}
                         </Typography>
@@ -982,13 +800,13 @@ const Monitor = (props) => {
                         justifyContent={"flex-start"}
                         mb={1}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Monthly AVG:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {monthlyAvg == null
                             ? 0
@@ -999,15 +817,15 @@ const Monitor = (props) => {
                         display={"flex"}
                         flexDirection={"row"}
                         justifyContent={"flex-start"}
-                        sx={{ marginBottom: "15px" }}
+                        sx={{ marginBottom: "5px" }}
                       >
-                        <Typography variant="modal" sx={{ fontSize: "12px" }}>
+                        <Typography variant="modal" sx={{ fontSize: "15px" }}>
                           Yearly AVG:
                         </Typography>
                         <Typography
                           mx={1}
                           variant="side"
-                          sx={{ color: "primary.main", fontSize: "12px" }}
+                          sx={{ color: "primary.main", fontSize: "15px" }}
                         >
                           {yearlyAvg == null ? 0 : Number(yearlyAvg).toFixed(2)}
                         </Typography>
@@ -1016,69 +834,34 @@ const Monitor = (props) => {
                   </Box>
                 </Paper>
               </Grid>
-
-              {sensorTypes.length > 1 ? (
-                <>
-                  <Grid item xs={12} md={6}>
-                    <Paper elevation={3}>
-                      <Box
-                        display={"flex"}
-                        flexDirection={"column"}
-                        alignItems={"center"}
-                      >
-                        <LineChart
-                          id={sn}
-                          types={sensorTypes}
-                          chart={tempChart}
-                        />
-                      </Box>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Paper elevation={3}>
-                      <Box
-                        display={"flex"}
-                        flexDirection={"column"}
-                        alignItems={"center"}
-                      >
-                        <LineChart
-                          id={sn}
-                          types={sensorTypes}
-                          chart={humChart}
-                        />
-                      </Box>
-                    </Paper>
-                  </Grid>
-                </>
-              ) : sensorTypes == "temperature" ? (
-                <Grid item xs={12}>
-                  <Paper elevation={3}>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                      alignItems={"center"}
-                    >
-                      <LineChart
-                        id={sn}
-                        types={sensorTypes}
-                        chart={tempChart}
-                      />
-                    </Box>
-                  </Paper>
-                </Grid>
-              ) : (
-                <Grid item xs={12}>
-                  <Paper elevation={3}>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                      alignItems={"center"}
-                    >
-                      <LineChart id={sn} types={sensorTypes} chart={humChart} />
-                    </Box>
-                  </Paper>
-                </Grid>
-              )}
+            </Grid>
+          </Paper>
+          <Paper sx={{ p: 3 }} elevation={3}>
+            {asset.map((element) => {
+              return (
+                <Typography
+                  variant="modal"
+                  sx={{
+                    fontSize: "30px",
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: 2,
+                  }}
+                >
+                  {element.name} devices
+                </Typography>
+              );
+            })}
+            <Grid container spacing={3}>
+              {devices.map((element) => {
+                return (
+                  <DeviceCard
+                    name={element.name}
+                    status={"asset"}
+                    id={element.id}
+                  />
+                );
+              })}
             </Grid>
           </Paper>
         </TabPanel>
@@ -1300,6 +1083,7 @@ const Monitor = (props) => {
           </Paper>
           <ClearAllDeviceAlert
             open={openClearAllDialog}
+            isAsset={true}
             handleclose={handleCloseClearAll}
             fullWidth={true}
             maxWidth="md"
@@ -1308,6 +1092,7 @@ const Monitor = (props) => {
           />
           <DeleteAllDeviceAlert
             open={openDeleteAllDialog}
+            isAsset={true}
             handleclose={handleCloseDeleteAll}
             fullWidth={true}
             maxWidth="md"
@@ -1444,100 +1229,12 @@ const Monitor = (props) => {
                   options={options}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <Box sx={{ minWidth: 120 }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      Please select the duration of graph data
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={staticChartSelect}
-                      label="staticChart"
-                      onChange={handleStaticChartSelectChange}
-                      sx={{}}
-                    >
-                      <MenuItem value={1}>Last Day</MenuItem>
-                      <MenuItem value={7}>Last Week</MenuItem>
-                      <MenuItem value={30}>Last Month</MenuItem>
-                      <MenuItem value={365}>Last Year</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Grid>
-
-              {sensorTypes.length > 1 ? (
-                <>
-                  <Grid item xs={12} md={6}>
-                    <Paper elevation={3}>
-                      <Box
-                        display={"flex"}
-                        flexDirection={"column"}
-                        alignItems={"center"}
-                      >
-                        <LineChart
-                          id={sn}
-                          types={sensorTypes}
-                          chart={staticTempChart}
-                        />
-                      </Box>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Paper elevation={3}>
-                      <Box
-                        display={"flex"}
-                        flexDirection={"column"}
-                        alignItems={"center"}
-                      >
-                        <LineChart
-                          id={sn}
-                          types={sensorTypes}
-                          chart={staticHumChart}
-                        />
-                      </Box>
-                    </Paper>
-                  </Grid>
-                </>
-              ) : sensorTypes == "temperature" ? (
-                <Grid item xs={12}>
-                  <Paper elevation={3}>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                      alignItems={"center"}
-                    >
-                      <LineChart
-                        id={sn}
-                        types={sensorTypes}
-                        chart={staticTempChart}
-                      />
-                    </Box>
-                  </Paper>
-                </Grid>
-              ) : (
-                <Grid item xs={12}>
-                  <Paper elevation={3}>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                      alignItems={"center"}
-                    >
-                      <LineChart
-                        id={sn}
-                        types={sensorTypes}
-                        chart={staticHumChart}
-                      />
-                    </Box>
-                  </Paper>
-                </Grid>
-              )}
             </Grid>
           </Paper>
         </TabPanel>
       </TabContext>
     </>
   );
-};
-export default Monitor;
+}
+
+export default AssetsDevices;

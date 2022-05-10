@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function DeleteDialogBox(props) {
-    const { open, maxWidth, setIsChange, selectedRowName, selectedRowSn, selectedRowId, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, selectedRowName, selectedRowId, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
@@ -25,8 +25,7 @@ export default function DeleteDialogBox(props) {
         setSnackbarMessage(null);
     }
     const handleDelete = async () => {
-        console.log(selectedRowSn);
-        await axios.delete('http://176.235.202.77:4000/api/v1/devices/' + selectedRowId + '.' + selectedRowSn)
+        await axios.delete('http://176.235.202.77:4000/api/v1/devices/' + selectedRowId)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
                 setIsChange(true);

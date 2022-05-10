@@ -11,6 +11,9 @@ import EditAssetDialog from './EditAssetDialog';
 import DeleteAssetDialog from './DeleteAssetDialog';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
+import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
+import { Typography } from '@mui/material'
+
 
 const Assets = (props) => {
     const tenantID = props.tenantID;
@@ -22,12 +25,7 @@ const Assets = (props) => {
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
     const [isChange, setIsChange] = useState(false);
-    const handleCloseAdd = () => {
-        setOpenAddDialog(false);
-    };
-    const handleCloseEdit = () => {
-        setOpenEditDialog(false);
-    }
+
     const handleCloseDelete = () => {
         setOpenDeleteDialog(false);
     }
@@ -74,37 +72,52 @@ const Assets = (props) => {
         { name: 'Name' },
         { name: 'City' },
         { name: 'Location' },
-        { name: 'Capacity' },
+        {
+            name: 'Capacity (m²)', options: {
+                customBodyRender: (val) => {
+                    return (
+                        <Typography>{val} m²</Typography>
+                    )
+                }
+
+            }
+        },
         { name: 'Description' },
-        { name: 'Tenant', options: { display: false, viewColumns: false, filter: false } },
         {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
                     return (
                         <Box display={'flex'}
                             flexDirection={'row'}>
+                            <Tooltip title="View">
+                                <IconButton disabled={props.isCreator} sx={{ color: 'primary.main' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                    <RemoveRedEyeSharpIcon />
+                                </IconButton>
+                            </Tooltip>
                             <Tooltip title="Edit">
-                                <IconButton sx={{ color: '#14a37f' }} onClick={() => {
-                                    const rowValue = tableData[rowIndex];
-                                    setSelectedRow(rowValue);
-                                    setOpenEditDialog(true);
-                                }}>
+                                <IconButton disabled={props.isObserver} sx={{ color: '#14a37f' }}
+                                    onClick={() => {
+                                        const rowValue = tableData[rowIndex];
+                                        setSelectedRow(rowValue);
+                                        setOpenEditDialog(true);
+                                    }}>
                                     <EditIcon />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Delete">
-                                <IconButton sx={{ color: '#f44336' }} onClick={() => {
-                                    setSelectedRowId(tableData[rowIndex][0]);
-                                    setSelectedRowName(tableData[rowIndex][1]);
-                                    setOpenDeleteDialog(true);
-                                }}>
+                                <IconButton disabled={props.isObserver} sx={{ color: '#f44336' }}
+                                    onClick={() => {
+                                        setSelectedRowId(tableData[rowIndex][0]);
+                                        setSelectedRowName(tableData[rowIndex][1]);
+                                        setOpenDeleteDialog(true);
+                                    }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
-                        </Box>
-
+                        </Box >
                     )
-                }
+                },
+                setCellHeaderProps: value => ({ style: { display: 'flex', justifyContent: 'left' } }),
             }
         }
     ]
@@ -125,8 +138,8 @@ const Assets = (props) => {
                     </Fab>
                 </Tooltip>
             </Box>
-            <AddAssetDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditAssetDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} />
+            <AddAssetDialog open={openAddDialog} setOpenAddDialog={setOpenAddDialog} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditAssetDialog open={openEditDialog} setOpenEditDialog={setOpenEditDialog} fullWidth={true} maxWidth='md' setSelectedRow={setSelectedRow} selectedRow={selectedRow} setIsChange={setIsChange} />
             <DeleteAssetDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
                 selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
         </>

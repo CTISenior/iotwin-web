@@ -31,7 +31,7 @@ export default function ClearDialogBox(props) {
                 setIsChange(true);
                 setSnackbarOpen(true);
                 setAnchorElNotification(null);
-                setSnackbarMessage(response.data)
+                setSnackbarMessage(response.data);
             })
             .catch(function (error) {
                 setSnackbarColor('#ff5722');

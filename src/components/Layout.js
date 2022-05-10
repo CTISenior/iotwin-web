@@ -27,7 +27,6 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import { Link } from '@mui/material';
-import DashboardDevices from './DashboardDevices';
 import Dashboard from './Dashboard'
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
@@ -36,6 +35,9 @@ import Assets from './Assets';
 import NotificationList from './NotificationList';
 import Monitor from './Monitor';
 import Settings from './Settings';
+import Timeseries from './Timeseries/Stepper';
+import TipsAndUpdatesSharpIcon from '@mui/icons-material/TipsAndUpdatesSharp';
+import AssetsDevices from './AssetsDevices';
 
 const drawerWidth = 200;
 
@@ -96,6 +98,7 @@ export default function PersistentDrawerLeft() {
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
             { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
+            { text: "Timeseries", Icon: <TipsAndUpdatesSharpIcon fontSize='large' />, path: "/timeseries" },
             { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
@@ -103,13 +106,14 @@ export default function PersistentDrawerLeft() {
         DrawerContent = [
             { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
             { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
-            { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
         ];
     }
     else if (isObserver) {
         DrawerContent = [
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
-            { text: "Settings", Icon: <ManageAccountsSharpIcon fontSize='large' />, path: "/settings" },
+            { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
+            { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
+            { text: "Timeseries", Icon: <TipsAndUpdatesSharpIcon fontSize='large' />, path: "/timeseries" },
         ];
     }
 
@@ -299,13 +303,7 @@ export default function PersistentDrawerLeft() {
                             </PrivateRoute>
                         </>
                         } />
-                        <Route path="/dashboard/devices" element={<>
-                            <PrivateRoute>
-                                <DashboardDevices tenantID={tenantID} />
-                            </PrivateRoute>
-                        </>
-                        } />
-                        <Route path="/dashboard/monitor/:sn/:id/:name/:assetName/:types" element={<>
+                        <Route path="/dashboard/monitor/:id" element={<>
                             <PrivateRoute>
                                 <Monitor />
                             </PrivateRoute>
@@ -313,13 +311,25 @@ export default function PersistentDrawerLeft() {
                         } />
                         <Route path="/assets" element={<>
                             <PrivateRoute>
-                                <Assets tenantID={tenantID} />
+                                <Assets tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/assets/devices/:id" element={<>
+                            <PrivateRoute>
+                                <AssetsDevices isCreator={isCreator} />
                             </PrivateRoute>
                         </>
                         } />
                         <Route path="/devices" element={<>
                             <PrivateRoute>
-                                <Devices tenantID={tenantID} />
+                                <Devices tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
+                            </PrivateRoute>
+                        </>
+                        } />
+                        <Route path="/timeseries" element={<>
+                            <PrivateRoute>
+                                <Timeseries />
                             </PrivateRoute>
                         </>
                         } />

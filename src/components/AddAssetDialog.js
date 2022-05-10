@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function AddDialogBox(props) {
-    const { open, maxWidth, setIsChange, tenantID, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, tenantID, setOpenAddDialog, ...fullWidth } = props;
     const [name, setName] = useState(null);
     const [city, setCity] = useState(null);
     const [location, setLocation] = useState(null);
@@ -27,6 +27,16 @@ export default function AddDialogBox(props) {
 
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
+        setSnackbarMessage(null);
+    }
+    const handleclose = (event) => {
+        setOpenAddDialog(false);
+        setName(null);
+        setCity(null);
+        setLocation(null);
+        setCapacity(null);
+        setDescription(null);
+        setSnackbarOpen(null);
         setSnackbarMessage(null);
     }
     const handleNameChange = (event) => {
@@ -151,7 +161,7 @@ export default function AddDialogBox(props) {
                         autoFocus
                         margin="dense"
                         id="capacity"
-                        label="Capacity"
+                        label="Capacity (m²)"
                         type="number"
                         fullWidth
                         variant="standard"

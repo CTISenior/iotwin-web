@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function DeleteDialogBox(props) {
-    const { open, maxWidth, setIsChange, id, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, isAsset, setIsChange, id, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
@@ -24,7 +24,7 @@ export default function DeleteDialogBox(props) {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
-    const handleClearAll = async () => {
+    const deleteDeviceAlert = async () => {
         await axios.delete(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
@@ -36,6 +36,25 @@ export default function DeleteDialogBox(props) {
                 setSnackbarColor('#ff5722');
                 setSnackbarOpen(true);
                 setSnackbarMessage('The device alerts could not changed successfully')
+            })
+            .finally(() => {
+                setTimeout(function () {
+                    handleclose();
+                }, 300)
+            });
+    }
+    const deleteAssetAlert = async () => {
+        await axios.delete(`http://176.235.202.77:4000/api/v1/assets/${id}/alerts`)
+            .then(function (response) {
+                setSnackbarColor('#4caf50');
+                setIsChange(true);
+                setSnackbarOpen(true);
+                setSnackbarMessage(response.data)
+            })
+            .catch(function (error) {
+                setSnackbarColor('#ff5722');
+                setSnackbarOpen(true);
+                setSnackbarMessage('The asset alerts could not changed successfully')
             })
             .finally(() => {
                 setTimeout(function () {
@@ -73,17 +92,21 @@ export default function DeleteDialogBox(props) {
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
                 <DialogTitle style={{ fontWeight: 'bold' }}>
-                    {"Are you sure you want to delete all alert?"}
+                    {"Are you sure you want to delete all alerts?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        After the confirmation the device alerts and all related data will become unrecoverable.
+                        After the confirmation the alerts and all related data will become unrecoverable.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>No</Button>
-                        <Button onClick={handleClearAll} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        {isAsset ? (
+                            <Button onClick={deleteAssetAlert} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        ) : (
+                            <Button onClick={deleteDeviceAlert} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#228B22', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        )}
                     </Stack>
                 </DialogActions>
             </Dialog>

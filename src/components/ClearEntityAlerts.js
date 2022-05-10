@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
 export default function ClearDialogBox(props) {
-    const { open, maxWidth, setIsChange, id, handleclose, ...fullWidth } = props;
+    const { open, maxWidth, setIsChange, isAsset, id, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarColor, setSnackbarColor] = useState();
@@ -24,7 +24,27 @@ export default function ClearDialogBox(props) {
         setSnackbarOpen(false);
         setSnackbarMessage(null);
     }
-    const handleClearAll = async () => {
+    const clearAssetAlert = async () => {
+        await axios.put(`http://176.235.202.77:4000/api/v1/assets/${id}/alerts`)
+            .then(function (response) {
+                setSnackbarColor('#4caf50');
+                setIsChange(true);
+                setSnackbarOpen(true);
+                setSnackbarMessage(response.data)
+            })
+            .catch(function (error) {
+                setSnackbarColor('#ff5722');
+                setSnackbarOpen(true);
+                setSnackbarMessage('The asset alerts could not changed successfully')
+            })
+            .finally(() => {
+                setTimeout(function () {
+                    handleclose();
+                }, 300)
+            });
+
+    }
+    const clearDeviceAlert = async () => {
         await axios.put(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
@@ -73,17 +93,22 @@ export default function ClearDialogBox(props) {
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
                 <DialogTitle style={{ fontWeight: 'bold' }}>
-                    {"Are you sure you want to clear all device alerts?"}
+                    {"Are you sure you want to clear all alerts?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        After the confirmation the device alerts and alert status will changed.
+                        After the confirmation the alerts and alert status will changed.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>No</Button>
-                        <Button onClick={handleClearAll} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        {isAsset ? (
+                            <Button onClick={clearAssetAlert} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+
+                        ) : (
+                            <Button onClick={clearDeviceAlert} variant="contained" startIcon={<DoneIcon />} autoFocus style={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'capitalize' }}>Yes</Button>
+                        )}
                     </Stack>
                 </DialogActions>
             </Dialog>

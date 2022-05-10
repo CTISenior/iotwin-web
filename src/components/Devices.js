@@ -11,7 +11,10 @@ import AddDialog from './AddDeviceDialog';
 import EditDeviceDialog from './EditDeviceDialog';
 import DeleteDeviceDialog from './DeleteDevice';
 import Tooltip from '@mui/material/Tooltip';
-
+import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Snackbar from '@mui/material/Snackbar';
+import SnackbarContent from '@mui/material/SnackbarContent';
 const Devices = (props) => {
     const { tenantID } = props;
     const [tableData, setTableData] = useState([]);
@@ -21,23 +24,25 @@ const Devices = (props) => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
-    const [selectedRowSn, setSelectedRowSn] = useState('');
     const [isChange, setIsChange] = useState(false);
-    const [selectedRowMaxTemp, setSelectedRowMaxTemp] = useState(0);
-    const [selectedRowMaxHum, setSelectedRowMaxHum] = useState(0);
-    const [selectedDeviceType, setSelectedDeviceType] = useState([]);
+    const [selectedRowMinTemp, setSelectedRowMinTemp] = useState();
+    const [selectedRowMinHum, setSelectedRowMinHum] = useState();
+    const [selectedRowMaxTemp, setSelectedRowMaxTemp] = useState();
+    const [selectedRowMaxHum, setSelectedRowMaxHum] = useState();
+    const [selectedRowSn, setSelectedRowSn] = useState();
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarColor, setSnackbarColor] = useState();
 
-    const handleCloseAdd = () => {
-        setOpenAddDialog(false);
-    };
-    const handleCloseEdit = () => {
-        setOpenEditDialog(false);
-    }
     const handleCloseDelete = () => {
         setOpenDeleteDialog(false);
     }
     const handleOpenAdd = () => {
         setOpenAddDialog(true);
+    }
+    const snackbarClose = (event) => {
+        setSnackbarOpen(false);
+        setSnackbarMessage(null);
     }
     const getDevices = () => {
         axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`)
@@ -45,8 +50,7 @@ const Devices = (props) => {
                 // Success 🎉
                 let temp = [];
                 response.data.forEach(elm => {
-                    //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.types.join(' & '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(', '), elm.min_values.join(' - '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name];
                     temp.push(data);
                 });
                 setTableData(temp);
@@ -77,11 +81,16 @@ const Devices = (props) => {
 
     const columns = [
         { name: 'ID', options: { display: false, viewColumns: false, filter: false } },
-        { name: 'SN' },
+        { name: 'SN', options: { display: false, viewColumns: false, filter: false } },
         { name: 'Name' },
-        { name: 'Model' },
+        {
+            name: 'Model', options: {
+                setCellProps: value => ({ style: { textTransform: 'capitalize', width: '11%' } }),
+            }
+        },
         { name: 'Protocol' },
-        { name: 'Types' },
+        { name: 'Sensor Types' },
+        { name: 'Min Values' },
         { name: 'Max Values' },
         { name: 'Description' },
         { name: 'Asset ID', options: { display: false, viewColumns: false, filter: false } },
@@ -92,56 +101,65 @@ const Devices = (props) => {
                     return (
                         <Box display={'flex'}
                             flexDirection={'row'}>
-                            <Tooltip title="Edit">
-                                <IconButton sx={{ color: '#14a37f' }} onClick={() => {
-                                    const rowValue = tableData[rowIndex];
-                                    setSelectedRow(rowValue);
-                                    console.log(rowValue);
-                                    const maxValues = rowValue[6];
-                                    let splitMaxValues = maxValues.split("-");
-                                    if (splitMaxValues[0] !== undefined)
-                                        setSelectedRowMaxTemp(splitMaxValues[0].trim());
-                                    else
-                                        setSelectedRowMaxTemp(0);
-                                    if (splitMaxValues[1] !== undefined)
-                                        setSelectedRowMaxHum(splitMaxValues[1].trim());
-                                    else
-                                        setSelectedRowMaxHum(0);
-                                    let deviceType = rowValue[5];
-                                    let splitDeviceType = [];
-                                    let trimmedDeviceType = [];
-                                    if (deviceType.includes('&')) {
-                                        splitDeviceType = deviceType.split('&');
-                                        trimmedDeviceType = splitDeviceType.map(element => {
-                                            return element.trim();
-                                        });
-                                    }
-                                    else {
-                                        splitDeviceType = deviceType.split(' ');
-                                        trimmedDeviceType = splitDeviceType.map(element => {
-                                            return element.trim();
-                                        });
-                                    }
-                                    setSelectedDeviceType(trimmedDeviceType);
-                                    setOpenEditDialog(true);
-                                }}>
-                                    <EditIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                                <IconButton sx={{ color: '#f44336' }} onClick={() => {
-                                    //const rowValue = tableData[rowIndex];
-                                    console.log(tableData[rowIndex][1]);
-                                    setSelectedRowId(tableData[rowIndex][0]);
-                                    setSelectedRowSn(tableData[rowIndex][1]);
-                                    setSelectedRowName(tableData[rowIndex][2]);
-                                    setOpenDeleteDialog(true);
-                                }}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-
+                            <>
+                                <Tooltip title="View">
+                                    <IconButton disabled={props.isCreator} sx={{ color: 'primary.main' }} href={`/dashboard/monitor/${tableData[rowIndex][0]}`} >
+                                        <RemoveRedEyeSharpIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Edit">
+                                    <IconButton disabled={props.isObserver} sx={{ color: '#14a37f' }} onClick={() => {
+                                        const rowValue = tableData[rowIndex];
+                                        setSelectedRow(rowValue);
+                                        const minValues = rowValue[6];
+                                        let splitMinValues = minValues.split("-");
+                                        console.log(splitMinValues);
+                                        if (splitMinValues[0] !== undefined)
+                                            setSelectedRowMinTemp(splitMinValues[0].trim());
+                                        else
+                                            setSelectedRowMinTemp(null);
+                                        if (splitMinValues[1] !== undefined)
+                                            setSelectedRowMinHum(splitMinValues[1].trim());
+                                        else
+                                            setSelectedRowMinHum(null);
+                                        const maxValues = rowValue[7];
+                                        let splitMaxValues = maxValues.split("-");
+                                        if (splitMaxValues[0] !== undefined)
+                                            setSelectedRowMaxTemp(splitMaxValues[0].trim());
+                                        else
+                                            setSelectedRowMaxTemp(null);
+                                        if (splitMaxValues[1] !== undefined)
+                                            setSelectedRowMaxHum(splitMaxValues[1].trim());
+                                        else
+                                            setSelectedRowMaxHum(null);
+                                        setOpenEditDialog(true);
+                                    }}>
+                                        <EditIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton disabled={props.isObserver} sx={{ color: '#f44336' }} onClick={() => {
+                                        setSelectedRowId(tableData[rowIndex][0]);
+                                        setSelectedRowName(tableData[rowIndex][2]);
+                                        setOpenDeleteDialog(true);
+                                    }}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Copy Device Serial No">
+                                    <IconButton disabled={props.isObserver} sx={{ color: '#000' }}
+                                        onClick={() => {
+                                            setSelectedRowSn(tableData[rowIndex][1]);
+                                            setSnackbarColor('#4caf50');
+                                            setSnackbarOpen(true);
+                                            setSnackbarMessage("Copied to clipboard")
+                                            navigator.clipboard.writeText(selectedRowSn);
+                                        }}>
+                                        <ContentCopyIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        </Box >
                     )
                 }
             }
@@ -154,6 +172,28 @@ const Devices = (props) => {
     };
     return (
         <>
+            <Snackbar
+                open={snackbarOpen}
+                onClose={snackbarClose}
+                autoHideDuration={3000}
+            >
+                <SnackbarContent
+                    style={{
+                        backgroundColor: snackbarColor,
+                    }}
+                    message={snackbarMessage}
+                    action={[
+                        <Tooltip title="Close">
+                            <IconButton
+                                key='close'
+                                aria-label='Close'
+                                color='inherit'
+                                onClick={snackbarClose}
+                            >x</IconButton>
+                        </Tooltip>
+                    ]}
+                />
+            </Snackbar>
             <MUIDataTable
                 title={'Device List'}
                 data={tableData}
@@ -169,10 +209,10 @@ const Devices = (props) => {
                     </Fab>
                 </Tooltip>
             </Box>
-            <AddDialog open={openAddDialog} handleclose={handleCloseAdd} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
-            <EditDeviceDialog open={openEditDialog} handleclose={handleCloseEdit} fullWidth={true} maxWidth='md' selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} selectedDeviceType={selectedDeviceType} tenantID={tenantID} />
+            <AddDialog open={openAddDialog} setOpenAddDialog={setOpenAddDialog} fullWidth={true} maxWidth='md' tenantID={tenantID} setIsChange={setIsChange} />
+            <EditDeviceDialog open={openEditDialog} setOpenEditDialog={setOpenEditDialog} fullWidth={true} maxWidth='md' setSelectedRow={setSelectedRow} selectedRow={selectedRow} setIsChange={setIsChange} selectedRowMinTemp={selectedRowMinTemp} selectedRowMinHum={selectedRowMinHum} selectedRowMaxTemp={selectedRowMaxTemp} selectedRowMaxHum={selectedRowMaxHum} tenantID={tenantID} />
             <DeleteDeviceDialog open={openDeleteDialog} handleclose={handleCloseDelete} fullWidth={false} maxWidth='md'
-                selectedRowId={selectedRowId} selectedRowName={selectedRowName} selectedRowSn={selectedRowSn} setIsChange={setIsChange} />
+                selectedRowId={selectedRowId} selectedRowName={selectedRowName} setIsChange={setIsChange} />
         </>
     )
 }
