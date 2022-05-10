@@ -47,7 +47,7 @@ const DataSelectionStep = (props) => {
   }, []);
 
   return (
-    <Container sx={{ mt: 2, p: 3 }}>
+    <Box sx={{ mt: 2, p: 3 }}>
       <Grid
         sx={{ boxShadow: 5, p: 2, bgcolor: "white" }}
         container
@@ -170,7 +170,7 @@ const DataSelectionStep = (props) => {
           </Button>
         )}
       </Box>
-    </Container>
+    </Box>
   );
 };
 

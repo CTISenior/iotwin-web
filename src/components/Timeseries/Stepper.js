@@ -11,7 +11,7 @@ import PredictContainer from "./containers/PredictContainer";
 import { Box, Button, Container } from "@mui/material";
 
 function getSteps() {
-  return ["TimeSeries", "Training", "Prediction"];
+  return ["TimeSeries", "Training & Prediction"];
 }
 
 export default function UnivariateStepper() {
@@ -108,7 +108,7 @@ export default function UnivariateStepper() {
   };
 
   return (
-    <Container>
+    <>
       <Stepper activeStep={activeStep}>
         {steps.map((label) => {
           return (
@@ -132,6 +132,6 @@ export default function UnivariateStepper() {
           <Box>{getStepContent(activeStep)}</Box>
         )}
       </Box>
-    </Container>
+    </>
   );
 }

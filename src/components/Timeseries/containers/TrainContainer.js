@@ -122,7 +122,7 @@ const TrainContainer = (props) => {
   };
 
   return (
-    <Container>
+    <Box sx={{ mt: 2, p: 3 }}>
       <Grid
         container
         sx={{ mt: 2, boxShadow: 5, p: 2, bgcolor: "white" }}
@@ -205,7 +205,7 @@ const TrainContainer = (props) => {
 					</Box>)
 				} */}
       </Box>
-    </Container>
+    </Box>
   );
 };
 
