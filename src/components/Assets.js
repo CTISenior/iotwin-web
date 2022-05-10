@@ -23,12 +23,7 @@ const Assets = (props) => {
     const [selectedRowId, setSelectedRowId] = useState(0);
     const [selectedRowName, setSelectedRowName] = useState('');
     const [isChange, setIsChange] = useState(false);
-    const handleCloseAdd = () => {
-        setOpenAddDialog(false);
-    };
-    const handleCloseEdit = () => {
-        setOpenEditDialog(false);
-    }
+
     const handleCloseDelete = () => {
         setOpenDeleteDialog(false);
     }
@@ -82,31 +77,95 @@ const Assets = (props) => {
                 customBodyRenderLite: (rowIndex) => {
                     return (
                         <Box display={'flex'}
-                            flexDirection={'row'}
-                            justifyContent={'flex-start'}>
-                            <Tooltip title="View">
-                                <IconButton sx={{ color: 'primary' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
-                                    <RemoveRedEyeSharpIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Edit">
-                                <IconButton sx={{ color: '#14a37f' }} onClick={() => {
-                                    const rowValue = tableData[rowIndex];
-                                    setSelectedRow(rowValue);
-                                    setOpenEditDialog(true);
-                                }}>
-                                    <EditIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                                <IconButton sx={{ color: '#f44336' }} onClick={() => {
-                                    setSelectedRowId(tableData[rowIndex][0]);
-                                    setSelectedRowName(tableData[rowIndex][1]);
-                                    setOpenDeleteDialog(true);
-                                }}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Tooltip>
+                            flexDirection={'row'}>
+                            {props.isAdmin && (
+                                <>
+                                    <Tooltip title="View">
+                                        <IconButton sx={{ color: 'primary.main' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                            <RemoveRedEyeSharpIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Edit">
+                                        <IconButton sx={{ color: '#14a37f' }}
+                                            onClick={() => {
+                                                const rowValue = tableData[rowIndex];
+                                                setSelectedRow(rowValue);
+                                                setOpenEditDialog(true);
+                                            }}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+
+                                        <IconButton sx={{ color: '#f44336' }}
+                                            onClick={() => {
+                                                setSelectedRowId(tableData[rowIndex][0]);
+                                                setSelectedRowName(tableData[rowIndex][1]);
+                                                setOpenDeleteDialog(true);
+                                            }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                </>
+                            )}
+                            {props.isObserver && (
+                                <>
+                                    <Tooltip title="View">
+                                        <IconButton sx={{ color: 'primary.main' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
+                                            <RemoveRedEyeSharpIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Edit">
+                                        <IconButton
+                                            disabled
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+
+                                        <IconButton
+                                            disabled
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                </>
+                            )}
+                            {props.isCreator && (
+                                <>
+                                    <Tooltip title="View">
+                                        <IconButton
+                                            disabled
+                                        >
+                                            <RemoveRedEyeSharpIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Edit">
+                                        <IconButton sx={{ color: '#14a37f' }}
+                                            onClick={() => {
+                                                const rowValue = tableData[rowIndex];
+                                                setSelectedRow(rowValue);
+                                                setOpenEditDialog(true);
+                                            }}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete">
+                                        <IconButton sx={{ color: '#f44336' }}
+                                            onClick={() => {
+                                                setSelectedRowId(tableData[rowIndex][0]);
+                                                setSelectedRowName(tableData[rowIndex][1]);
+                                                setOpenDeleteDialog(true);
+                                            }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                            )}
+
                         </Box >
 
                     )

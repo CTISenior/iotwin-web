@@ -112,8 +112,9 @@ export default function PersistentDrawerLeft() {
     else if (isObserver) {
         DrawerContent = [
             { text: "Dashboard", Icon: <TimelineSharpIcon fontSize='large' />, path: "/dashboard" },
+            { text: "Assets", Icon: <ApartmentSharpIcon fontSize='large' />, path: "/assets" },
+            { text: "Devices", Icon: <SensorsSharpIcon fontSize='large' />, path: "/devices" },
             { text: "Timeseries", Icon: <TipsAndUpdatesSharpIcon fontSize='large' />, path: "/timeseries" },
-
         ];
     }
 
@@ -305,7 +306,7 @@ export default function PersistentDrawerLeft() {
                         } />
                         <Route path="/dashboard/devices" element={<>
                             <PrivateRoute>
-                                <DashboardDevices tenantID={tenantID} />
+                                <DashboardDevices tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
                             </PrivateRoute>
                         </>
                         } />
@@ -317,7 +318,7 @@ export default function PersistentDrawerLeft() {
                         } />
                         <Route path="/assets" element={<>
                             <PrivateRoute>
-                                <Assets tenantID={tenantID} />
+                                <Assets tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
                             </PrivateRoute>
                         </>
                         } />
@@ -329,7 +330,7 @@ export default function PersistentDrawerLeft() {
                         } />
                         <Route path="/devices" element={<>
                             <PrivateRoute>
-                                <Devices tenantID={tenantID} />
+                                <Devices tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
                             </PrivateRoute>
                         </>
                         } />

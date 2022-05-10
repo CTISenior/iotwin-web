@@ -18,11 +18,11 @@ const PrivateRoute = ({ children }) => {
     if (window.location.pathname === "/dashboard/devices")
         return (isAdmin || isObserver) ? children : null;
     if (window.location.pathname === "/devices")
-        return (isAdmin || isCreator) ? children : null;
+        return (isAdmin || isCreator || isObserver) ? children : null;
     if (window.location.pathname === "/assets")
-        return (isAdmin || isCreator) ? children : null;
+        return (isAdmin || isCreator || isObserver) ? children : null;
     if (window.location.pathname.includes("/assets/devices"))
-        return (isAdmin || isCreator) ? children : null;
+        return (isAdmin || isObserver) ? children : null;
     if (window.location.pathname === "/timeseries")
         return (isAdmin || isObserver) ? children : null;
     if (window.location.pathname === "/settings")
