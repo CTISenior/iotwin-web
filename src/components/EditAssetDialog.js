@@ -160,7 +160,7 @@ export default function AddDialogBox(props) {
                         autoFocus
                         margin="dense"
                         id="capacity"
-                        label="Capacity"
+                        label="Capacity (m²)"
                         type="number"
                         fullWidth
                         variant="standard"
