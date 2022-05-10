@@ -77,13 +77,13 @@ const Assets = (props) => {
         { name: 'Location' },
         { name: 'Capacity' },
         { name: 'Description' },
-        { name: 'Tenant', options: { display: false, viewColumns: false, filter: false } },
         {
             name: 'Action', options: {
                 customBodyRenderLite: (rowIndex) => {
                     return (
                         <Box display={'flex'}
-                            flexDirection={'row'}>
+                            flexDirection={'row'}
+                            justifyContent={'flex-start'}>
                             <Tooltip title="View">
                                 <IconButton sx={{ color: 'primary' }} href={`/assets/devices/${tableData[rowIndex][0]}`} >
                                     <RemoveRedEyeSharpIcon />
@@ -110,7 +110,8 @@ const Assets = (props) => {
                         </Box >
 
                     )
-                }
+                },
+                setCellHeaderProps: value => ({ style: { display: 'flex', justifyContent: 'left' } }),
             }
         }
     ]

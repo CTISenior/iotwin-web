@@ -162,10 +162,12 @@ function AssetsDevices() {
             });
     };
 
+
     const getAssetDevices = () => {
         const tempDevices = [];
         axios.get(`http://176.235.202.77:4000/api/v1/assets/${id}/devices`).then((response) => {
             if (response != null) {
+                console.log(response.data);
                 response.data.forEach(element => {
                     const temp = {
                         assetName: element.asset_name,
@@ -175,7 +177,6 @@ function AssetsDevices() {
                         types: element.types
                     };
                     tempDevices.push(temp);
-                    console.log(tempDevices);
                 });
                 setDevices(tempDevices);
             }

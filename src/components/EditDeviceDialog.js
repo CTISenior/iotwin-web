@@ -22,7 +22,9 @@ export default function EditDeviceDialog(props) {
     const { open, maxWidth, selectedRow, setSelectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setOpenEditDialog, setIsChange, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
+    const [minTemp, setMinTemp] = useState(0);
     const [maxTemp, setMaxTemp] = useState(0);
+    const [minHum, setMinHum] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState();
     const [deviceType, setDeviceType] = useState([]);
@@ -37,6 +39,8 @@ export default function EditDeviceDialog(props) {
     const [models, setModels] = useState([]);
     const [protocols, setProtocols] = useState([]);
     const [deviceTypes, setDeviceTypes] = useState([]);
+    const [tempVisibility, setTempVisibility] = useState(false);
+    const [humVisibility, setHumVisibility] = useState(false);
 
     const handleclose = (event) => {
         setOpenEditDialog(false);
@@ -130,8 +134,14 @@ export default function EditDeviceDialog(props) {
     const handleDescriptionChange = (event) => {
         setDescriptionValue(event.target.value);
     }
+    const handleMinTempValueChange = (event) => {
+        setMinTemp(event.target.value);
+    }
     const handleMaxTempValueChange = (event) => {
         setMaxTemp(event.target.value);
+    }
+    const handleMinHumValueChange = (event) => {
+        setMinHum(event.target.value);
     }
     const handleMaxHumValueChange = (event) => {
         setMaxHum(event.target.value);
@@ -198,6 +208,24 @@ export default function EditDeviceDialog(props) {
         },
         variant: "menu"
     };
+    useEffect(() => {
+        if (deviceType.includes("temperature") && deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(false);
+        }
+        else if (deviceType.includes("temperature")) {
+            setTempVisibility(false);
+            setHumVisibility(true);
+        }
+        else if (deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(true);
+        }
+        else {
+            setTempVisibility(true);
+            setHumVisibility(true);
+        }
+    }, [deviceType]);
     return (
         <>
             <Snackbar
@@ -335,6 +363,17 @@ export default function EditDeviceDialog(props) {
                         </Select>
                     </FormControl>
                     <TextFieldItem
+                        id="minValuesTemp"
+                        label="Temperature - Minimum Value"
+                        type="number"
+                        autoFocus
+                        hidden={tempVisibility}
+                        fullWidth
+                        variant="standard"
+                        value={minTemp}
+                        onChange={handleMinTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
                         id="maxValuesTemp"
                         label="Max Temperature Values"
                         type="number"
@@ -342,7 +381,19 @@ export default function EditDeviceDialog(props) {
                         fullWidth
                         variant="standard"
                         value={maxTemp}
+                        hidden={tempVisibility}
                         onChange={handleMaxTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
+                        id="minValuesHum"
+                        label="Humidity - Minimum Value"
+                        type="number"
+                        autoFocus
+                        fullWidth
+                        hidden={humVisibility}
+                        variant="standard"
+                        value={minHum}
+                        onChange={handleMinHumValueChange}
                         margin="normal" />
                     <TextFieldItem
                         id="maxValuesHum"
@@ -350,6 +401,7 @@ export default function EditDeviceDialog(props) {
                         type="number"
                         autoFocus
                         fullWidth
+                        hidden={humVisibility}
                         variant="standard"
                         value={maxHum}
                         onChange={handleMaxHumValueChange}

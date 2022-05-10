@@ -40,8 +40,9 @@ const Dashboard = (props) => {
         response.data.latestAlerts.forEach((elm) => {
           const data = [
             elm.timestamptz,
-            elm.message,
+            elm.asset_name,
             elm.device_name,
+            elm.message,
             elm.status,
             elm.telemetry_key,
             elm.severity,
@@ -52,6 +53,7 @@ const Dashboard = (props) => {
         response.data.latestTelemetry.forEach((elm) => {
           const data = [
             elm.timestamptz,
+            elm.asset_name,
             elm.device_name,
             JSON.stringify(elm.values)
           ];
@@ -99,8 +101,9 @@ const Dashboard = (props) => {
         }
       }
     },
-    { name: "Message" },
+    { name: "Asset Name" },
     { name: "Device Name" },
+    { name: "Message" },
     {
       name: "Status", options: {
         customBodyRender: (val) => {
@@ -150,6 +153,7 @@ const Dashboard = (props) => {
         }
       }
     },
+    { name: "Asset Name" },
     { name: "Device Name" },
     {
       name: "Values", options: {
@@ -354,23 +358,6 @@ const Dashboard = (props) => {
             options={options}
           />
         </Grid>
-      </Grid>
-
-      <Grid
-        item
-        xs={12}
-        md={6}
-        lg={6}
-        sx={{ justifyContent: "center", display: "flex", marginTop: 5 }}
-      >
-        <Button
-          href="/dashboard/devices"
-          variant="contained"
-          startIcon={<VisibilityIcon />}
-          style={{ color: "#FFF" }}
-        >
-          View All Devices
-        </Button>
       </Grid>
     </Container >
   );

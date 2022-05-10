@@ -20,7 +20,9 @@ import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox }
 export default function DialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, setOpenAddDialog, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
+    const [minTemp, setMinTemp] = useState(0);
     const [maxTemp, setMaxTemp] = useState(0);
+    const [minHum, setMinHum] = useState(0);
     const [maxHum, setMaxHum] = useState(0);
     const [deviceName, setDeviceName] = useState();
     const [asset, setAsset] = useState();
@@ -35,6 +37,8 @@ export default function DialogBox(props) {
     const [protocols, setProtocols] = useState([]);
     const [models, setModels] = useState([]);
     const [deviceTypes, setDeviceTypes] = useState([]);
+    const [tempVisibility, setTempVisibility] = useState(false);
+    const [humVisibility, setHumVisibility] = useState(false);
 
     const snackbarClose = (event) => {
         setSnackbarOpen(false);
@@ -46,9 +50,11 @@ export default function DialogBox(props) {
         setDeviceName(null);
         setProtocol([]);
         setAsset(null);
-        setMaxTemp(null);
+        setMinTemp(0);
+        setMaxTemp(0);
         setModel([]);
-        setMaxHum(null);
+        setMinHum(0);
+        setMaxHum(0);
         setDeviceType([]);
         setDescriptionValue(null);
     }
@@ -69,8 +75,14 @@ export default function DialogBox(props) {
     const handleDescriptionChange = (event) => {
         setDescriptionValue(event.target.value);
     }
+    const handleMinTempValueChange = (event) => {
+        setMinTemp(event.target.value);
+    }
     const handleMaxTempValueChange = (event) => {
         setMaxTemp(event.target.value);
+    }
+    const handleMinHumValueChange = (event) => {
+        setMinHum(event.target.value);
     }
     const handleMaxHumValueChange = (event) => {
         setMaxHum(event.target.value);
@@ -172,6 +184,7 @@ export default function DialogBox(props) {
             "model": model,
             "sensor_types": deviceType,
             "max_values": [maxTemp, maxHum],
+            "min_values": [minTemp, minHum],
             "description": descriptionValue,
             "asset_id": asset,
             "tenant_id": tenantID
@@ -195,6 +208,25 @@ export default function DialogBox(props) {
                 }, 500)
             })
     }
+
+    useEffect(() => {
+        if (deviceType.includes("temperature") && deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(false);
+        }
+        else if (deviceType.includes("temperature")) {
+            setTempVisibility(false);
+            setHumVisibility(true);
+        }
+        else if (deviceType.includes("humidity")) {
+            setHumVisibility(false);
+            setTempVisibility(true);
+        }
+        else {
+            setTempVisibility(true);
+            setHumVisibility(true);
+        }
+    }, [deviceType]);
 
     return (
         <>
@@ -332,14 +364,37 @@ export default function DialogBox(props) {
                         ))}
                     </TextFieldItem>
                     <TextFieldItem
+                        id="minValuesTemp"
+                        label="Temperature - Minimum Value"
+                        type="number"
+                        autoFocus
+                        hidden={tempVisibility}
+                        fullWidth
+                        variant="standard"
+                        value={minTemp}
+                        onChange={handleMinTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
                         id="maxValuesTemp"
-                        label="Max Temperature Values"
+                        label="Temperature - Maximum Value"
                         type="number"
                         autoFocus
                         fullWidth
+                        hidden={tempVisibility}
                         variant="standard"
                         value={maxTemp}
                         onChange={handleMaxTempValueChange}
+                        margin="normal" />
+                    <TextFieldItem
+                        id="minValuesHum"
+                        label="Humidity - Minimum Value"
+                        type="number"
+                        autoFocus
+                        fullWidth
+                        hidden={humVisibility}
+                        variant="standard"
+                        value={minHum}
+                        onChange={handleMinHumValueChange}
                         margin="normal" />
                     <TextFieldItem
                         id="maxValuesHum"
@@ -348,6 +403,7 @@ export default function DialogBox(props) {
                         autoFocus
                         fullWidth
                         variant="standard"
+                        hidden={humVisibility}
                         value={maxHum}
                         onChange={handleMaxHumValueChange}
                         margin="normal" />

@@ -63,12 +63,6 @@ const DashboardDevices = (props) => {
     return (
         <Container>
             <SnackbarProvider maxSnack={3}>
-                <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
-                    <Button href="/dashboard" variant="contained"
-                        startIcon={<BackspaceIcon />} style={{ color: '#FFF' }}>
-                        Back to dashboard
-                    </Button>
-                </Grid>
                 <Paper sx={{ p: 3 }} elevation={3}>
                     <Typography variant="modal" sx={{ fontSize: "30px", display: 'flex', justifyContent: 'center', marginBottom: 2 }}>All Devices</Typography>
                     <Grid container spacing={3}>

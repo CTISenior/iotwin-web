@@ -12,6 +12,8 @@ import EditDeviceDialog from './EditDeviceDialog';
 import DeleteDeviceDialog from './DeleteDevice';
 import Tooltip from '@mui/material/Tooltip';
 import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
+import { Typography } from '@mui/material'
+
 
 const Devices = (props) => {
     const { tenantID } = props;
@@ -36,9 +38,9 @@ const Devices = (props) => {
             .then((response) => {
                 // Success 🎉
                 let temp = [];
+                console.log(response.data);
                 response.data.forEach(elm => {
-                    //const data = { id: element.id, asset_id: element.asset_id, sn: element.sn, name: element.name, protocol: element.protocol, types: element.types, max_values: element.max_values, description: element.description };
-                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(', '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name,];
+                    const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(', '), elm.min_values.join(' - '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name];
                     temp.push(data);
                 });
                 setTableData(temp);
@@ -78,6 +80,7 @@ const Devices = (props) => {
         },
         { name: 'Protocol' },
         { name: 'Sensor Types' },
+        { name: 'Min Values' },
         { name: 'Max Values' },
         { name: 'Description' },
         { name: 'Asset ID', options: { display: false, viewColumns: false, filter: false } },

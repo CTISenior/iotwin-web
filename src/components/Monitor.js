@@ -588,41 +588,6 @@ const Monitor = (props) => {
                                         display={"flex"}
                                         flexDirection={"column"}
                                         alignItems={"center"}
-                                    >
-                                        <SensorsSharpIcon
-                                            sx={{ fontSize: "3rem", color: "primary.main" }}
-                                        />
-                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                                            <Box sx={{ marginLeft: 2 }}>
-                                                <FormControl variant="standard">
-                                                    <InputLabel>Sensor Type</InputLabel>
-                                                    <Select
-                                                        labelId="select-Type"
-                                                        id="select-TotalType"
-                                                        value={deviceType}
-                                                        onChange={handleDeviceTypeChange}
-                                                        autoWidth
-                                                        label="Select Device Type"
-                                                    >
-                                                        {deviceTypes.map((option) => (
-                                                            <MenuItem key={option.id} value={option.value}>
-                                                                {option.text}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={6} lg={2}>
-                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
-                                    <Box
-                                        p={2}
-                                        display={"flex"}
-                                        flexDirection={"column"}
-                                        alignItems={"center"}
 
                                     >
                                         <SensorsSharpIcon
@@ -665,7 +630,41 @@ const Monitor = (props) => {
                                     </Box>
                                 </Paper>
                             </Grid>
-
+                            <Grid item xs={12} md={6} lg={2}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={2}
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+                                    >
+                                        <SensorsSharpIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main" }}
+                                        />
+                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                                            <Box sx={{ marginLeft: 2 }}>
+                                                <FormControl variant="standard">
+                                                    <InputLabel>Sensor Type</InputLabel>
+                                                    <Select
+                                                        labelId="select-Type"
+                                                        id="select-TotalType"
+                                                        value={deviceType}
+                                                        onChange={handleDeviceTypeChange}
+                                                        autoWidth
+                                                        label="Select Device Type"
+                                                    >
+                                                        {deviceTypes.map((option) => (
+                                                            <MenuItem key={option.id} value={option.value}>
+                                                                {option.text}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
                             <Grid item xs={12} md={6} lg={3}>
                                 <Paper sx={{ bgcolor: "white" }} elevation={3}>
 
