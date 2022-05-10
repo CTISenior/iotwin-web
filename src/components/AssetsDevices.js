@@ -7,7 +7,6 @@ import { useParams } from 'react-router-dom';
 import SensorsSharpIcon from "@mui/icons-material/SensorsSharp";
 import MUIDataTable from "mui-datatables";
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import io from 'socket.io-client';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
@@ -18,19 +17,19 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from '@mui/material/SnackbarContent';
+import PriorityHighTwoToneIcon from '@mui/icons-material/PriorityHighTwoTone';
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearAllDeviceAlert from './ClearEntityAlerts';
 import DeleteAllDeviceAlert from './DeleteEntityAlerts';
 import Moment from 'react-moment';
-
-function AssetsDevices() {
+import BalanceIcon from '@mui/icons-material/Balance';
+function AssetsDevices(props) {
     const { id } = useParams();
     const [devices, setDevices] = useState([]);
+    const [asset, setAsset] = useState([]);
     const [selectedTab, setSelectedTab] = useState("1");
-    const [updateHeat, setUpdateHeat] = useState(0);
-    const [updateHum, setUpdateHum] = useState(0);
     const [latestAlerts, setLatestAlerts] = useState([]);
     const [latestTelemetry, setLatestTelemetry] = useState([]);
     const [dailyTelemetry, setDailyTelemetry] = useState(0);
@@ -50,7 +49,16 @@ function AssetsDevices() {
     const [snackbarColor, setSnackbarColor] = useState();
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-
+    const [dailyMax, setDailyMax] = useState(0);
+    const [weeklyMax, setWeeklyMax] = useState(0);
+    const [monthlyMax, setMonthlyMax] = useState(0);
+    const [yearlyMax, setYearlyMax] = useState(0);
+    const [dailyAvg, setDailyAvg] = useState(0);
+    const [weeklyAvg, setWeeklyAvg] = useState(0);
+    const [monthlyAvg, setMonthlyAvg] = useState(0);
+    const [yearlyAvg, setYearlyAvg] = useState(0);
+    const [deviceType, setDeviceType] = useState("temperature");
+    const [deviceTypes, setDeviceTypes] = useState([]);
     const handleOpenClearAll = () => {
         setOpenClearAllDialog(true);
     }
@@ -70,6 +78,9 @@ function AssetsDevices() {
     const handleAlertChange = (event) => {
         setAlertValue(event.target.value);
         setIsChange(true);
+    };
+    const handleDeviceTypeChange = (event) => {
+        setDeviceType(event.target.value);
     };
 
     const getAlerts = () => {
@@ -133,7 +144,6 @@ function AssetsDevices() {
         axios.get(`http://176.235.202.77:4000/api/v1/assets/${id}/telemetry?limit=200`)
             .then((response) => {
                 let telemetry = [];
-                console.log(response.data);
                 response.data.latestTelemetry.forEach((elm) => {
                     const data = [
                         elm.timestamptz,
@@ -162,15 +172,91 @@ function AssetsDevices() {
             });
     };
 
+    const getTelemetryMax = () => {
+        axios
+            .get(`http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/max?sensorType=${deviceType}`)
+            .then((response) => {
+                setDailyMax(response.data.daily_max);
+                setWeeklyMax(response.data.weekly_max);
+                setMonthlyMax(response.data.monthly_max);
+                setYearlyMax(response.data.yearly_max);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log("Error", error.message);
+                }
+                console.log(error.config);
+            });
+    };
+    const getTelemetryAvg = () => {
+        axios
+            .get(`http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/avg?sensorType=${deviceType}`)
+            .then((response) => {
+                setDailyAvg(response.data.daily_avg);
+                setWeeklyAvg(response.data.weekly_avg);
+                setMonthlyAvg(response.data.monthly_avg);
+                setYearlyAvg(response.data.yearly_avg);
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log(error.response.data);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                } else if (error.request) {
+                    console.log(error.request);
+                } else {
+                    console.log("Error", error.message);
+                }
+                console.log(error.config);
+            });
+    };
+
+    React.useEffect(() => {
+        console.log("The Device Type is : " + deviceType);
+        getTelemetryMax();
+        getTelemetryAvg();
+    }, [deviceType])
+
+    const getAssetName = () => {
+        const assetInfo = [];
+        axios.get(`http://176.235.202.77:4000/api/v1/assets/${id}`).then((response) => {
+            if (response != null) {
+                response.data.forEach(element => {
+                    const temp = {
+                        id: element.id,
+                        name: element.name,
+                    };
+                    assetInfo.push(temp);
+                });
+                setAsset(assetInfo);
+            }
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error.request) {
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        });
+    }
+
 
     const getAssetDevices = () => {
         const tempDevices = [];
         axios.get(`http://176.235.202.77:4000/api/v1/assets/${id}/devices`).then((response) => {
             if (response != null) {
-                console.log(response.data);
                 response.data.forEach(element => {
                     const temp = {
-                        assetName: element.asset_name,
                         id: element.id,
                         name: element.name,
                         sn: element.sn,
@@ -178,6 +264,7 @@ function AssetsDevices() {
                     };
                     tempDevices.push(temp);
                 });
+                setIsChange(false);
                 setDevices(tempDevices);
             }
         }).catch((error) => {
@@ -196,6 +283,14 @@ function AssetsDevices() {
 
 
     useEffect(() => {
+        const types = []
+        const data = [
+            { value: "temperature", text: "Temperature" },
+            { value: "humidity", text: "Humidity" },
+        ];
+        data.map((item) => types.push(item));
+        setDeviceTypes(types);
+        getAssetName();
         getAssetDevices();
         getTelemetries();
         getAlerts();
@@ -211,9 +306,9 @@ function AssetsDevices() {
     }
 
     useEffect(() => {
-        if (selectedTab == "2")
+        if (selectedTab === "2")
             getAlerts();
-        else if (selectedTab == "3")
+        else if (selectedTab === "3")
             getTelemetries();
 
     }, [selectedTab])
@@ -421,17 +516,254 @@ function AssetsDevices() {
             <TabContext value={selectedTab}>
 
                 <TabList onChange={handleChange}>
-                    <Tab label='Devices' value='1'></Tab>
+                    <Tab label='Dashboard' value='1'></Tab>
                     <Tab label='Alerts' value='2'></Tab>
                     <Tab label='Telemetry' value='3'></Tab>
                 </TabList>
 
                 <TabPanel value="1">
+                    <Paper sx={{ p: 3, mb: 2 }} elevation={3}>
+                        <Grid container spacing={2} xs={12} width={1}>
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={2}
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+
+                                    >
+                                        <SensorsSharpIcon
+                                            sx={{ fontSize: "4rem", color: "primary.main" }}
+                                        />
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"} mx={2}>
+                                            <Typography variant="modal" sx={{ fontSize: "18px" }}>Asset Name</Typography>
+                                            {asset.map(element => {
+                                                return (
+                                                    <Typography
+                                                        mx={2}
+                                                        mt={1}
+                                                        variant="side"
+                                                        sx={{ color: "primary.main", fontSize: "18px" }}
+                                                    > {element.name}
+                                                    </Typography>
+                                                )
+                                            })}
+
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={3}
+                                        display={"flex"}
+                                        flexDirection={"column"}
+                                        alignItems={"center"}
+                                    >
+                                        <SensorsSharpIcon
+                                            sx={{ fontSize: "4rem", color: "primary.main" }}
+                                        />
+                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                                            <Box sx={{ marginLeft: 2 }}>
+                                                <FormControl variant="standard">
+                                                    <InputLabel>Sensor Type</InputLabel>
+                                                    <Select
+                                                        labelId="select-Type"
+                                                        id="select-TotalType"
+                                                        value={deviceType}
+                                                        onChange={handleDeviceTypeChange}
+                                                        autoWidth
+                                                        label="Select Device Type"
+                                                    >
+                                                        {deviceTypes.map((option) => (
+                                                            <MenuItem key={option.id} value={option.value}>
+                                                                {option.text}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={2}
+                                        display={"flex"}
+                                        flexDirection={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <PriorityHighTwoToneIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 4 }}
+                                        />
+                                        <Box
+                                            display={"flex"}
+                                            flexDirection={"column"}
+                                            justifyContent={"space-around"}
+                                        >
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                                mt={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily MAX:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {dailyMax == null ? 0 : dailyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly MAX:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {weeklyMax == null ? 0 : weeklyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly MAX:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {monthlyMax == null ? 0 : monthlyMax}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                sx={{ marginBottom: '5px' }}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly MAX:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {yearlyMax == null ? 0 : yearlyMax}
+                                                </Typography>
+                                            </Grid>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={3}>
+                                <Paper sx={{ bgcolor: "white" }} elevation={3}>
+                                    <Box
+                                        p={1}
+                                        display={"flex"}
+                                        flexDirection={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <BalanceIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
+                                        />
+                                        <Box
+                                            display={"flex"}
+                                            flexDirection={"column"}
+                                            justifyContent={"space-around"}
+                                            p={1}
+                                        >
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                                mt={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Daily AVG:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {dailyAvg == null ? 0 : Number(dailyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Weekly AVG:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {weeklyAvg == null ? 0 : Number(weeklyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                mb={1}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Monthly AVG:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {monthlyAvg == null ? 0 : Number(monthlyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid
+                                                display={"flex"}
+                                                flexDirection={"row"}
+                                                justifyContent={"flex-start"}
+                                                sx={{ marginBottom: '5px' }}
+                                            >
+                                                <Typography variant="modal" sx={{ fontSize: "15px" }}>Yearly AVG:</Typography>
+                                                <Typography
+                                                    mx={1}
+                                                    variant="side"
+                                                    sx={{ color: "primary.main", fontSize: "15px" }}
+                                                >
+                                                    {yearlyAvg == null ? 0 : Number(yearlyAvg).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        </Grid>
+                    </Paper>
                     <Paper sx={{ p: 3 }} elevation={3}>
+                        {asset.map(element => {
+                            return (
+                                <Typography variant="modal" sx={{ fontSize: "30px", display: 'flex', justifyContent: 'center', marginBottom: 2 }}>{element.name} devices</Typography>
+                            )
+                        })}
                         <Grid container spacing={3}>
                             {devices.map(element => {
                                 return (
-                                    < DeviceCard name={element.name} status={"asset"} />
+                                    <DeviceCard name={element.name} status={"asset"} id={element.id} />
                                 );
                             })}
                         </Grid>

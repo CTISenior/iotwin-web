@@ -176,14 +176,14 @@ const NotificationList = (props) => {
           xs={5}
           md={5}
           lg={5}
-          sx={{ justifyContent: "space-around", display: "flex", marginTop: 2 }}
+          sx={{ justifyContent: "space-between", display: "flex", marginTop: 2 }}
         >
           {notificationList.length > 0 ? (
             <>
               <Typography variant="modal" sx={{ marginLeft: 1 }}>
                 Notifications
               </Typography>
-              <Box>
+              <Box sx={{ marginRight: 1 }}>
                 <Tooltip title="Clear All">
                   <Button variant="contained" onClick={handleOpenClearAll} color="info" startIcon={<ClearAllIcon />} style={{ color: '#FFF', textTransform: 'capitalize' }}>Clear All</Button>
                 </Tooltip>

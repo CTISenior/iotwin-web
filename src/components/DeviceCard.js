@@ -24,20 +24,11 @@ export default function DeviceCard(props) {
                         display={'flex'}
                         alignItems={'center'}
                     >
-                        {isCreator ? (
-                            <Tooltip title="Display Device Details">
-                                <IconButton disabled variant='modal' aria-label="display" href={`/dashboard/monitor/${sn}/${id}/${name}/${assetName}/${types}/`}>
-                                    <ShowChartIcon fontSize='large' />
-                                </IconButton>
-                            </Tooltip>
-                        ) : (
-                            <Tooltip title="Display Device Details">
-                                <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/`}>
-                                    <ShowChartIcon fontSize='large' />
-                                </IconButton>
-                            </Tooltip>
-                        )}
-
+                        <Tooltip title="Display Device Details">
+                            <IconButton variant='modal' aria-label="display" href={`/dashboard/monitor/${id}/`}>
+                                <ShowChartIcon fontSize='large' />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 </Box>
             </Paper>

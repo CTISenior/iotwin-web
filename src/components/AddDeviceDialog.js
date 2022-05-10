@@ -15,20 +15,20 @@ import SaveIcon from '@mui/icons-material/Save';
 import SnackbarContent from '@mui/material/SnackbarContent';
 import axios from 'axios';
 import conf from "../conf.json";
+import { v4 as uuid } from 'uuid';
 import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox } from '@mui/material';
 
 export default function DialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, setOpenAddDialog, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
-    const [minTemp, setMinTemp] = useState(0);
-    const [maxTemp, setMaxTemp] = useState(0);
-    const [minHum, setMinHum] = useState(0);
-    const [maxHum, setMaxHum] = useState(0);
+    const [minTemp, setMinTemp] = useState(null);
+    const [maxTemp, setMaxTemp] = useState(null);
+    const [minHum, setMinHum] = useState(null);
+    const [maxHum, setMaxHum] = useState(null);
     const [deviceName, setDeviceName] = useState();
     const [asset, setAsset] = useState();
     const [deviceType, setDeviceType] = useState([]);
     const [protocol, setProtocol] = useState();
-    const [deviceSn, setDeviceSn] = useState();
     const [model, setModel] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -46,15 +46,14 @@ export default function DialogBox(props) {
     }
     const handleclose = (event) => {
         setOpenAddDialog(false);
-        setDeviceSn(null);
         setDeviceName(null);
         setProtocol([]);
         setAsset(null);
-        setMinTemp(0);
-        setMaxTemp(0);
+        setMinTemp();
+        setMaxTemp();
         setModel([]);
-        setMinHum(0);
-        setMaxHum(0);
+        setMinHum();
+        setMaxHum();
         setDeviceType([]);
         setDescriptionValue(null);
     }
@@ -89,9 +88,6 @@ export default function DialogBox(props) {
     }
     const handleDeviceNameChange = (event) => {
         setDeviceName(event.target.value);
-    }
-    const handleDeviceSnChange = (event) => {
-        setDeviceSn(event.target.value);
     }
     const handleModelChange = (event) => {
         setModel(event.target.value);
@@ -176,15 +172,25 @@ export default function DialogBox(props) {
     };
 
     const handleadd = async () => {
-
+        let maxValues = [];
+        let minValues = [];
+        if (maxTemp != null)
+            maxValues.push(maxTemp)
+        if (maxHum != null)
+            maxValues.push(maxHum)
+        if (minTemp != null)
+            minValues.push(minTemp)
+        if (minHum != null)
+            minValues.push(minHum)
+        const deviceSerialNo = uuid();
         await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
-            "sn": deviceSn,
+            "sn": deviceSerialNo,
             "name": deviceName,
             "protocol": protocol,
             "model": model,
             "sensor_types": deviceType,
-            "max_values": [maxTemp, maxHum],
-            "min_values": [minTemp, minHum],
+            "max_values": maxValues,
+            "min_values": minValues,
             "description": descriptionValue,
             "asset_id": asset,
             "tenant_id": tenantID
@@ -291,18 +297,6 @@ export default function DialogBox(props) {
                         // error={true}
                         helperText="Name is required." />
                     <TextFieldItem
-                        autoFocus
-                        margin="dense"
-                        id="serial-number"
-                        label="Serial Number"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={deviceSn}
-                        onChange={handleDeviceSnChange}
-                        required={true}
-                        helperText="Serial number must be unique" />
-                    <TextFieldItem
                         id="model"
                         autoFocus
                         margin="dense"
@@ -331,7 +325,6 @@ export default function DialogBox(props) {
                             value={deviceType}
                             onChange={handleDeviceTypeChange}
                             renderValue={(selected) => selected.join(", ")}
-                            helperText="Please select your sensor types"
                             MenuProps={MenuProps}
                         >
                             {deviceTypes.map((option) => (
@@ -420,7 +413,7 @@ export default function DialogBox(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleadd} variant="contained" disabled={!(asset && deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(asset && deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleadd} variant="contained" disabled={!(asset && deviceName && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(asset && deviceName && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog >

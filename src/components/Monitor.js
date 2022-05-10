@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import Badge from '@mui/material/Badge';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
+import PriorityHighTwoToneIcon from '@mui/icons-material/PriorityHighTwoTone';
 import DoneIcon from '@mui/icons-material/Done';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
@@ -72,7 +73,6 @@ const Monitor = (props) => {
     const [deviceTypes, setDeviceTypes] = useState([]);
     const [telemetryColumn, setTelemetryColumn] = useState([]);
 
-    let type = [];
     const data = [
         { value: "temperature", text: "Temperature" },
         { value: "humidity", text: "Humidity" },
@@ -150,8 +150,6 @@ const Monitor = (props) => {
                 setName(response.data.name);
                 setAssetName(response.data.asset_name);
                 setSensorTypes(response.data.sensor_types);
-
-
             })
             .catch((error) => {
                 if (error.response) {
@@ -564,7 +562,7 @@ const Monitor = (props) => {
                 />
             </Snackbar>
             <Grid item xs={12} md={6} lg={6} sx={{ marginBottom: 2 }}>
-                <Button href="/dashboard/devices" variant="contained"
+                <Button href="/devices" variant="contained"
                     startIcon={<BackspaceIcon />} style={{ color: '#FFF' }}>
                     Back to Devices
                 </Button>
@@ -593,12 +591,12 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "3rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
-                                            <Typography variant="modal" sx={{ fontSize: "15px" }}>Device Name</Typography>
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"} mt={1}>
+                                            <Typography variant="modal" sx={{ fontSize: "16px" }}>Device Name</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
-                                                sx={{ color: "primary.main", fontSize: "15px" }}
+                                                sx={{ color: "primary.main", fontSize: "14px" }}
                                             >
                                                 {name}
                                             </Typography>
@@ -617,12 +615,12 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "3rem", color: "primary.main" }}
                                         />
-                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"}>
-                                            <Typography variant="modal" sx={{ fontSize: "15px" }}>Asset Name</Typography>
+                                        <Box flexDirection={"column"} display={"flex"} alignItems={"center"} mt={1}>
+                                            <Typography variant="modal" sx={{ fontSize: "16px" }}>Asset Name</Typography>
                                             <Typography
                                                 mx={1}
                                                 variant="side"
-                                                sx={{ color: "primary.main", fontSize: "15px" }}
+                                                sx={{ color: "primary.main", fontSize: "14px" }}
                                             >
                                                 {assetName}
                                             </Typography>
@@ -641,7 +639,7 @@ const Monitor = (props) => {
                                         <SensorsSharpIcon
                                             sx={{ fontSize: "3rem", color: "primary.main" }}
                                         />
-                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                                        <Box display={"flex"} flexDirection={"row"} alignItems={"center"} mt={1}>
                                             <Box sx={{ marginLeft: 2 }}>
                                                 <FormControl variant="standard">
                                                     <InputLabel>Sensor Type</InputLabel>
@@ -672,10 +670,10 @@ const Monitor = (props) => {
                                         p={1}
                                         display={"flex"}
                                         flexDirection={"row"}
-                                        justifyContent={"space-evenly"}
+                                        justifyContent={"space-around"}
                                     >
-                                        <NotificationsIcon
-                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
+                                        <PriorityHighTwoToneIcon
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 4 }}
                                         />
                                         <Box
                                             display={"flex"}
@@ -732,7 +730,7 @@ const Monitor = (props) => {
                                                 display={"flex"}
                                                 flexDirection={"row"}
                                                 justifyContent={"flex-start"}
-                                                sx={{ marginBottom: '5px' }}
+                                                sx={{ marginBottom: '15px' }}
                                             >
                                                 <Typography variant="modal" sx={{ fontSize: "12px" }}>Yearly MAX:</Typography>
                                                 <Typography
@@ -754,10 +752,10 @@ const Monitor = (props) => {
                                         p={1}
                                         display={"flex"}
                                         flexDirection={"row"}
-                                        justifyContent={"space-evenly"}
+                                        justifyContent={"space-around"}
                                     >
                                         <BalanceIcon
-                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 5 }}
+                                            sx={{ fontSize: "3rem", color: "primary.main", marginTop: 4 }}
                                         />
                                         <Box
                                             display={"flex"}
@@ -814,7 +812,7 @@ const Monitor = (props) => {
                                                 display={"flex"}
                                                 flexDirection={"row"}
                                                 justifyContent={"flex-start"}
-                                                sx={{ marginBottom: '5px' }}
+                                                sx={{ marginBottom: '15px' }}
                                             >
                                                 <Typography variant="modal" sx={{ fontSize: "12px" }}>Yearly AVG:</Typography>
                                                 <Typography

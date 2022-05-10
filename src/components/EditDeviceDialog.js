@@ -19,17 +19,16 @@ import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox }
 
 
 export default function EditDeviceDialog(props) {
-    const { open, maxWidth, selectedRow, setSelectedRow, tenantID, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setOpenEditDialog, setIsChange, ...fullWidth } = props;
+    const { open, maxWidth, selectedRow, setSelectedRow, tenantID, selectedRowMinTemp, selectedRowMinHum, selectedRowMaxTemp, selectedDeviceType, selectedRowMaxHum, setOpenEditDialog, setIsChange, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
     const [id, setID] = useState();
-    const [minTemp, setMinTemp] = useState(0);
-    const [maxTemp, setMaxTemp] = useState(0);
-    const [minHum, setMinHum] = useState(0);
-    const [maxHum, setMaxHum] = useState(0);
+    const [minTemp, setMinTemp] = useState();
+    const [maxTemp, setMaxTemp] = useState();
+    const [minHum, setMinHum] = useState();
+    const [maxHum, setMaxHum] = useState();
     const [deviceName, setDeviceName] = useState();
     const [deviceType, setDeviceType] = useState([]);
     const [protocol, setProtocol] = useState();
-    const [deviceSn, setDeviceSn] = useState();
     const [assetName, setAssetName] = useState([]);
     const [model, setModel] = useState();
     const [assetId, setAssetId] = useState();
@@ -54,15 +53,16 @@ export default function EditDeviceDialog(props) {
     useEffect(() => {
         if (selectedRow.length > 0) {
             setID(selectedRow[0]);
-            setDeviceSn(selectedRow[1]);
             setDeviceName(selectedRow[2]);
             setModel(selectedRow[3]);
             setProtocol(selectedRow[4]);
             setDeviceType(selectedRow[5].split(', '));
+            setMinTemp(selectedRowMinTemp);
+            setMinHum(selectedRowMinHum);
             setMaxTemp(selectedRowMaxTemp);
             setMaxHum(selectedRowMaxHum);
-            setDescriptionValue(selectedRow[7]);
-            setAssetId(selectedRow[8]);
+            setDescriptionValue(selectedRow[8]);
+            setAssetId(selectedRow[9]);
             let protocols = [];
             let models = [];
             let sensorTypes = [];
@@ -94,12 +94,23 @@ export default function EditDeviceDialog(props) {
     }, [selectedRow]);
 
     const handleEdit = async () => {
+        let maxValues = [];
+        let minValues = [];
+        if (maxTemp != null)
+            maxValues.push(maxTemp)
+        if (maxHum != null)
+            maxValues.push(maxHum)
+        if (minTemp != null)
+            minValues.push(minTemp)
+        if (minHum != null)
+            minValues.push(minHum)
         await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
             "sensor_types": deviceType,
-            "max_values": [maxTemp, maxHum],
+            "max_values": maxValues,
+            "min_values": minValues,
             "description": descriptionValue,
             "asset_id": assetId,
         })
@@ -148,9 +159,6 @@ export default function EditDeviceDialog(props) {
     }
     const handleDeviceNameChange = (event) => {
         setDeviceName(event.target.value);
-    }
-    const handleDeviceSnChange = (event) => {
-        setDeviceSn(event.target.value);
     }
     const handleModelChange = (event) => {
         setModel(event.target.value);
@@ -254,22 +262,8 @@ export default function EditDeviceDialog(props) {
                 {...fullWidth}
                 maxWidth={maxWidth}
                 aria-labelledby="responsive-dialog-title">
-                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device {deviceSn}</DialogTitle>
+                <DialogTitle style={{ backgroundColor: '#305680', padding: '16px', color: 'white' }}>Edit Device</DialogTitle>
                 <DialogContent>
-                    <TextFieldItem
-                        autoFocus
-                        margin="dense"
-                        id="serial-number"
-                        label="Serial Number"
-                        type="text"
-                        fullWidth
-                        variant="standard"
-                        value={deviceSn}
-                        onChange={handleDeviceSnChange}
-                        required={true}
-                        disabled
-                        // error={true}
-                        helperText="Serial number must be unique" />
                     <TextFieldItem
                         autoFocus
                         margin="dense"
@@ -375,7 +369,7 @@ export default function EditDeviceDialog(props) {
                         margin="normal" />
                     <TextFieldItem
                         id="maxValuesTemp"
-                        label="Max Temperature Values"
+                        label="Temperature - Maximum Value"
                         type="number"
                         autoFocus
                         fullWidth
@@ -397,7 +391,7 @@ export default function EditDeviceDialog(props) {
                         margin="normal" />
                     <TextFieldItem
                         id="maxValuesHum"
-                        label="Max Humidity Values"
+                        label="Humidity - Maximum Value"
                         type="number"
                         autoFocus
                         fullWidth
@@ -419,7 +413,7 @@ export default function EditDeviceDialog(props) {
                 <DialogActions style={{ marginTop: 30 }}>
                     <Stack direction="row" spacing={3}>
                         <Button onClick={handleclose} variant="contained" startIcon={<CancelIcon />} style={{ backgroundColor: '#f44336', color: '#FFF', textTransform: 'capitalize' }}>Cancel</Button>
-                        <Button onClick={handleEdit} variant="contained" disabled={!(deviceName && deviceSn && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceSn && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
+                        <Button onClick={handleEdit} variant="contained" disabled={!(deviceName && deviceType && protocol)} startIcon={<SaveIcon />} style={{ backgroundColor: !(deviceName && deviceType && protocol) ? 'gray' : '#4caf50', color: '#FFF', textTransform: 'capitalize' }}>Save</Button>
                     </Stack>
                 </DialogActions>
             </Dialog>

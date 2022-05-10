@@ -27,7 +27,6 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import { Link } from '@mui/material';
-import DashboardDevices from './DashboardDevices';
 import Dashboard from './Dashboard'
 import Navigation from '../helpers/Navigation';
 import PrivateRoute from '../helpers/PrivateRoute';
@@ -301,12 +300,6 @@ export default function PersistentDrawerLeft() {
                         <Route path="/dashboard" element={<>
                             <PrivateRoute>
                                 <Dashboard tenantID={tenantID} />
-                            </PrivateRoute>
-                        </>
-                        } />
-                        <Route path="/dashboard/devices" element={<>
-                            <PrivateRoute>
-                                <DashboardDevices tenantID={tenantID} isAdmin={isAdmin} isCreator={isCreator} isObserver={isObserver} />
                             </PrivateRoute>
                         </>
                         } />

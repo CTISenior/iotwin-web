@@ -15,8 +15,6 @@ const PrivateRoute = ({ children }) => {
         return (isAdmin || isObserver) ? children : null;
     if (window.location.pathname.includes("/dashboard/monitor"))
         return (isAdmin || isObserver) ? children : null;
-    if (window.location.pathname === "/dashboard/devices")
-        return (isAdmin || isObserver) ? children : null;
     if (window.location.pathname === "/devices")
         return (isAdmin || isCreator || isObserver) ? children : null;
     if (window.location.pathname === "/assets")
