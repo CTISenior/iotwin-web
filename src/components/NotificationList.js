@@ -142,7 +142,7 @@ const NotificationList = (props) => {
     <>
       <Snackbar
         anchorOrigin={{
-          vertical: ' top',
+          vertical: 'top',
           horizontal: 'center'
         }}
         open={snackbarOpen}

@@ -49,7 +49,6 @@ const Devices = (props) => {
             .then((response) => {
                 // Success 🎉
                 let temp = [];
-                console.log(response.data);
                 response.data.forEach(elm => {
                     const data = [elm.id, elm.sn, elm.name, elm.model, elm.protocol, elm.sensor_types.join(', '), elm.min_values.join(' - '), elm.max_values.join(' - '), elm.description, elm.asset_id, elm.asset_name];
                     temp.push(data);
@@ -112,7 +111,6 @@ const Devices = (props) => {
                                     <IconButton disabled={props.isObserver} sx={{ color: '#14a37f' }} onClick={() => {
                                         const rowValue = tableData[rowIndex];
                                         setSelectedRow(rowValue);
-                                        console.log(rowValue);
                                         const minValues = rowValue[6];
                                         let splitMinValues = minValues.split("-");
                                         console.log(splitMinValues);
@@ -126,7 +124,6 @@ const Devices = (props) => {
                                             setSelectedRowMinHum(null);
                                         const maxValues = rowValue[7];
                                         let splitMaxValues = maxValues.split("-");
-                                        console.log(splitMaxValues);
                                         if (splitMaxValues[0] !== undefined)
                                             setSelectedRowMaxTemp(splitMaxValues[0].trim());
                                         else
@@ -142,8 +139,6 @@ const Devices = (props) => {
                                 </Tooltip>
                                 <Tooltip title="Delete">
                                     <IconButton disabled={props.isObserver} sx={{ color: '#f44336' }} onClick={() => {
-                                        //const rowValue = tableData[rowIndex];
-                                        console.log(tableData[rowIndex][1]);
                                         setSelectedRowId(tableData[rowIndex][0]);
                                         setSelectedRowName(tableData[rowIndex][2]);
                                         setOpenDeleteDialog(true);
@@ -155,7 +150,6 @@ const Devices = (props) => {
                                     <IconButton disabled={props.isObserver} sx={{ color: '#000' }}
                                         onClick={() => {
                                             setSelectedRowSn(tableData[rowIndex][1]);
-                                            console.log(tableData[rowIndex][1]);
                                             setSnackbarColor('#4caf50');
                                             setSnackbarOpen(true);
                                             setSnackbarMessage("Copied to clipboard")
