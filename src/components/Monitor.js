@@ -85,6 +85,30 @@ const Monitor = (props) => {
   const [telemetryColumn, setTelemetryColumn] = useState([]);
   const [staticChartSelect, setStaticChartSelect] = React.useState(1);
 
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const data = [
     { value: "temperature", text: "Temperature" },
     { value: "humidity", text: "Humidity" },
@@ -116,7 +140,7 @@ const Monitor = (props) => {
     setStaticChartSelect(event.target.value);
   };
   React.useEffect(() => {
-    console.log("Static chart value is : " + staticChartSelect);
+    getStaticGraph();
   }, [staticChartSelect]);
   React.useEffect(() => {
     if (isChange) getAlerts();
@@ -153,6 +177,72 @@ const Monitor = (props) => {
     setDeviceType(sensorTypes[0]);
   }, [sensorTypes]);
 
+  const getStaticGraph = async () => {
+    let tempHumStatic = [];
+    let tempHeatStatic = [];
+    let tempLabelStatic = [];
+    axios
+      .get(
+        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/chart?sensorType=temperature&sensorType2=humidity&days=${staticChartSelect}`
+      )
+      .then((response) => {
+        response.data.chartTelemetries.forEach((elm) => {
+          if (elm.temperature != null) {
+            tempHeatStatic.push(elm.temperature);
+          }
+          if (elm.humidity != null) {
+            tempHumStatic.push(elm.humidity);
+          }
+
+          let date = new Date(elm.date);
+          let hour = date.getUTCHours();
+          let day = date.getUTCDay();
+          let month = date.getMonth();
+          let year = date.getFullYear();
+          console.log("Static chart select is : " + staticChartSelect);
+          if (staticChartSelect == 1) tempLabelStatic.push(hour + ":00");
+          else if (staticChartSelect == 7) tempLabelStatic.push(days[day]);
+          else if (staticChartSelect == 30) tempLabelStatic.push(days[day]);
+          else if (staticChartSelect == 365)
+            tempLabelStatic.push(months[month]);
+        });
+
+        setStaticHumChart({
+          labels: tempLabelStatic,
+          datasets: [
+            {
+              label: "Humidity",
+              data: tempHumStatic,
+              borderColor: "#3e95cd",
+              fill: true,
+            },
+          ],
+        });
+        setStaticTempChart({
+          labels: tempLabelStatic,
+          datasets: [
+            {
+              label: "Temperature",
+              data: tempHeatStatic,
+              borderColor: "#FF0000",
+              fill: true,
+            },
+          ],
+        });
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
+  };
   const getDeviceInformation = async () => {
     axios
       .get(`http://176.235.202.77:4000/api/v1/devices/${id}`)
