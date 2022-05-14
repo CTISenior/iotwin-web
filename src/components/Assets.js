@@ -130,7 +130,7 @@ const Assets = (props) => {
                 columns={columns}
                 options={options}
             />
-            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 14 } }}>
+            <Box sx={{ '& > :not(style)': { m: 1, float: 'right', marginRight: 1 } }}>
                 <Tooltip title="Add">
                     <Fab color='info' aria-label='add'>
                         <IconButton color='inherit' onClick={handleOpenAdd}>
