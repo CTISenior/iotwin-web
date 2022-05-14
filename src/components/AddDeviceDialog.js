@@ -18,6 +18,7 @@ import conf from "../conf.json";
 import { v4 as uuid } from 'uuid';
 import { FormControl, InputLabel, Select, ListItemIcon, ListItemText, Checkbox } from '@mui/material';
 
+
 export default function DialogBox(props) {
     const { open, maxWidth, setIsChange, tenantID, setOpenAddDialog, ...fullWidth } = props;
     const [descriptionValue, setDescriptionValue] = useState('');
@@ -93,7 +94,7 @@ export default function DialogBox(props) {
         setModel(event.target.value);
     }
     const getAssetsName = () => {
-        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
+        axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
                 // Success 🎉
                 let temp = [];
@@ -183,7 +184,7 @@ export default function DialogBox(props) {
         if (minHum != null)
             minValues.push(minHum)
         const deviceSerialNo = uuid();
-        await axios.post('http://176.235.202.77:4000/api/v1/devices/', {
+        await axios.post(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/`, {
             "sn": deviceSerialNo,
             "name": deviceName,
             "protocol": protocol,

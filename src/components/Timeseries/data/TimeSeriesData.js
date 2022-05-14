@@ -1,6 +1,6 @@
 import { DataFrame } from "danfojs";
 import axios from 'axios';
-
+import conf from '../../../conf.json';
 
 export class Configuration {
   constructor() {
@@ -60,10 +60,8 @@ export default class TimeSeriesData {
 
   async loadData(deviceID, deviceType) {
     if (deviceID != "" && deviceType != "") {
-      console.log("Device type is : " + deviceType);
-      console.log(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry/timeseries?sensorType=${deviceType}`)
 
-      const response = await axios.get(`http://176.235.202.77:4000/api/v1/devices/${deviceID}/telemetry/timeseries?sensorType=${deviceType}`);
+      const response = await axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${deviceID}/telemetry/timeseries?sensorType=${deviceType}`);
       const parsedData = JSON.parse(JSON.stringify(response.data.timeSeriesData));
 
       const df = new DataFrame(parsedData)

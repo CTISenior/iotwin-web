@@ -5,7 +5,6 @@ import io from 'socket.io-client';
 import Alert from './Alert';
 import { Box } from "@mui/system";
 import { Grid, Paper } from "@mui/material";
-const socket = io("http://176.235.202.77:4001/", { transports: ['websocket', 'polling', 'flashsocket'] })
 
 
 ChartJS.register(
@@ -19,13 +18,10 @@ ChartJS.register(
 )
 
 
-const temp = [];
-const hum = [];
-const tempLabel = [];
 
 const LineChart = (props) => {
 
-  const { id, types, disconnect, chart } = props;
+  const { chart } = props;
 
   var options = {
     responsive: true,

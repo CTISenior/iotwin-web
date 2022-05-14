@@ -9,6 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import SnackbarContent from "@mui/material/SnackbarContent";
 import { Container, Paper, Grid, Typography } from "@mui/material";
 import TextFieldItem from "./TextField";
+import conf from '../conf.json';
 
 const Settings = (props) => {
   const { tenantID, clientID } = props;
@@ -32,7 +33,7 @@ const Settings = (props) => {
 
   const handleAdd = async () => {
     await axios
-      .post("http://176.235.202.77:4000/api/v1/tenants/", {
+      .post(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/`, {
         realm_id: tenantID,
         client_id: clientID,
         name: tenantName,
@@ -58,7 +59,7 @@ const Settings = (props) => {
 
   const handleUpdate = async () => {
     await axios
-      .put("http://176.235.202.77:4000/api/v1/tenants/" + tenantID, {
+      .put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/` + tenantID, {
         name: tenantName,
         country: country,
         city: city,
@@ -82,7 +83,7 @@ const Settings = (props) => {
 
   const getSettings = () => {
     axios
-      .get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}`)
       .then((response) => {
         // Success 🎉
         console.log(response.data);

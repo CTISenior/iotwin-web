@@ -13,6 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import axios from 'axios';
 import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
+import conf from '../conf.json'
 
 export default function AddDialogBox(props) {
     const { open, maxWidth, tenantID, setIsChange, setAlertMessage, selectedRow, setOpenEditDialog, setSelectedRow, ...fullWidth } = props;
@@ -60,7 +61,7 @@ export default function AddDialogBox(props) {
     }
 
     const handleadd = async () => {
-        await axios.put('http://176.235.202.77:4000/api/v1/assets/' + id, {
+        await axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/` + id, {
             "name": name,
             "city": city,
             "location": location,

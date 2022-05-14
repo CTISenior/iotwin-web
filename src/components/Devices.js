@@ -15,6 +15,7 @@ import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from '@mui/material/SnackbarContent';
+import conf from '../conf.json';
 const Devices = (props) => {
     const { tenantID } = props;
     const [tableData, setTableData] = useState([]);
@@ -45,7 +46,7 @@ const Devices = (props) => {
         setSnackbarMessage(null);
     }
     const getDevices = () => {
-        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/devices`)
+        axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/devices`)
             .then((response) => {
                 // Success 🎉
                 let temp = [];

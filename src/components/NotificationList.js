@@ -17,6 +17,7 @@ import { Grid, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClearAllTenantAlert from './ClearAllTenantAlert';
 import Moment from 'react-moment';
+import conf from '../conf.json'
 
 const NotificationList = (props) => {
   const { anchorEl, open, handleClose, setAnchorElNotification, setAlertCount, tenantID } = props;
@@ -41,7 +42,7 @@ const NotificationList = (props) => {
 
   const getNotification = () => {
     let notificationListItem = [];
-    axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/alerts`)
+    axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/alerts`)
       .then((response) => {
         response.data.forEach(element => {
           const temp = {
@@ -123,7 +124,7 @@ const NotificationList = (props) => {
   }
 
   const handleClear = (id, status) => {
-    axios.put('http://176.235.202.77:4000/api/v1/alerts/' + id, {
+    axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id, {
       "status": !status
     })
       .then(function (response) {

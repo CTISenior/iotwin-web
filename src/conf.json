@@ -4,6 +4,18 @@
         "PORT":"8080",
         "clientId":"IoTwin-auth"
     },
+    "backend":{
+        "IP":"http://176.235.202.77",
+        "PORT":"4000"
+    },
+    "trainContainer":{
+        "IP":"http://176.235.202.76",
+        "PORT": "4005"
+    },
+    "socket":{
+        "IP":"http://176.235.202.77",
+        "PORT":"4001"
+    },
     "protocols": [
         {
             "value": "mqtt",

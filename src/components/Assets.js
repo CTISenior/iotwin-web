@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import RemoveRedEyeSharpIcon from '@mui/icons-material/RemoveRedEyeSharp';
 import { Typography } from '@mui/material'
+import conf from '../conf.json';
 
 
 const Assets = (props) => {
@@ -33,7 +34,7 @@ const Assets = (props) => {
         setOpenAddDialog(true);
     }
     const getAssets = () => {
-        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
+        axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
                 // Success 🎉
                 let temp = [];

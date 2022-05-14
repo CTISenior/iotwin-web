@@ -35,6 +35,7 @@ import ClearAllDeviceAlert from "./ClearEntityAlerts";
 import DeleteAllDeviceAlert from "./DeleteEntityAlerts";
 import Moment from "react-moment";
 import BalanceIcon from "@mui/icons-material/Balance";
+import conf from '../conf.json'
 function AssetsDevices(props) {
   const { id } = useParams();
   const [devices, setDevices] = useState([]);
@@ -114,7 +115,7 @@ function AssetsDevices(props) {
     setAlertCount(alertCount);
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/assets/${id}/alerts?days=${alertValue}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/alerts?days=${alertValue}`
       )
       .then((response) => {
         setIsChange(false);
@@ -154,7 +155,7 @@ function AssetsDevices(props) {
 
   const getTelemetries = () => {
     axios
-      .get(`http://176.235.202.77:4000/api/v1/assets/${id}/telemetry?limit=200`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/telemetry?limit=200`)
       .then((response) => {
         let telemetry = [];
         response.data.latestTelemetry.forEach((elm) => {
@@ -188,7 +189,7 @@ function AssetsDevices(props) {
   const getTelemetryMax = () => {
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/max?sensorType=${deviceType}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/telemetry/max?sensorType=${deviceType}`
       )
       .then((response) => {
         setDailyMax(response.data.daily_max);
@@ -212,7 +213,7 @@ function AssetsDevices(props) {
   const getTelemetryAvg = () => {
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/assets/${id}/telemetry/avg?sensorType=${deviceType}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/telemetry/avg?sensorType=${deviceType}`
       )
       .then((response) => {
         setDailyAvg(response.data.daily_avg);
@@ -243,7 +244,7 @@ function AssetsDevices(props) {
   const getAssetName = () => {
     const assetInfo = [];
     axios
-      .get(`http://176.235.202.77:4000/api/v1/assets/${id}`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}`)
       .then((response) => {
         if (response != null) {
           response.data.forEach((element) => {
@@ -273,7 +274,7 @@ function AssetsDevices(props) {
   const getAssetDevices = () => {
     const tempDevices = [];
     axios
-      .get(`http://176.235.202.77:4000/api/v1/assets/${id}/devices`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/devices`)
       .then((response) => {
         if (response != null) {
           response.data.forEach((element) => {
@@ -334,7 +335,7 @@ function AssetsDevices(props) {
     console.log(id);
     console.log(status);
     axios
-      .put("http://176.235.202.77:4000/api/v1/alerts/" + id, {
+      .put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id, {
         status: !status,
       })
       .then((response) => {
@@ -353,7 +354,7 @@ function AssetsDevices(props) {
 
   const handleDelete = (id) => {
     axios
-      .delete("http://176.235.202.77:4000/api/v1/alerts/" + id)
+      .delete(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id)
       .then(function (response) {
         setIsChange(true);
         setSnackbarOpen(true);

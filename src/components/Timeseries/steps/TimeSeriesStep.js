@@ -3,6 +3,7 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import { Box } from "@mui/system";
 import axios from "axios";
+import conf from '../../../conf.json'
 import {
   Button,
   Container,
@@ -17,7 +18,7 @@ const DataSelectionStep = (props) => {
   const [tableData, setTableData] = React.useState([]);
   const getDevices = () => {
     axios
-      .get(`http://176.235.202.77:4000/api/v1/tenants/ctis/devices`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/ctis/devices`)
       .then((response) => {
         // Success 🎉
         let temp = [];

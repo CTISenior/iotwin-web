@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import conf from '../conf.json'
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -13,7 +14,6 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
-
 export default function ClearDialogBox(props) {
     const { open, maxWidth, setIsChange, isAsset, id, handleclose, ...fullWidth } = props;
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -25,7 +25,7 @@ export default function ClearDialogBox(props) {
         setSnackbarMessage(null);
     }
     const clearAssetAlert = async () => {
-        await axios.put(`http://176.235.202.77:4000/api/v1/assets/${id}/alerts`)
+        await axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/assets/${id}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
                 setIsChange(true);
@@ -45,7 +45,7 @@ export default function ClearDialogBox(props) {
 
     }
     const clearDeviceAlert = async () => {
-        await axios.put(`http://176.235.202.77:4000/api/v1/devices/${id}/alerts`)
+        await axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
                 setIsChange(true);

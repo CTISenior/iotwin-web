@@ -36,8 +36,9 @@ import ClearAllDeviceAlert from "./ClearEntityAlerts";
 import DeleteAllDeviceAlert from "./DeleteEntityAlerts";
 import Moment from "react-moment";
 import BalanceIcon from "@mui/icons-material/Balance";
+import conf from '../conf.json'
 
-const socket = io("http://176.235.202.77:4001/", {
+const socket = io(`${conf.socket.IP}:${conf.socket.PORT}/`, {
   transports: ["websocket", "polling", "flashsocket"],
 });
 const temp = [];
@@ -183,7 +184,7 @@ const Monitor = (props) => {
     let tempLabelStatic = [];
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/chart?sensorType=temperature&sensorType2=humidity&days=${staticChartSelect}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/telemetry/chart?sensorType=temperature&sensorType2=humidity&days=${staticChartSelect}`
       )
       .then((response) => {
         response.data.chartTelemetries.forEach((elm) => {
@@ -245,7 +246,7 @@ const Monitor = (props) => {
   };
   const getDeviceInformation = async () => {
     axios
-      .get(`http://176.235.202.77:4000/api/v1/devices/${id}`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}`)
       .then((response) => {
         setSn(response.data.sn);
         setName(response.data.name);
@@ -269,7 +270,7 @@ const Monitor = (props) => {
   const getTelemetryMax = () => {
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/max?sensorType=${deviceType}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/telemetry/max?sensorType=${deviceType}`
       )
       .then((response) => {
         setDailyMax(response.data.daily_max);
@@ -294,7 +295,7 @@ const Monitor = (props) => {
   const getTelemetryAvg = () => {
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry/avg?sensorType=${deviceType}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/telemetry/avg?sensorType=${deviceType}`
       )
       .then((response) => {
         setDailyAvg(response.data.daily_avg);
@@ -336,7 +337,7 @@ const Monitor = (props) => {
     setAlertCount(alertCount);
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/alerts?days=${alertValue}`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/alerts?days=${alertValue}`
       )
       .then((response) => {
         setIsChange(false);
@@ -376,7 +377,7 @@ const Monitor = (props) => {
   const getTelemetries = async () => {
     axios
       .get(
-        `http://176.235.202.77:4000/api/v1/devices/${id}/telemetry?limit=200`
+        `${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/${id}/telemetry?limit=200`
       )
       .then((response) => {
         let telemetry = [];
@@ -513,7 +514,7 @@ const Monitor = (props) => {
 
   const handleClearAlert = async (id, status) => {
     axios
-      .put("http://176.235.202.77:4000/api/v1/alerts/" + id, {
+      .put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id, {
         status: !status,
       })
       .then((response) => {
@@ -532,7 +533,7 @@ const Monitor = (props) => {
 
   const handleDelete = (id) => {
     axios
-      .delete("http://176.235.202.77:4000/api/v1/alerts/" + id)
+      .delete(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id)
       .then(function (response) {
         setIsChange(true);
         setSnackbarOpen(true);

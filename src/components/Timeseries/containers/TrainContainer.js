@@ -8,7 +8,7 @@ import axios from "axios";
 import { Button, Container } from "@mui/material";
 import { Box } from "@mui/system";
 import { CircularProgress } from "@mui/material";
-
+import conf from '../../../conf.json';
 const PrettoSlider = withStyles({
   root: {
     color: "#52af77",
@@ -95,7 +95,7 @@ const TrainContainer = (props) => {
     console.log("TrainBtn");
     setLoading(true);
     axios
-      .post(`http://176.235.202.76:4005/api/v1/timeseries/predict`, {
+      .post(`${conf.trainContainer.IP}:${conf.trainContainer.PORT}/api/v1/timeseries/predict`, {
         trainData: tsdata,
         epochs: epochs,
         lags: lags,

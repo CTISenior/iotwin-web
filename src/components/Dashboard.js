@@ -11,6 +11,7 @@ import Badge from "@mui/material/Badge";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import Moment from "react-moment";
+import conf from '../conf.json';
 
 const Dashboard = (props) => {
   const { tenantID } = props;
@@ -24,7 +25,7 @@ const Dashboard = (props) => {
   const [yearlyAlert, setYearlyAlert] = useState(0);
   const getDashboard = () => {
     axios
-      .get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/dashboard`)
+      .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/dashboard`)
       .then((response) => {
         // Success 🎉
         console.log(response.data);

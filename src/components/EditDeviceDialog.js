@@ -104,7 +104,7 @@ export default function EditDeviceDialog(props) {
             minValues.push(minTemp)
         if (minHum != null)
             minValues.push(minHum)
-        await axios.put('http://176.235.202.77:4000/api/v1/devices/' + id, {
+        await axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/devices/` + id, {
             "name": deviceName,
             "protocol": protocol,
             "model": model,
@@ -167,7 +167,7 @@ export default function EditDeviceDialog(props) {
         setAssetId(event.target.value);
     };
     const getAssetsName = () => {
-        axios.get(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/assets`)
+        axios.get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/assets`)
             .then((response) => {
                 // Success 🎉
                 let temp = [];

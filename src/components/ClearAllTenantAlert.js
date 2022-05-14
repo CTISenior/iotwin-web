@@ -25,7 +25,7 @@ export default function ClearDialogBox(props) {
         setSnackbarMessage(null);
     }
     const handleClearAll = async () => {
-        await axios.put(`http://176.235.202.77:4000/api/v1/tenants/${tenantID}/alerts`)
+        await axios.put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/alerts`)
             .then(function (response) {
                 setSnackbarColor('#4caf50');
                 setIsChange(true);
