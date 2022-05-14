@@ -69,7 +69,6 @@ const Devices = (props) => {
                 }
                 console.log(error.config);
             });
-        console.log("Table data is : " + tableData);
     }
 
     useEffect(() => {
@@ -114,7 +113,6 @@ const Devices = (props) => {
                                         setSelectedRow(rowValue);
                                         const minValues = rowValue[6];
                                         let splitMinValues = minValues.split("-");
-                                        console.log(splitMinValues);
                                         if (splitMinValues[0] !== undefined)
                                             setSelectedRowMinTemp(splitMinValues[0].trim());
                                         else

@@ -236,7 +236,6 @@ function AssetsDevices(props) {
   };
 
   React.useEffect(() => {
-    console.log("The Device Type is : " + deviceType);
     getTelemetryMax();
     getTelemetryAvg();
   }, [deviceType]);
@@ -332,8 +331,6 @@ function AssetsDevices(props) {
   }, [selectedTab]);
 
   const handleClearAlert = async (id, status) => {
-    console.log(id);
-    console.log(status);
     axios
       .put(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/alerts/` + id, {
         status: !status,
@@ -450,7 +447,6 @@ function AssetsDevices(props) {
                   color="info"
                   onClick={() => {
                     const rowValue = latestAlerts[rowIndex];
-                    console.log(rowValue[3]);
                     handleClearAlert(rowValue[5], rowValue[3]);
                   }}
                 >

@@ -147,7 +147,6 @@ const Monitor = (props) => {
     if (isChange) getAlerts();
   }, [isChange]);
   React.useEffect(() => {
-    console.log("The Device Type is : " + deviceType);
     getTelemetryMax();
     getTelemetryAvg();
   }, [deviceType]);
@@ -200,7 +199,6 @@ const Monitor = (props) => {
           let day = date.getUTCDay();
           let month = date.getMonth();
           let year = date.getFullYear();
-          console.log("Static chart select is : " + staticChartSelect);
           if (staticChartSelect == 1) tempLabelStatic.push(hour + ":00");
           else if (staticChartSelect == 7) tempLabelStatic.push(days[day]);
           else if (staticChartSelect == 30) tempLabelStatic.push(days[day]);
@@ -381,7 +379,6 @@ const Monitor = (props) => {
       )
       .then((response) => {
         let telemetry = [];
-        console.log(response.data);
         response.data.latestTelemetry.forEach((elm) => {
           const data = [elm.timestamptz];
           if ("temperature" in elm.values) data.push(elm.values.temperature);

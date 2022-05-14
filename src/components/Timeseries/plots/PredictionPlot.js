@@ -15,23 +15,6 @@ const PredictionPlot = props => {
   const datasets = props.datasets;
   let chart = useRef(null);
 
-  console.log(datasets)
-
-  // date
-  //let last_date = new Date(datasets[0]["X"][datasets[0]["X"].length - 1]);
-  //console.log(last_date)
-  
-
-  /*let last_date = new Date(datasets[1]["X"][datasets[1]["X"].length - 1]);
-  console.log("11111111")
-  console.log(datasets[1]["X"][datasets[1]["X"].length - 1])
-  console.log(last_date)
-  last_date = addHours(1, last_date)
-  console.log("000000000")
-  console.log(last_date);
-  datasets[1]["X"][datasets[1]["X"].length] = last_date;*/
-  
-
   useEffect(() => {
     Plotly.Plots.resize("plotlyChart");
   }, []);

@@ -1,19 +1,19 @@
 {
     "keycloak":{
-        "IP":"http://176.235.202.77",
+        "IP":"keycloakIP",
         "PORT":"8080",
         "clientId":"IoTwin-auth"
     },
     "backend":{
-        "IP":"http://176.235.202.77",
+        "IP":"backendIP",
         "PORT":"4000"
     },
-    "trainContainer":{
-        "IP":"http://176.235.202.76",
+    "timeSeries":{
+        "IP":"timeSeriesIP",
         "PORT": "4005"
     },
     "socket":{
-        "IP":"http://176.235.202.77",
+        "IP":"socketIP",
         "PORT":"4001"
     },
     "protocols": [

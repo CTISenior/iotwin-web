@@ -26,7 +26,6 @@ const DataSelectionStep = (props) => {
           const data = { id: elm.id, name: elm.name, types: elm.sensor_types };
           temp.push(data);
         });
-        console.log(temp);
         setTableData(temp);
       })
       .catch((error) => {

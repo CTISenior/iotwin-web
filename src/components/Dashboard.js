@@ -28,7 +28,6 @@ const Dashboard = (props) => {
       .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}/dashboard`)
       .then((response) => {
         // Success 🎉
-        console.log(response.data);
         setTotalAssets(response.data.entityCount.asset_count);
         setTotalDevice(response.data.entityCount.device_count);
         let alerts = [];

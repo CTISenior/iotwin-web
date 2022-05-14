@@ -47,7 +47,6 @@ export default function UnivariateStepper() {
     setUrl(url);
   };
   const handleTypeChanged = (type) => {
-    console.log("Type is : " + JSON.stringify(type));
     setType(type);
   };
 
@@ -69,7 +68,6 @@ export default function UnivariateStepper() {
         X_label: "date",
         y_label: type,
       });
-      console.log(tsdata);
       setFetched(true);
       setTSData(tsdata);
     });

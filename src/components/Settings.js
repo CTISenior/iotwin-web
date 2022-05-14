@@ -86,7 +86,6 @@ const Settings = (props) => {
       .get(`${conf.backend.IP}:${conf.backend.PORT}/api/v1/tenants/${tenantID}`)
       .then((response) => {
         // Success 🎉
-        console.log(response.data);
         setAddress(response.data.address);
         setCity(response.data.city);
         setEmail(response.data.email);

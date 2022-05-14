@@ -92,18 +92,14 @@ const TrainContainer = (props) => {
 
     setTrainStatus(false);
 
-    console.log("TrainBtn");
     setLoading(true);
     axios
-      .post(`${conf.trainContainer.IP}:${conf.trainContainer.PORT}/api/v1/timeseries/predict`, {
+      .post(`${conf.timeSeries.IP}:${conf.timeSeries.PORT}/api/v1/timeseries/predict`, {
         trainData: tsdata,
         epochs: epochs,
         lags: lags,
       })
       .then(function (response) {
-        console.log(response);
-        console.log(response.data.lastEpoch);
-        console.log(response.data.status);
         setLoading(false);
         setPredictions(response.data.predData);
         setTrained(true);
@@ -116,8 +112,6 @@ const TrainContainer = (props) => {
   };
 
   const handlePredict = (event) => {
-    console.log(props.tsdata);
-    console.log(props.tsdata.X);
     props.setPredicted(true);
   };
 
@@ -199,11 +193,7 @@ const TrainContainer = (props) => {
         <Button color="primary" onClick={props.handleReset} variant="contained">
           Reset
         </Button>
-        {/* {loading && (
-					<Box display={"flex"}>
-						<CircularProgress />
-					</Box>)
-				} */}
+    
       </Box>
     </Box>
   );

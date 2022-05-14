@@ -79,7 +79,6 @@ export default class TimeSeriesData {
     let self = this;
     return new Promise(resolve => {
       if (self.data == null || self.data == []) {
-        console.log("This is null");
       } else {
         self.x = self.data['date'].values
           .map(item => new Date(Date.parse(item)));
