@@ -13,6 +13,7 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import SnackbarContent from '@mui/material/SnackbarContent';
+import conf from '../conf.json'
 
 export default function ClearDialogBox(props) {
     const { open, maxWidth, setIsChange, setAnchorElNotification, tenantID, handleclose, ...fullWidth } = props;
