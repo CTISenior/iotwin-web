@@ -12,5 +12,3 @@
 ![Web04](/assets/web04.jpg)
 
 ![Web05](/assets/web05.jpg)
-
-![Web06](/assets/web06.jpg)
